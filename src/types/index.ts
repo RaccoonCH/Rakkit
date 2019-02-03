@@ -1,9 +1,15 @@
-export * from "./App/IConfig";
-export * from "./App/IMain";
+export * from "./Core/IAppConfig";
+export * from "./Core/IMain";
 
-export * from "./FrontTypes/Package";
+export * from "./Decorators/IDecorator";
+export * from "./Decorators/Front/IAttribute";
+export * from "./Decorators/Front/IPackage";
+export * from "./Decorators/Routing/IEndpoint";
+export * from "./Decorators/Routing/IGet";
+export * from "./Decorators/Routing/IMiddleware";
+export * from "./Decorators/Routing/IRouter";
+
 export * from "./FrontTypes/FrontType";
-export * from "./FrontTypes/TypeParams";
 export * from "./FrontTypes/Number/INumber";
 export * from "./FrontTypes/Text/IText";
 export * from "./FrontTypes/Text/Html";

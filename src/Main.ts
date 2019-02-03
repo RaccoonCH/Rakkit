@@ -5,19 +5,18 @@ import * as Express from "express";
 import * as jwt from "express-jwt";
 import * as Path from "path";
 import * as Cors from "cors";
-import { getConnectionOptions, createConnection } from "typeorm";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
 import { ApolloServer } from "apollo-server-express";
 import { createServer, Server } from "http";
-import { IPackage, FrontType, TypeParams, IMain } from "@types";
-import { AppLoader } from "@logic";
-import { config } from "@config";
+import { IMain } from "@types";
+import { AppLoader, DecoratorStorage } from "@logic";
+import { config } from "@app/RakkitConfig";
 import { Color } from "@misc";
 import { GetableUser } from "@api/User/Types/GetableUser";
 
 export class Main extends AppLoader {
-  private static _instance: Main;
+  protected static _instance: Main;
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
@@ -28,8 +27,6 @@ export class Main extends AppLoader {
   private _httpServer: Server;
   private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
-  private _rps: IPackage[] = [];
-  private _rpsAttributes: Map<string, Array<TypeParams & FrontType>> = new Map();
 
   static get Instance(): Main {
     return this._instance;
@@ -51,58 +48,29 @@ export class Main extends AppLoader {
    * Start the application (Express, GraphQL, ...)
    */
   static async start(params?: IMain): Promise<Main> {
+    await DecoratorStorage.Instance.BuildAll();
+
+    config.controllers.map(router => router);
+
     if (!this.Instance) {
       this._instance = new Main(params || {});
     }
-    try {
-      // Get ormconfig.ts file content and create the connection to the database
-      await createConnection(await getConnectionOptions());
-      // Start Rest service and GraphQL
-      await this.Instance.startAllServices();
-    } catch (err) {
-      console.log(err);
+    if (config.ormConnection) {
+      try {
+        await config.ormConnection();
+      } catch (err) {
+        console.log(err);
+      }
     }
+    this.Instance.startAllServices();
     return this.Instance;
-  }  
+  }
 
   /**
    * Restart REST and GraphQL service
    */
   async Restart() {
     return this.startAllServices();
-  }
-
-  /**
-   * Add the rakkitPackage to the RP list to provide it
-   * @param rp The RPackage passed in params into the decorator
-   */
-  AddRp(rp: IPackage) {
-    this._rps.push({
-      ...rp,
-      attributes: this._rpsAttributes.get(rp.className)
-    });
-  }
-
-  /**
-   * This function is called by the Attributes decorator
-   * /!\ It's called before addRp
-   * @param className the classname that call the function
-   * @param key the property name
-   * @param rakkitFrontType the parameter in the decorator parameter
-   */
-  AddRpAttribute(
-    className: string,
-    key: string,
-    rakkitFrontType: FrontType,
-    rakkitAttributeParams: TypeParams
-  ) {
-    const rpAttributes = this._rpsAttributes.get(className) || [];
-    rpAttributes.push({
-      name: key,
-      ...rakkitAttributeParams,
-      ...rakkitFrontType
-    });
-    this._rpsAttributes.set(className, rpAttributes);
   }
 
   private async startAllServices() {
@@ -113,10 +81,22 @@ export class Main extends AppLoader {
   private async startRest() {
     return new Promise<void>((resolve) => {
       // Load the application (all RakkitPackage)
-      this.Load();
-      this.ExpressRouter.use("/", (req, res) => {
-        res.send(this._rps);
+      // this.Load();
+      const expressRouter = Express.Router();
+      DecoratorStorage.Instance.Routers.map((router) => {
+        router.endpoints.map((endpoint) => {
+          expressRouter[endpoint.method.toLowerCase()](
+            `/${router.path}${endpoint.endpoint}`,
+            ...endpoint.functions
+          );
+        });
       });
+
+      if (DecoratorStorage.Instance.Packages) {
+        this.ExpressRouter.use("/", (req, res) => {
+          res.send(DecoratorStorage.Instance.Packages);
+        });
+      }
 
       if (this._corsEnabled) {
         this._expressApp.use(Cors());
@@ -128,16 +108,21 @@ export class Main extends AppLoader {
       this._expressApp.use("/", Express.static(this._publicPath));
 
       // Load the api returned router into the /[restEndpoint] route
-      this._expressApp.use(this._restEndpoint, this.ExpressRouter);
+      this._expressApp.use(this._restEndpoint, expressRouter);
 
       // Use jwt auth middleware
       this._expressApp.use(jwt({
-        secret: config.secret,
+        secret: config.jwtSecret,
         credentialsRequired: false
       }));
 
       // Invalid token error response
-      this._expressApp.use((err: Express.ErrorRequestHandler, req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+      this._expressApp.use((
+        err: Express.ErrorRequestHandler,
+        req: Express.Request,
+        res: Express.Response,
+        next: Express.NextFunction
+      ) => {
         if (err.name === "UnauthorizedError") {
           res.status(401).send("unauthorized");
         } else {
@@ -158,7 +143,7 @@ export class Main extends AppLoader {
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
     const schema: GraphQLSchema = await TypeGraphQL.buildSchema({
-      resolvers: this.Resolvers,
+      resolvers: config.controllers,
       authChecker: ({ context }, roles) =>  {
         const user: GetableUser = context.req.user;
         if (user) {
@@ -201,4 +186,4 @@ export class Main extends AppLoader {
   }
 }
 
-Main.start(config.start);
+Main.start(config.startOptions);

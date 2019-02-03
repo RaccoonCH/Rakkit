@@ -1,5 +1,6 @@
 export * from "./Core/AppLoader";
 export * from "./Core/FileUtils";
+export * from "./Core/DecoratorStorage";
 
 export * from "./GraphQL/OrmInterface";
 export * from "./GraphQL/GraphqlUtils";

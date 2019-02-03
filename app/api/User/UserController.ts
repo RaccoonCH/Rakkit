@@ -4,11 +4,11 @@ import { Context } from "apollo-server-core";
 import { sign } from "jsonwebtoken";
 import { compare } from "bcrypt";
 import { OrmInterface, ErrorHelper } from "@logic";
-import { config } from "@config";
+import { config } from "@app/RakkitConfig";
 import UserModel from "./UserModel";
 
 @Resolver(UserModel)
-export default class UserController {
+export class UserController {
   private _ormInterface = new OrmInterface(UserModel);
 
   //#region GraphQL

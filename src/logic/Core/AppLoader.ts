@@ -4,13 +4,6 @@ import { Middleware, Router, Route, Action, FileUtils } from "@logic";
 import { Color } from "@misc";
 
 export class AppLoader {
-  private _apiPath: string;
-  private _filesExtenstion: string = "ts";
-  private _resolvers: Function[] = [];
-  private _appFileUtil: FileUtils;
-  private _expressRouter: ExpressRouter = ExpressRouter();
-  private _rpNames: string[] = [];
-  private _rpApiOnlyNames: string[] = [];
 
   get RpApiOnlyNames(): string[] {
     return this._rpApiOnlyNames;
@@ -39,6 +32,13 @@ export class AppLoader {
   private get AppFileUtil(): FileUtils {
     return this._appFileUtil;
   }
+  private _apiPath: string;
+  private _filesExtenstion: string = "ts";
+  private _resolvers: Function[] = [];
+  private _appFileUtil: FileUtils;
+  private _expressRouter: ExpressRouter = ExpressRouter();
+  private _rpNames: string[] = [];
+  private _rpApiOnlyNames: string[] = [];
 
   constructor()
   constructor(apiPath: string)
@@ -49,21 +49,6 @@ export class AppLoader {
       this._filesExtenstion = filesExtension;
     }
     this._appFileUtil = new FileUtils(apiPath || "api");
-  }
-
-  /**
-   * Get the RakkitPackageObject absolute path from the root dir
-   * @param rpName The RakkitPackage name
-   * @param rpObjectName The RakkitPackageObject name (controller, router, model, args, ...)
-   */
-  private getRpObjectPath(rpName: string, rpObjectName: string): string {
-    return this.AppFileUtil.GetFilePath(
-      join(rpName, `${rpName + rpObjectName.charAt(0).toLocaleUpperCase() + rpObjectName.slice(1).toLocaleLowerCase()}.${this.FilesExtension}`)
-    );
-  }
-
-  private rpExists(rpName: string) {
-    return this.RpNames.indexOf(rpName) >= 0;
   }
 
   /**
@@ -132,5 +117,20 @@ export class AppLoader {
       ...rpNames
     ];
     return rpNames;
+  }
+
+  /**
+   * Get the RakkitPackageObject absolute path from the root dir
+   * @param rpName The RakkitPackage name
+   * @param rpObjectName The RakkitPackageObject name (controller, router, model, args, ...)
+   */
+  private getRpObjectPath(rpName: string, rpObjectName: string): string {
+    return this.AppFileUtil.GetFilePath(
+      join(rpName, `${rpName + rpObjectName.charAt(0).toLocaleUpperCase() + rpObjectName.slice(1).toLocaleLowerCase()}.${this.FilesExtension}`)
+    );
+  }
+
+  private rpExists(rpName: string) {
+    return this.RpNames.indexOf(rpName) >= 0;
   }
 }

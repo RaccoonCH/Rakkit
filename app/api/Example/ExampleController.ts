@@ -8,7 +8,6 @@ import ExampleModel from "./ExampleModel";
 export default class ExampleController {
   private _ormInterface = new OrmInterface(ExampleModel);
 
-  //#region GraphQL
   @Query(returns => ExampleGetResponse)
   async examples(@Args() args: ExampleArgs) {
     return this._ormInterface.Query(args);
@@ -34,42 +33,4 @@ export default class ExampleController {
   nameToUppercase(@Root() exampleInstance: ExampleModel): string {
     return exampleInstance.Name.toLocaleUpperCase();
   }
-  //#endregion
-
-  //#region REST
-  static async getOne (req, res) {
-    res.send(await ExampleModel.findOne(req.params.id));
-    // findOne({id: req.params.id}) works too
-  }
-
-  static async getAll (req, res) {
-    res.send(await ExampleModel.find());
-  }
-
-  static async create (req, res) {
-    const m = new ExampleModel(req.body.name, req.body.text);
-    res.send(await m.save());
-  }
-
-  static async update (req, res) {
-    const m = await ExampleModel.findOne(req.params.id);
-    if (m) {
-      m.Name = req.body.name;
-      await m.save();
-      res.send(m);
-    } else {
-      res.status(404).send("Item not found");
-    }
-  }
-
-  static async remove (req, res) {
-    const m = await ExampleModel.findOne(req.params.id);
-    if (m) {
-      m.remove();
-      res.send(m);
-    } else {
-      res.status(404).send("Item not found");
-    }
-  }
-  //#endregion
 }

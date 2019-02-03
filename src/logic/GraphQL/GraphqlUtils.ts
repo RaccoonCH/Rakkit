@@ -1,5 +1,5 @@
-import { QueryArgs } from "@types";
 import { ArgsType, Field, ClassType } from "type-graphql";
+import { QueryArgs } from "@types";
 
 export class GraphqlUtils {
   static createArgsClass<DefaultClass>(defaultClass: ClassType<DefaultClass>) {

@@ -20,30 +20,6 @@ export class OrmInterface<Entity> {
     this.Model = model;
   }
 
-  private getQueryFieldName(fieldName: string, mainField: string = null, noBase?: boolean): string {
-    const fieldProps = fieldName.split(".");
-    const basic = (mainField) => mainField ? `${mainField}.${fieldName}` : fieldName;
-    if (mainField) {
-      return basic(mainField);
-    } else {
-      return fieldProps.length > 1 ? fieldName : basic(noBase ? null : queryModelName);
-    }
-  }
-
-  private getConditionString(mainField: string, subField: string): string {
-    return `${this.getQueryFieldName(subField, mainField)} = :${subField}`;
-  }
-
-  private parse(items: Object[], count = false) {
-    if (count) {
-      return {
-        items: items[0],
-        count: items[1]
-      };
-    }
-    return { items };
-  }
-
   async GetManyAndCount(options?: ComposeQueryOptions) {
     return this.parse(await this.ComposeQuery(options).getManyAndCount(), true);
   }
@@ -176,5 +152,29 @@ export class OrmInterface<Entity> {
     }
 
     return queryBuilder;
+  }
+
+  private getQueryFieldName(fieldName: string, mainField: string = null, noBase?: boolean): string {
+    const fieldProps = fieldName.split(".");
+    const basic = (mainField) => mainField ? `${mainField}.${fieldName}` : fieldName;
+    if (mainField) {
+      return basic(mainField);
+    } else {
+      return fieldProps.length > 1 ? fieldName : basic(noBase ? null : queryModelName);
+    }
+  }
+
+  private getConditionString(mainField: string, subField: string): string {
+    return `${this.getQueryFieldName(subField, mainField)} = :${subField}`;
+  }
+
+  private parse(items: Object[], count = false) {
+    if (count) {
+      return {
+        items: items[0],
+        count: items[1]
+      };
+    }
+    return { items };
   }
 }

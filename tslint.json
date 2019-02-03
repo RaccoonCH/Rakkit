@@ -27,7 +27,7 @@
           "private-static-method",
           "private-instance-method",
           "protected-static-method",
-          "protected-instance-method",
+          "protected-instance-method"
         ]
       }
     ],

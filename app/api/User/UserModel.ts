@@ -8,28 +8,6 @@ import { RId, RShorttext, RPassword } from "@types";
 @ObjectType()
 @Entity({ name: "User" })
 export default class UserModel extends BaseEntity {
-  private _name: string;
-  private _email: string;
-  private _role: string;
-  private _password: string;
-
-  constructor(name: string, email: string, password: string, confirm: string, role = "default") {
-    if (password === confirm) {
-      super();
-      this.Name = name;
-      this.Email = email;
-      this.Role = role;
-      this.Password = password ? hashSync(password, 10) : "";
-    } else {
-      throw new Error("password:match");
-    }
-  }
-
-  @Attribute(new RId())
-  @Field(type => ID)
-  @PrimaryGeneratedColumn()
-  readonly Id: number;
-
   @Attribute(new RShorttext("Enter the name here"))
   @Field()
   @Column({ unique: true })
@@ -68,5 +46,26 @@ export default class UserModel extends BaseEntity {
   }
   set Role(val: string) {
     this._role = val;
+  }
+
+  @Attribute(new RId())
+  @Field(type => ID)
+  @PrimaryGeneratedColumn()
+  readonly Id: number;
+  private _name: string;
+  private _email: string;
+  private _role: string;
+  private _password: string;
+
+  constructor(name: string, email: string, password: string, confirm: string, role = "default") {
+    if (password === confirm) {
+      super();
+      this.Name = name;
+      this.Email = email;
+      this.Role = role;
+      this.Password = password ? hashSync(password, 10) : "";
+    } else {
+      throw new Error("password:match");
+    }
   }
 }

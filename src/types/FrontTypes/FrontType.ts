@@ -1,13 +1,9 @@
 export abstract class FrontType {
-  readonly type: {
-    name: string,
-    subject: string
-  };
+  readonly name: string;
+  readonly subject: string;
 
   constructor(typeName: string, typeSubject?: string) {
-    this.type = {
-      name: typeName,
-      subject: typeSubject || "other"
-    };
+    this.name = typeName;
+    this.subject = typeSubject || "other";
   }
 }
