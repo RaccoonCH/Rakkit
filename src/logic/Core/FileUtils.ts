@@ -2,7 +2,6 @@ import { lstatSync, readdirSync, existsSync } from "fs";
 import { join } from "path";
 
 export class FileUtils {
-  private rootPath: string;
 
   get RootPath(): string {
     return this.rootPath;
@@ -10,6 +9,7 @@ export class FileUtils {
   set RootPath(val: string) {
     this.rootPath = val;
   }
+  private rootPath: string;
 
   constructor(rootPath: string) {
     this.RootPath = rootPath;

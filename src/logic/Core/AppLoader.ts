@@ -2,9 +2,11 @@ import { Router as ExpressRouter } from "express";
 import { join } from "path";
 import { Middleware, Router, Route, Action, FileUtils } from "@logic";
 import { Color } from "@misc";
+import { IAppConfig } from "@types";
+import { sync as GlobSync } from "glob";
 
+// DEPRECATED
 export class AppLoader {
-
   get RpApiOnlyNames(): string[] {
     return this._rpApiOnlyNames;
   }
@@ -49,6 +51,20 @@ export class AppLoader {
       this._filesExtenstion = filesExtension;
     }
     this._appFileUtil = new FileUtils(apiPath || "api");
+  }
+
+  LoadControllers(options: IAppConfig) {
+    if (options.routers) {
+      options.routers.map((controller) => {
+        if (typeof controller === "string") {
+          const filePaths = GlobSync(
+            controller,
+            { root: join(__dirname, "../../../app") }
+          );
+          filePaths.map(require);
+        }
+      });
+    }
   }
 
   /**

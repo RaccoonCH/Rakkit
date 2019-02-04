@@ -1,15 +1,3 @@
 import { DecoratorStorage } from "@logic";
 
-export const Delete = (endpoint: string): Function => {
-  return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
-    DecoratorStorage.Instance.AddEndpoint({
-      class: target.constructor,
-      key,
-      params: {
-        functions: [descriptor.value],
-        endpoint,
-        method: "DELETE"
-      }
-    });
-  };
-};
+export const Delete = DecoratorStorage.getAddEndPointDecorator("DELETE");

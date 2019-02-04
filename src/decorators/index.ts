@@ -7,3 +7,4 @@ export * from "./Routing/Get";
 export * from "./Routing/Put";
 export * from "./Routing/Post";
 export * from "./Routing/Router";
+export * from "./Routing/Middleware";

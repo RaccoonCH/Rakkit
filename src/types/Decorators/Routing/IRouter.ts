@@ -1,7 +1,10 @@
-import { IEndpoint } from "./IEndpoint";
+import { MiddlewareType, IEndpoint } from "@types";
+import { Router } from "express";
 
 export interface IRouter {
   path: string;
-  extends?: Function;
+  middlewares: MiddlewareType[];
   endpoints?: IEndpoint[];
+  router?: Router;
+  // extends?: Object;
 }

@@ -1,13 +1,16 @@
 export * from "./Core/IAppConfig";
 export * from "./Core/IMain";
+export * from "./Core/IType";
 
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/Front/IAttribute";
 export * from "./Decorators/Front/IPackage";
 export * from "./Decorators/Routing/IEndpoint";
-export * from "./Decorators/Routing/IGet";
-export * from "./Decorators/Routing/IMiddleware";
 export * from "./Decorators/Routing/IRouter";
+export * from "./Decorators/Routing/IMiddleware";
+export * from "./Decorators/Params/Routing/IEndpointParams";
+export * from "./Decorators/Params/Routing/IRouterParams";
+export * from "./Decorators/Params/Routing/IMiddlewareParams";
 
 export * from "./FrontTypes/FrontType";
 export * from "./FrontTypes/Number/INumber";
@@ -28,3 +31,8 @@ export * from "./GraphQL/IGetResponse";
 export * from "./GraphQL/IRelationQuery";
 export * from "./GraphQL/OrderByArgs";
 export * from "./GraphQL/QueryArgs";
+
+export * from "./Routing/BaseMiddleware";
+export * from "./Routing/MiddlewareType";
+export * from "./Routing/HttpMethod";
+export * from "./Routing/MiddlewareFunction";

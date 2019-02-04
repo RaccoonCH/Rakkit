@@ -9,13 +9,17 @@ import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
 import { ApolloServer } from "apollo-server-express";
 import { createServer, Server } from "http";
-import { IMain } from "@types";
+import { IMain, IType, BaseMiddleware } from "@types";
 import { AppLoader, DecoratorStorage } from "@logic";
 import { config } from "@app/RakkitConfig";
 import { Color } from "@misc";
 import { GetableUser } from "@api/User/Types/GetableUser";
 
 export class Main extends AppLoader {
+
+  static get Instance(): Main {
+    return this._instance;
+  }
   protected static _instance: Main;
   private _host: string;
   private _port: number;
@@ -27,10 +31,6 @@ export class Main extends AppLoader {
   private _httpServer: Server;
   private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
-
-  static get Instance(): Main {
-    return this._instance;
-  }
 
   private constructor(params: IMain) {
     super(params.apiPath || Path.join(__dirname, "..", "app", "api"));
@@ -48,10 +48,6 @@ export class Main extends AppLoader {
    * Start the application (Express, GraphQL, ...)
    */
   static async start(params?: IMain): Promise<Main> {
-    await DecoratorStorage.Instance.BuildAll();
-
-    config.controllers.map(router => router);
-
     if (!this.Instance) {
       this._instance = new Main(params || {});
     }
@@ -62,6 +58,10 @@ export class Main extends AppLoader {
         console.log(err);
       }
     }
+
+    this.Instance.LoadControllers(config);
+    await DecoratorStorage.Instance.BuildAll();
+
     this.Instance.startAllServices();
     return this.Instance;
   }
@@ -73,24 +73,28 @@ export class Main extends AppLoader {
     return this.startAllServices();
   }
 
+  private loadMiddlewares(middlewares: IType<BaseMiddleware>[]) {
+    if (middlewares) {
+      middlewares.map((Item) => {
+        const instance = new Item();
+        this._expressApp.use(instance.use);
+      });
+    }
+  }
+
   private async startAllServices() {
-    await this.startRest();
-    await this.startGraphQl();
+    if (config.routers && config.routers.length > 0) {
+      await this.startRest();
+    }
+    if (config.resolvers && config.resolvers.length > 0) {
+      await this.startGraphQl();
+    }
   }
 
   private async startRest() {
     return new Promise<void>((resolve) => {
       // Load the application (all RakkitPackage)
       // this.Load();
-      const expressRouter = Express.Router();
-      DecoratorStorage.Instance.Routers.map((router) => {
-        router.endpoints.map((endpoint) => {
-          expressRouter[endpoint.method.toLowerCase()](
-            `/${router.path}${endpoint.endpoint}`,
-            ...endpoint.functions
-          );
-        });
-      });
 
       if (DecoratorStorage.Instance.Packages) {
         this.ExpressRouter.use("/", (req, res) => {
@@ -107,8 +111,10 @@ export class Main extends AppLoader {
       // Server the public folder to be served as a static folder
       this._expressApp.use("/", Express.static(this._publicPath));
 
+      this.loadMiddlewares(config.globalMiddlwares);
       // Load the api returned router into the /[restEndpoint] route
-      this._expressApp.use(this._restEndpoint, expressRouter);
+      this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter);
+      this.loadMiddlewares(config.globalMiddlwares);
 
       // Use jwt auth middleware
       this._expressApp.use(jwt({
@@ -143,7 +149,7 @@ export class Main extends AppLoader {
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
     const schema: GraphQLSchema = await TypeGraphQL.buildSchema({
-      resolvers: config.controllers,
+      resolvers: config.resolvers,
       authChecker: ({ context }, roles) =>  {
         const user: GetableUser = context.req.user;
         if (user) {

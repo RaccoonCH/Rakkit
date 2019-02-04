@@ -1,7 +1,9 @@
 import { RequestHandlerParams } from "express-serve-static-core";
+import { MiddlewareType, HttpMethod } from "@types";
 
 export interface IEndpoint {
   endpoint: string;
+  method: HttpMethod;
   functions: RequestHandlerParams[];
-  method: "GET" | "POST" | "DELETE" | "PUT";
+  middlewares: MiddlewareType[];
 }

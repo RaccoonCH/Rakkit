@@ -5,11 +5,10 @@ export class ExampleRouter {
   @Get("/")
   getAll(req, res, next) {
     console.log("Hello");
-    next();
   }
 
   @Post("/")
-  getAll2() {
+  add(req, res, next) {
     console.log("Hello 2");
   }
 }

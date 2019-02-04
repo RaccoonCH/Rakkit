@@ -3,21 +3,24 @@ import {
   IPackage,
   IAttribute,
   IRouter,
+  IEndpoint,
+  HttpMethod,
+  MiddlewareType,
   IMiddleware,
-  IEndpoint
+  BaseMiddleware
 } from "@types";
 import { RequestHandlerParams } from "express-serve-static-core";
+import { Router } from "express";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;
-  private _packages: Map<Function, IDecorator<IPackage>> = new Map();
+  private _packages: Map<Object, IDecorator<IPackage>> = new Map();
   private _attributes: IDecorator<IAttribute>[] = [];
-  private _routers: Map<Function, IDecorator<IRouter>> = new Map();
+  private _routers: Map<Object, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
-  private _middlewares: IDecorator<IMiddleware>[];
-
+  private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
   private _compiledPackages: IPackage[];
-  private _compiledRouters: IRouter[];
+  private _compiledRouter: Router = Router();
 
   static get Instance() {
     if (!this._instance) {
@@ -30,8 +33,25 @@ export class DecoratorStorage {
     return this._compiledPackages;
   }
 
-  get Routers() {
-    return this._compiledRouters;
+  get MainRouter() {
+    return this._compiledRouter;
+  }
+
+  static getAddEndPointDecorator(method: HttpMethod) {
+    return (endpoint: string, middlewares?: MiddlewareType[]): Function => {
+      return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
+        DecoratorStorage.Instance.AddEndpoint({
+          class: target.constructor,
+          key,
+          params: {
+            endpoint,
+            method,
+            functions: [descriptor.value],
+            middlewares: middlewares || []
+          }
+        });
+      };
+    };
   }
 
   AddAttribute(item: IDecorator<IAttribute>) {
@@ -46,12 +66,16 @@ export class DecoratorStorage {
     this._routers.set(item.class, item);
   }
 
-  AddMiddleware(item: IDecorator<IMiddleware>) {
-    this._middlewares.push(item);
-  }
-
   AddEndpoint(item: IDecorator<IEndpoint>) {
     this._endpoints.push(item);
+  }
+
+  AddMiddleware(item: IDecorator<IMiddleware>) {
+    if (Object.getPrototypeOf(item.class) === BaseMiddleware) {
+      this._middlewares.set(item.class, item);
+    } else {
+      throw new Error(`${item.key} do not extends ${BaseMiddleware.name} class`);
+    }
   }
 
   async BuildAll() {
@@ -93,10 +117,45 @@ export class DecoratorStorage {
         router.params.endpoints.push(item.params);
       }
     });
-    this._compiledRouters = this.compile(this._routers);
+    const routers = Array.from(this._routers.values());
+    routers.map((item) => {
+      this.mountEndpointsToRouter(item);
+      this._compiledRouter.use(item.params.router);
+    });
+
+    // EXTENDS FEATURE
+    // routers
+    //   .sort((a, b) => {
+    //     return !!a.params.extends && !!b.params.extends ? 1 : -1;
+    //   })
+    //   .map((item) => {
+    //     this.mountEndpointsToRouter(item);
+    //     if (item.params.extends) {
+    //       const routerToFind = item.params.extends;
+    //       const foundRouter = this._routers.get(routerToFind);
+    //       if (foundRouter) {
+    //         foundRouter.params.router.use(`/${item.params.path}`, item.params.router);
+    //       } else {
+    //         throw new Error(
+    //           `The Router from the class: ${item.class.name} cannot extends ${routerToFind.constructor.name}
+    //            because it is not declared as a Router`
+    //         );
+    //       }
+    //     }
+    // });
   }
 
-  private compile(map: Map<Function, IDecorator<any>>) {
+  private mountEndpointsToRouter(router: IDecorator<IRouter>) {
+    router.params.router = Router();
+    router.params.endpoints.map((endpoint) => {
+      router.params.router[endpoint.method.toLowerCase()](
+        `/${router.params.path}${endpoint.endpoint}`,
+        ...endpoint.functions
+      );
+    });
+  }
+
+  private compile(map: Map<Object, IDecorator<any>>) {
     return Array.from(map.values()).map((item) => {
       return item.params;
     });
