@@ -1,4 +1,4 @@
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field } from "rakkitql";
 
 @ObjectType()
 export class Notif {

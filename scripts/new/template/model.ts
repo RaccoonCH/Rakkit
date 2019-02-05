@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { ObjectType, Field, ID } from "type-graphql";
+import { ObjectType, Field, ID } from "rakkitql";
 import { Attribute, Package } from "@decorators";
 import { RId, RShorttext } from "@types";
 

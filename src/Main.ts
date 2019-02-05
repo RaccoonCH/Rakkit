@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import * as TypeGraphQL from "type-graphql";
+import * as TypeGraphQL from "rakkitql";
 import * as BodyParser from "body-parser";
 import * as SocketIO from "socket.io";
 import * as Express from "express";

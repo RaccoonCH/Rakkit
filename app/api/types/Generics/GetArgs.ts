@@ -1,9 +1,10 @@
-import { ArgsType, Field } from "rakkitql";
+import { Field, GenericType, GenericField } from "rakkitql";
 import { OrderByArgs } from "@types";
 
-@ArgsType()
-export abstract class QueryArgs {
-  abstract readonly where?;
+@GenericType()
+export abstract class GetArgs<Type> {
+  @GenericField({ nullable: true })
+  readonly where?: Type;
 
   @Field({ nullable: true })
   readonly count?: boolean;

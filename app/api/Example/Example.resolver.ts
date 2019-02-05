@@ -1,16 +1,18 @@
-import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from "type-graphql";
+import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from "rakkitql";
 import { PubSubEngine } from "graphql-subscriptions";
 import { OrmInterface } from "@logic";
-import { ExampleGetResponse, Notif, ExampleArgs } from "./Types";
-import {ExampleModel } from "./Example.model";
+import { Notif, GetResponse, GetArgs } from "@api/types";
+import { ExampleModel } from "./Example.model";
 
 @Resolver(ExampleModel)
 export default class ExampleController {
   private _ormInterface = new OrmInterface(ExampleModel);
 
-  @Query(returns => ExampleGetResponse)
-  async examples(@Args() args: ExampleArgs) {
-    return this._ormInterface.GetManyAndCount(args);
+  @Query(returns => ExampleModel, { generic: GetResponse })
+  async examples(
+    @Args({ type: ExampleModel }) args: GetArgs<ExampleModel>
+  ) {
+    // return this._ormInterface.GetManyAndCount(args);
   }
 
   @Query(returns => String)

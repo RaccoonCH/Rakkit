@@ -1,4 +1,4 @@
-import { ArgsType, Field, InputType } from "type-graphql";
+import { ArgsType, Field, InputType } from "rakkitql";
 import { GraphqlUtils } from "@logic";
 import _MODEL_FILE_ from "./_MODEL_FILE_";
 

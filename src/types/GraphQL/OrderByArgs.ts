@@ -1,4 +1,4 @@
-import { Field, InputType } from "type-graphql";
+import { Field, InputType } from "rakkitql";
 
 @InputType()
 export abstract class OrderByArgs {

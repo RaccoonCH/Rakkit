@@ -1,4 +1,4 @@
-import { ArgsType, Field, ClassType } from "type-graphql";
+import { ArgsType, Field, ClassType } from "rakkitql";
 import { QueryArgs } from "@types";
 
 export class GraphqlUtils {
