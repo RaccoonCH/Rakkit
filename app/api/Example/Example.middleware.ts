@@ -1,9 +1,10 @@
 import { BaseMiddleware } from "@types";
-import { Middleware } from "@decorators";
+import { BeforeMiddleware } from "@decorators";
 
-@Middleware()
+@BeforeMiddleware()
 export class Auth extends BaseMiddleware {
   use(req, res, next) {
     console.log("mid");
+    next();
   }
 }

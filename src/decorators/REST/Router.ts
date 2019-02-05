@@ -1,14 +1,14 @@
 import { DecoratorStorage } from "@logic";
-import { IRouterParams } from "@types";
+import { IRouterParams, MiddlewareType } from "@types";
 
-export const Router = (path: string, params: IRouterParams = {}): Function => {
+export const Router = (path: string, middlewares?: MiddlewareType[]): Function => {
   return (target: Function): void => {
     DecoratorStorage.Instance.AddRouter({
       class: target,
       key: target.name,
       params: {
         path,
-        middlewares: params.middlewares || [],
+        middlewares: middlewares || [],
         endpoints: []
         // extends: params.extends,
       }

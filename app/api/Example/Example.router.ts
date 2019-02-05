@@ -1,10 +1,18 @@
 import { Router, Get, Post } from "@decorators";
+import { Auth } from "./Example.middleware";
+import { Stat } from "./Example.finisher";
 
-@Router("example")
+@Router(
+  "example"
+)
 export class ExampleRouter {
-  @Get("/")
+  @Get(
+    "/",
+    [Stat]
+  )
   getAll(req, res, next) {
     console.log("Hello");
+    next();
   }
 
   @Post("/")

@@ -1,25 +1,22 @@
 import "reflect-metadata";
 import * as TypeGraphQL from "type-graphql";
 import * as BodyParser from "body-parser";
+import * as SocketIO from "socket.io";
 import * as Express from "express";
 import * as jwt from "express-jwt";
 import * as Path from "path";
 import * as Cors from "cors";
+import { RequestHandlerParams } from "express-serve-static-core";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
 import { ApolloServer } from "apollo-server-express";
 import { createServer, Server } from "http";
-import { IMain, IType, BaseMiddleware } from "@types";
 import { AppLoader, DecoratorStorage } from "@logic";
 import { config } from "@app/RakkitConfig";
+import { IMain } from "@types";
 import { Color } from "@misc";
-import { GetableUser } from "@api/User/Types/GetableUser";
 
 export class Main extends AppLoader {
-
-  static get Instance(): Main {
-    return this._instance;
-  }
   protected static _instance: Main;
   private _host: string;
   private _port: number;
@@ -31,6 +28,11 @@ export class Main extends AppLoader {
   private _httpServer: Server;
   private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
+  private _socketio: SocketIO.Server;
+
+  static get Instance(): Main {
+    return this._instance;
+  }
 
   private constructor(params: IMain) {
     super(params.apiPath || Path.join(__dirname, "..", "app", "api"));
@@ -73,15 +75,6 @@ export class Main extends AppLoader {
     return this.startAllServices();
   }
 
-  private loadMiddlewares(middlewares: IType<BaseMiddleware>[]) {
-    if (middlewares) {
-      middlewares.map((Item) => {
-        const instance = new Item();
-        this._expressApp.use(instance.use);
-      });
-    }
-  }
-
   private async startAllServices() {
     if (config.routers && config.routers.length > 0) {
       await this.startRest();
@@ -91,8 +84,31 @@ export class Main extends AppLoader {
     }
   }
 
+  private loadMiddlewares(middlewares: Map<Object, RequestHandlerParams>) {
+    AppLoader.loadMiddlewares(
+      config.globalMiddlewares,
+      this._expressApp,
+      middlewares
+    );
+  }
+
+  private async startWs() {
+    this._socketio = SocketIO(this._httpServer);
+    this._socketio.on("connection", (socket) => {
+      DecoratorStorage.Instance.Ons.map((item) => {
+        if (item.message !== "connection") {
+          socket.on(item.message, (message: any) => {
+            item.function(socket, message);
+          });
+        } else {
+          item.function(socket);
+        }
+      });
+    });
+  }
+
   private async startRest() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(async (resolve) => {
       // Load the application (all RakkitPackage)
       // this.Load();
 
@@ -111,10 +127,11 @@ export class Main extends AppLoader {
       // Server the public folder to be served as a static folder
       this._expressApp.use("/", Express.static(this._publicPath));
 
-      this.loadMiddlewares(config.globalMiddlwares);
+      const before = DecoratorStorage.Instance.BeforeMiddlewares;
+      this.loadMiddlewares(DecoratorStorage.Instance.BeforeMiddlewares);
       // Load the api returned router into the /[restEndpoint] route
       this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter);
-      this.loadMiddlewares(config.globalMiddlwares);
+      this.loadMiddlewares(DecoratorStorage.Instance.AfterMiddlewares);
 
       // Use jwt auth middleware
       this._expressApp.use(jwt({
@@ -136,6 +153,8 @@ export class Main extends AppLoader {
         }
       });
 
+      await this.startWs();
+
       this._httpServer.listen(this._port, this._host, () => {
         console.log(Color(
           `REST:     Started on http://${this._host}:${this._port}${this._restEndpoint}`,
@@ -149,15 +168,15 @@ export class Main extends AppLoader {
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
     const schema: GraphQLSchema = await TypeGraphQL.buildSchema({
-      resolvers: config.resolvers,
-      authChecker: ({ context }, roles) =>  {
-        const user: GetableUser = context.req.user;
-        if (user) {
-          const authorizedRole: Array<string> = (roles.length <= 0 ? [ process.env.DefaultRequiredRole ] : roles);
-          return authorizedRole.includes(user.Role);
-        }
-        return false;
-      }
+      resolvers: config.resolvers
+      // authChecker: ({ context }, roles) =>  {
+      //   const user: GetableUser = context.req.user;
+      //   if (user) {
+      //     const authorizedRole: Array<string> = (roles.length <= 0 ? [ process.env.DefaultRequiredRole ] : roles);
+      //     return authorizedRole.includes(user.Role);
+      //   }
+      //   return false;
+      // }
     });
     this._apolloServer = new ApolloServer({
       schema,

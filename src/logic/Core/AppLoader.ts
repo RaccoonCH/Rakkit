@@ -1,9 +1,11 @@
-import { Router as ExpressRouter } from "express";
+import { Router as ExpressRouter, Express } from "express";
 import { join } from "path";
 import { Middleware, Router, Route, Action, FileUtils } from "@logic";
 import { Color } from "@misc";
-import { IAppConfig } from "@types";
+import { IAppConfig, MiddlewareType, ClassOrString } from "@types";
 import { sync as GlobSync } from "glob";
+import { RequestHandlerParams } from "express-serve-static-core";
+import { load } from "protobufjs";
 
 // DEPRECATED
 export class AppLoader {
@@ -53,18 +55,24 @@ export class AppLoader {
     this._appFileUtil = new FileUtils(apiPath || "api");
   }
 
-  LoadControllers(options: IAppConfig) {
-    if (options.routers) {
-      options.routers.map((controller) => {
-        if (typeof controller === "string") {
-          const filePaths = GlobSync(
-            controller,
-            { root: join(__dirname, "../../../app") }
-          );
-          filePaths.map(require);
+  static loadMiddlewares(
+    middlewaresToLoad: MiddlewareType[],
+    expressApp: Express | ExpressRouter,
+    middlewares: Map<Object, RequestHandlerParams>
+  ) {
+    if (middlewaresToLoad) {
+      middlewaresToLoad.map((item) => {
+        const middleware = middlewares.get(item);
+        if (middleware) {
+          expressApp.use(middleware);
         }
       });
     }
+  }
+
+  LoadControllers(options: IAppConfig) {
+    this.load(options.routers);
+    this.load(options.websockets);
   }
 
   /**
@@ -133,6 +141,20 @@ export class AppLoader {
       ...rpNames
     ];
     return rpNames;
+  }
+
+  private load(items: ClassOrString[]) {
+    if (items) {
+      items.map((controller) => {
+        if (typeof controller === "string") {
+          const filePaths = GlobSync(
+            controller,
+            { root: join(__dirname, "../../../app") }
+          );
+          filePaths.map(require);
+        }
+      });
+    }
   }
 
   /**

@@ -7,10 +7,14 @@ import {
   HttpMethod,
   MiddlewareType,
   IMiddleware,
-  BaseMiddleware
+  BaseMiddleware,
+  MiddlewareExecutionTime,
+  IType,
+  IOn
 } from "@types";
 import { RequestHandlerParams } from "express-serve-static-core";
 import { Router } from "express";
+import { AppLoader } from "./AppLoader";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;
@@ -19,8 +23,11 @@ export class DecoratorStorage {
   private _routers: Map<Object, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
   private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
+  private _beforeMiddlewares: Map<Object, RequestHandlerParams> = new Map();
+  private _afterMiddlewares: Map<Object, RequestHandlerParams> = new Map();
   private _compiledPackages: IPackage[];
   private _compiledRouter: Router = Router();
+  private _ons: IOn[] = [];
 
   static get Instance() {
     if (!this._instance) {
@@ -37,10 +44,22 @@ export class DecoratorStorage {
     return this._compiledRouter;
   }
 
+  get BeforeMiddlewares() {
+    return this._beforeMiddlewares;
+  }
+
+  get AfterMiddlewares() {
+    return this._afterMiddlewares;
+  }
+
+  get Ons() {
+    return this._ons;
+  }
+
   static getAddEndPointDecorator(method: HttpMethod) {
     return (endpoint: string, middlewares?: MiddlewareType[]): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
-        DecoratorStorage.Instance.AddEndpoint({
+        this.Instance.AddEndpoint({
           class: target.constructor,
           key,
           params: {
@@ -48,6 +67,32 @@ export class DecoratorStorage {
             method,
             functions: [descriptor.value],
             middlewares: middlewares || []
+          }
+        });
+      };
+    };
+  }
+
+  static getAddMiddlewareDecorator(executionTime: MiddlewareExecutionTime) {
+    return (): Function => {
+      return (target: Function, key: string, descriptor: PropertyDescriptor): void => {
+        const finalKey = key || target.name;
+        let finalClass = target;
+        let func;
+        if (key && descriptor) {
+          func = descriptor.value;
+          finalClass = func;
+        } else {
+          const ItemClass: IType<BaseMiddleware> = target as any;
+          const instance = new ItemClass();
+          func = instance.use;
+        }
+        this.Instance.AddMiddleware({
+          class: finalClass,
+          key: finalKey,
+          params: {
+            executionTime,
+            function: func
           }
         });
       };
@@ -70,12 +115,20 @@ export class DecoratorStorage {
     this._endpoints.push(item);
   }
 
+  AddOn(item: IDecorator<IOn>) {
+    this._ons.push(item.params);
+  }
+
   AddMiddleware(item: IDecorator<IMiddleware>) {
-    if (Object.getPrototypeOf(item.class) === BaseMiddleware) {
-      this._middlewares.set(item.class, item);
-    } else {
-      throw new Error(`${item.key} do not extends ${BaseMiddleware.name} class`);
+    switch (item.params.executionTime) {
+      case "AFTER":
+        this._afterMiddlewares.set(item.class, item.params.function);
+      break;
+      case "BEFORE":
+        this._beforeMiddlewares.set(item.class, item.params.function);
+      break;
     }
+    this._middlewares.set(item.class, item);
   }
 
   async BuildAll() {
@@ -122,37 +175,46 @@ export class DecoratorStorage {
       this.mountEndpointsToRouter(item);
       this._compiledRouter.use(item.params.router);
     });
+  }
 
-    // EXTENDS FEATURE
-    // routers
-    //   .sort((a, b) => {
-    //     return !!a.params.extends && !!b.params.extends ? 1 : -1;
-    //   })
-    //   .map((item) => {
-    //     this.mountEndpointsToRouter(item);
-    //     if (item.params.extends) {
-    //       const routerToFind = item.params.extends;
-    //       const foundRouter = this._routers.get(routerToFind);
-    //       if (foundRouter) {
-    //         foundRouter.params.router.use(`/${item.params.path}`, item.params.router);
-    //       } else {
-    //         throw new Error(
-    //           `The Router from the class: ${item.class.name} cannot extends ${routerToFind.constructor.name}
-    //            because it is not declared as a Router`
-    //         );
-    //       }
-    //     }
-    // });
+  private loadMiddlewares(router: IRouter, middlewares: Map<Object, RequestHandlerParams>) {
+    AppLoader.loadMiddlewares(
+      router.middlewares,
+      router.router,
+      middlewares
+    );
+  }
+
+  private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
+    return middlewares.reduce((arr, item) => {
+      const foundMiddleware = this._middlewares.get(item);
+      if (foundMiddleware.params.executionTime === beforeAfter) {
+        return [
+          ...arr,
+          foundMiddleware.params.function
+        ];
+      }
+      return arr;
+    }, []);
   }
 
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
     router.params.router = Router();
+    this.loadMiddlewares(router.params, DecoratorStorage.Instance.BeforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
+      const beforeMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "BEFORE");
+      const afterMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "AFTER");
+      endpoint.functions = [
+        ...beforeMiddlewares,
+        ...endpoint.functions,
+        ...afterMiddlewares
+      ];
       router.params.router[endpoint.method.toLowerCase()](
         `/${router.params.path}${endpoint.endpoint}`,
         ...endpoint.functions
       );
     });
+    this.loadMiddlewares(router.params, DecoratorStorage.Instance.AfterMiddlewares);
   }
 
   private compile(map: Map<Object, IDecorator<any>>) {

@@ -1,4 +1,4 @@
-import { BaseMiddleware, IMain, IType } from "@types";
+import { IMain, MiddlewareType } from "@types";
 
 export type ClassOrString = (Function | string);
 
@@ -7,6 +7,7 @@ export interface IAppConfig {
   startOptions?: IMain;
   resolvers?: ClassOrString[];
   routers?: ClassOrString[];
-  globalMiddlwares?: (IType<BaseMiddleware>)[];
+  websockets?: ClassOrString[];
+  globalMiddlewares?: MiddlewareType[];
   ormConnection?: Function;
 }

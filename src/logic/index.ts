@@ -7,7 +7,7 @@ export * from "./GraphQL/GraphqlUtils";
 
 export * from "./Helpers/ErrorHelper";
 
-export * from "./Routing/Middleware";
-export * from "./Routing/Router";
-export * from "./Routing/Route";
-export * from "./Routing/RouterTypes";
+export * from "./REST/Middleware";
+export * from "./REST/Router";
+export * from "./REST/Route";
+export * from "./REST/RouterTypes";

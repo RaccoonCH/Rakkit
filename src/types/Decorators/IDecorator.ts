@@ -1,5 +1,5 @@
 export interface IDecorator<Type> {
   key: string;
-  class: Function;
+  class: Object;
   params: Type;
 }

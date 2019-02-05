@@ -13,6 +13,7 @@
     "test": "jest --config jest.config.json --detectOpenHandles"
   },
   "dependencies": {
+    "@types/socket.io": "^2.1.2",
     "apollo-server-express": "^2.1.0",
     "bcrypt": "3.0.2",
     "body-parser": "^1.18.3",
@@ -24,6 +25,7 @@
     "jsonwebtoken": "^8.3.0",
     "mysql": "^2.16.0",
     "reflect-metadata": "^0.1.12",
+    "socket.io": "^2.2.0",
     "subscriptions-transport-ws": "^0.9.15",
     "type-graphql": "^0.16.0",
     "typeorm": "^0.2.8"

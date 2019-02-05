@@ -2,7 +2,7 @@ import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from
 import { PubSubEngine } from "graphql-subscriptions";
 import { OrmInterface } from "@logic";
 import { ExampleGetResponse, Notif, ExampleArgs } from "./Types";
-import ExampleModel from "./ExampleModel";
+import ExampleModel from "./Example.model.";
 
 @Resolver(ExampleModel)
 export default class ExampleController {
