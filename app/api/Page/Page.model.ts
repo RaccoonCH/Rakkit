@@ -2,23 +2,23 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "t
 import { ObjectType, Field, ID, InputType } from "type-graphql";
 import { Package, Attribute } from "@decorators";
 import { RId, RShorttext, RObject } from "@types";
-import CultureModel from "@api/Culture/CultureModel";
+import CultureModel from "@api/Culture/Culture.model";
 
 @Package({ name: "Page" })
 @InputType("PageInput")
 @ObjectType()
 @Entity({ name: "Page" })
-export default class PageModel extends BaseEntity {
+export class PageModel extends BaseEntity {
+  @Attribute(new RId())
+  @Field(type => ID)
+  @PrimaryGeneratedColumn()
+  readonly Id: number;
+
   private _title: string;
   private _model: string;
   private _content: string;
   private _url: string;
   private _culture: CultureModel;
-
-  @Attribute(new RId())
-  @Field(type => ID)
-  @PrimaryGeneratedColumn()
-  readonly Id: number;
 
   @Attribute(new RShorttext())
   @Field()

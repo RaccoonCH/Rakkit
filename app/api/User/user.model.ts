@@ -7,7 +7,7 @@ import { RId, RShorttext, RPassword } from "@types";
 @Package({ name: "User", description: "User package" })
 @ObjectType()
 @Entity({ name: "User" })
-export default class UserModel extends BaseEntity {
+export class UserModel extends BaseEntity {
   @Attribute(new RShorttext("Enter the name here"))
   @Field()
   @Column({ unique: true })

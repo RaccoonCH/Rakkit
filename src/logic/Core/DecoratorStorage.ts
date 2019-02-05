@@ -1,3 +1,6 @@
+import { RequestHandlerParams } from "express-serve-static-core";
+import { AppLoader } from "@logic";
+import { Router } from "express";
 import {
   IDecorator,
   IPackage,
@@ -12,9 +15,6 @@ import {
   IType,
   IOn
 } from "@types";
-import { RequestHandlerParams } from "express-serve-static-core";
-import { Router } from "express";
-import { AppLoader } from "./AppLoader";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;

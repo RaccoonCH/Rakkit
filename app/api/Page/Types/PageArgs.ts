@@ -1,7 +1,7 @@
 import { ArgsType, Field, InputType } from "type-graphql";
 import { GraphqlUtils } from "@logic";
 import { CultureType } from "@api/Culture/Types";
-import PageModel from "../PageModel";
+import { PageModel } from "../Page.model";
 
 @InputType()
 export class PageType implements Pick<PageModel, "Url" | "Title"> {

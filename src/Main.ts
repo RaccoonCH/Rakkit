@@ -23,19 +23,20 @@ export class Main extends AppLoader {
   private _restEndpoint: string;
   private _graphqlEndpoint: string;
   private _expressApp: Express.Express;
-  private _publicPath: string;
-  private _subscriptionServer: SubscriptionServer;
   private _httpServer: Server;
   private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
   private _socketio: SocketIO.Server;
+  private _publicPath: string;
+  private _subscriptionServer: SubscriptionServer;
+  private _decoratorStorage: DecoratorStorage;
 
   static get Instance(): Main {
     return this._instance;
   }
 
   private constructor(params: IMain) {
-    super(params.apiPath || Path.join(__dirname, "..", "app", "api"));
+    super();
     this._corsEnabled = params.corsEnabled || true;
     this._host = params.host || "localhost";
     this._port = params.port || 4000;
@@ -109,15 +110,6 @@ export class Main extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
-      // Load the application (all RakkitPackage)
-      // this.Load();
-
-      if (DecoratorStorage.Instance.Packages) {
-        this.ExpressRouter.use("/", (req, res) => {
-          res.send(DecoratorStorage.Instance.Packages);
-        });
-      }
-
       if (this._corsEnabled) {
         this._expressApp.use(Cors());
       }
@@ -127,7 +119,6 @@ export class Main extends AppLoader {
       // Server the public folder to be served as a static folder
       this._expressApp.use("/", Express.static(this._publicPath));
 
-      const before = DecoratorStorage.Instance.BeforeMiddlewares;
       this.loadMiddlewares(DecoratorStorage.Instance.BeforeMiddlewares);
       // Load the api returned router into the /[restEndpoint] route
       this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter);

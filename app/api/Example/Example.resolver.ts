@@ -2,7 +2,7 @@ import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from
 import { PubSubEngine } from "graphql-subscriptions";
 import { OrmInterface } from "@logic";
 import { ExampleGetResponse, Notif, ExampleArgs } from "./Types";
-import ExampleModel from "./Example.model.";
+import {ExampleModel } from "./Example.model";
 
 @Resolver(ExampleModel)
 export default class ExampleController {
@@ -10,7 +10,7 @@ export default class ExampleController {
 
   @Query(returns => ExampleGetResponse)
   async examples(@Args() args: ExampleArgs) {
-    return this._ormInterface.Query(args);
+    return this._ormInterface.GetManyAndCount(args);
   }
 
   @Query(returns => String)

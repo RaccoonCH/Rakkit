@@ -1,16 +1,17 @@
 import { createConnection, getConnectionOptions } from "typeorm";
 import { IAppConfig } from "@types";
-import { Auth } from "@api/Example/Example.middleware";
-import { Stat } from "@api/Example/Example.finisher";
-import { TestMiddlewares } from "@api/Example/test.middlewares";
+import { Auth } from "@api/Example/Example.before";
+import { Stat } from "@api/Example/Example.after";
+import { TestMiddlewares } from "@api/Example/Example.middlewares";
+
+const basePath = `${__dirname}/api/`;
 
 export const config: IAppConfig = {
   jwtSecret: "Rakkit",
   startOptions: {
   },
   ormConnection: async () => {
-    // Get ormconfig.ts file content and create the connection to the database
-    await createConnection({
+    return createConnection({
       name: "default",
       type: "mysql",
       host: "localhost",
@@ -20,15 +21,18 @@ export const config: IAppConfig = {
       database: "rakkit",
       synchronize: false,
       entities: [
-        `${__dirname}/*/*Model.ts`
+        `${basePath}**/*.model.ts`
       ]
     });
   },
+  resolvers: [
+    `${basePath}**/*.resolver.ts`
+  ],
   routers: [
-    "**/*.router.ts"
+    `${basePath}**/*.router.ts`
   ],
   websockets: [
-    "**/*.ws.ts"
+    `${basePath}**/*.ws.ts`
   ],
   globalMiddlewares: [
     TestMiddlewares.check

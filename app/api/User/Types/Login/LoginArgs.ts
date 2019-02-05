@@ -1,5 +1,5 @@
 import { ArgsType, Field } from "type-graphql";
-import UserModel from "../../UserModel";
+import { UserModel } from "../../user.model";
 
 @ArgsType()
 export class LoginArgs implements Pick<UserModel, "Name" | "Password"> {

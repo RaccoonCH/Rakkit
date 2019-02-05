@@ -2,20 +2,20 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, OneToMany } from "t
 import { ObjectType, Field, ID } from "type-graphql";
 import { Package, Attribute } from "@decorators";
 import { RId, RShorttext } from "@types";
-import Page from "@api/Page/PageModel";
+import { PageModel } from "@api/Page/Page.model";
 
 @Package({ name: "Culture" })
 @ObjectType()
 @Entity({ name: "Culture" })
 export default class CultureModel extends BaseEntity {
-  private _langCode: string;
-  private _countryCode: string;
-  private _pages: Page[];
-
   @Attribute(new RId())
   @Field(type => ID, { nullable: true })
   @PrimaryGeneratedColumn()
   readonly Id: number;
+
+  private _langCode: string;
+  private _countryCode: string;
+  private _pages: PageModel[];
 
   @Attribute(new RShorttext())
   @Field({ nullable: true })
@@ -37,12 +37,12 @@ export default class CultureModel extends BaseEntity {
     this._countryCode = val;
   }
 
-  @Field(type => [Page], { nullable: true })
-  @OneToMany(type => Page, page => page.Culture)
-  get Pages(): Page[] {
+  @Field(type => [PageModel], { nullable: true })
+  @OneToMany(type => PageModel, page => page.Culture)
+  get Pages(): PageModel[] {
     return this._pages;
   }
-  set Pages(val: Page[]) {
+  set Pages(val: PageModel[]) {
     this._pages = val;
   }
 

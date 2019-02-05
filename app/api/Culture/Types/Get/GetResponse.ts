@@ -1,6 +1,6 @@
 import { IGetResponse } from "@types";
 import { ObjectType, Field } from "type-graphql";
-import CultureModel from "@api/Culture/CultureModel";
+import CultureModel from "@api/Culture/Culture.model";
 
 @ObjectType()
 export class CultureGetResponse implements IGetResponse {

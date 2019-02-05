@@ -1,17 +1,16 @@
 import { LoginArgs, LoginResponse, GetableUser, RegisterArgs, UserArgs, UpdateArgs, DeleteArgs, UserGetResponse } from "./Types";
-import { Query, Resolver, Args, Mutation, Authorized, Ctx } from "type-graphql";
+import { Query, Resolver, Args, Mutation, Ctx } from "type-graphql";
 import { Context } from "apollo-server-core";
 import { sign } from "jsonwebtoken";
 import { compare } from "bcrypt";
 import { OrmInterface, ErrorHelper } from "@logic";
 import { config } from "@app/RakkitConfig";
-import UserModel from "./UserModel";
+import { UserModel } from "./user.model";
 
 @Resolver(UserModel)
-export class UserController {
+export class UserResolver {
   private _ormInterface = new OrmInterface(UserModel);
 
-  //#region GraphQL
   @Query(returns => LoginResponse)
   async login(@Args() { Name, Password } : LoginArgs): Promise<LoginResponse> {
     const user: UserModel = await this._ormInterface.ComposeQuery({ where: { Name }}).getOne();
@@ -24,7 +23,7 @@ export class UserController {
           Name: user.Name,
           Email: user.Email,
           Role: user.Role
-        }, config.secret);
+        }, config.jwtSecret);
         return {
           Token: token,
           User: new GetableUser(user)
@@ -37,7 +36,6 @@ export class UserController {
     }
   }
 
-  // @Authorized()
   @Query(returns => UserGetResponse)
   async users(@Args() args: UserArgs) {
     return this._ormInterface.Query(args);
@@ -62,7 +60,6 @@ export class UserController {
     }
   }
 
-  @Authorized()
   @Mutation(returns => String)
   async deleteUser(@Args() { Id } : DeleteArgs) {
     try {
@@ -103,8 +100,4 @@ export class UserController {
       throw new Error(ErrorHelper.getError("server", "unauthorized"));
     }
   }
-  //#endregion
-
-  //#region REST
-  //#endregion
 }

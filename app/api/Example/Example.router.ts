@@ -1,17 +1,17 @@
 import { Router, Get, Post } from "@decorators";
-import { Auth } from "./Example.middleware";
-import { Stat } from "./Example.finisher";
+import { Auth } from "./Example.before";
+import { Stat } from "./Example.after";
+import { TestMiddlewares } from "./Example.middlewares";
+import { ExampleModel } from "./Example.model";
 
 @Router(
   "example"
 )
 export class ExampleRouter {
-  @Get(
-    "/",
-    [Stat]
-  )
-  getAll(req, res, next) {
+  @Get("/")
+  async getAll(req, res, next) {
     console.log("Hello");
+    res.send(await ExampleModel.find());
     next();
   }
 

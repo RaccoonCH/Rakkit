@@ -1,5 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import UserModel from "../UserModel";
+import { UserModel } from "../user.model";
 
 @ObjectType()
 export class GetableUser implements Pick<UserModel, "Id" | "Name" | "Email" | "Role"> {

@@ -1,6 +1,6 @@
 import { ArgsType, Field, InputType } from "type-graphql";
 import { GraphqlUtils } from "@logic";
-import UserModel from "../UserModel";
+import { UserModel } from "../user.model";
 
 @InputType()
 export class UserType implements Pick<UserModel, "Id" | "Name" | "Email" | "Role"> {

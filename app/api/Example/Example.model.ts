@@ -7,7 +7,7 @@ import { RShorttext, RId } from "@types";
 @ObjectType()
 @InputType("ExampleInput")
 @Entity({ name: "Example" })
-export default class ExampleModel extends BaseEntity {
+export class ExampleModel extends BaseEntity {
   @Attribute(new RShorttext())
   @Field({ nullable: true })
   @Column()

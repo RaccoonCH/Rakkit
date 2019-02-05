@@ -1,6 +1,6 @@
 import { ArgsType, Field, InputType } from "type-graphql";
 import { GraphqlUtils } from "@logic";
-import CultureModel from "@api/Culture/CultureModel";
+import CultureModel from "@api/Culture/Culture.model";
 
 @InputType()
 export class CultureType implements Pick<CultureModel, "LangCode" | "CountryCode"> {
