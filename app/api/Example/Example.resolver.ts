@@ -1,7 +1,7 @@
 import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from "rakkitql";
 import { PubSubEngine } from "graphql-subscriptions";
 import { OrmInterface } from "@logic";
-import { Notif, GetResponse, GetArgs } from "@api/types";
+import { Notif, GetResponse, GetArgs } from "@app/types";
 import { ExampleModel } from "./Example.model";
 
 @Resolver(ExampleModel)

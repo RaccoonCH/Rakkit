@@ -1,7 +1,9 @@
 import { Field, GenericType, GenericField } from "rakkitql";
 import { OrderByArgs } from "@types";
 
-@GenericType()
+@GenericType({
+  transformFields: { nullable: true }
+})
 export abstract class GetArgs<Type> {
   @GenericField({ nullable: true })
   readonly where?: Type;

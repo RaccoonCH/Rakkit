@@ -9,7 +9,7 @@ import { RShorttext, RId } from "@types";
 @Entity({ name: "Example" })
 export class ExampleModel extends BaseEntity {
   @Attribute(new RId())
-  @Field(type => ID, { nullable: true })
+  @Field(type => ID)
   @PrimaryGeneratedColumn()
   readonly Id: number;
   private _name: string;
@@ -22,7 +22,7 @@ export class ExampleModel extends BaseEntity {
   }
 
   @Attribute(new RShorttext())
-  @Field({ nullable: true })
+  @Field()
   @Column()
   get Name(): string {
     return this._name;
@@ -32,7 +32,7 @@ export class ExampleModel extends BaseEntity {
   }
 
   @Attribute(new RShorttext())
-  @Field({ nullable: true })
+  @Field()
   @Column()
   get Text(): string {
     return this._text;
