@@ -1,18 +1,34 @@
-import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub } from "rakkitql";
+import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub, Info } from "rakkitql";
+import { InfoParamMetadata, ParamMetadata } from "rakkitql/dist/metadata/definitions";
 import { PubSubEngine } from "graphql-subscriptions";
-import { OrmInterface } from "@logic";
 import { Notif, GetResponse, GetArgs } from "@app/types";
+import { TypeormInterface } from "@logic";
+import { IContext } from "@types";
 import { ExampleModel } from "./Example.model";
+import { Auth } from "./Example.before";
+import { GraphQLResolveInfo, FieldNode } from "graphql";
+import { Entity } from "typeorm";
 
 @Resolver(ExampleModel)
 export default class ExampleController {
-  private _ormInterface = new OrmInterface(ExampleModel);
+  private _ormInterface = new TypeormInterface(ExampleModel);
 
   @Query(returns => ExampleModel, { generic: GetResponse })
   async examples(
-    @Args({ type: ExampleModel }) args: GetArgs<ExampleModel>
+    @Args({ type: ExampleModel }) args: GetArgs<ExampleModel>,
+    @Info() info: GraphQLResolveInfo
   ) {
-    // return this._ormInterface.GetManyAndCount(args);
+    info;
+    return this._ormInterface.Query({
+      ...args,
+      relations: [
+        {
+          table: "test",
+          forArg: "test",
+          select: true
+        }
+      ]
+    }, (Array.from(Array.from(info.fieldNodes)[0].selectionSet.selections)[0] as FieldNode).selectionSet.selections as ReadonlyArray<FieldNode>);
   }
 
   @Query(returns => String)

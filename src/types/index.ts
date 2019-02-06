@@ -28,12 +28,16 @@ export * from "./FrontTypes/Other/Image";
 export * from "./FrontTypes/Other/Date";
 export * from "./FrontTypes/Other/Password";
 
-export * from "./GraphQL/IGetResponse";
 export * from "./GraphQL/IRelationQuery";
 export * from "./GraphQL/OrderByArgs";
-export * from "./GraphQL/QueryArgs";
+export * from "./GraphQL/IComposeQueryOptions";
+export * from "./GraphQL/ICompiledFieldNode";
+export * from "./GraphQL/Generics/GetArgs";
+export * from "./GraphQL/Generics/GetResponse";
 
 export * from "./REST/BaseMiddleware";
 export * from "./REST/MiddlewareType";
 export * from "./REST/HttpMethod";
-export * from "./REST/MiddlewareFunction";
+export * from "./REST/HandlerFunction";
+
+export * from "./Routing/IContext";

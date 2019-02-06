@@ -2,7 +2,6 @@ import { lstatSync, readdirSync, existsSync } from "fs";
 import { join } from "path";
 
 export class FileUtils {
-
   get RootPath(): string {
     return this.rootPath;
   }

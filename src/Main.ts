@@ -13,7 +13,7 @@ import { ApolloServer } from "apollo-server-express";
 import { createServer, Server } from "http";
 import { AppLoader, DecoratorStorage } from "@logic";
 import { config } from "@app/RakkitConfig";
-import { IMain } from "@types";
+import { IMain, HandlerFunction, IContext } from "@types";
 import { Color } from "@misc";
 
 export class Main extends AppLoader {
@@ -29,7 +29,6 @@ export class Main extends AppLoader {
   private _socketio: SocketIO.Server;
   private _publicPath: string;
   private _subscriptionServer: SubscriptionServer;
-  private _decoratorStorage: DecoratorStorage;
 
   static get Instance(): Main {
     return this._instance;
@@ -85,7 +84,7 @@ export class Main extends AppLoader {
     }
   }
 
-  private loadMiddlewares(middlewares: Map<Object, RequestHandlerParams>) {
+  private loadMiddlewares(middlewares: Map<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       config.globalMiddlewares,
       this._expressApp,
@@ -174,9 +173,11 @@ export class Main extends AppLoader {
       subscriptions: {
         path: this._graphqlEndpoint
       },
-      context: ({ req }) => {
+      context: ({ req, res, next }): IContext => {
         return {
           req,
+          res,
+          next,
           user: req.user // from express-jwt
         };
       }

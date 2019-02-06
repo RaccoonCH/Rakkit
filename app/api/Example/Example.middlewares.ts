@@ -1,8 +1,9 @@
 import { BeforeMiddleware } from "@decorators";
+import { IContext } from "@types";
 
 export class TestMiddlewares {
   @BeforeMiddleware()
-  static check(req, res, next) {
+  static check({ next }: IContext) {
     console.log("check");
     next();
   }

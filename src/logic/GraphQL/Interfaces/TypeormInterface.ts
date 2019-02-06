@@ -1,12 +1,10 @@
-import { getConnection, ObjectType, SelectQueryBuilder } from "typeorm";
-import { IRelationQuery, QueryArgs } from "@types";
+import { getConnection, ObjectType, SelectQueryBuilder, getMetadataArgsStorage } from "typeorm";
+import { FieldNode, SelectionNode } from "graphql";
+import { IRelationQuery, GetResponse, IComposeQueryOptions, ICompiledFieldNode } from "@types";
 
 const queryModelName = "model";
-interface ComposeQueryOptions extends QueryArgs {
-  readonly relations?: (string | IRelationQuery)[];
-}
 
-export class OrmInterface<Entity> {
+export class TypeormInterface<Entity> {
   private _model: ObjectType<Entity>;
 
   get Model() {
@@ -20,29 +18,45 @@ export class OrmInterface<Entity> {
     this.Model = model;
   }
 
-  async GetManyAndCount(options?: ComposeQueryOptions) {
-    return this.parse(await this.ComposeQuery(options).getManyAndCount(), true);
+  async GetManyAndCount(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ): Promise<GetResponse<Entity>> {
+    return this.parse(await (await this.ComposeQuery(options, fields)).getManyAndCount(), true);
   }
 
-  async GetMany(options?: ComposeQueryOptions) {
-    return this.parse(await this.ComposeQuery(options).getMany(), false);
+  async GetMany(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ): Promise<GetResponse<Entity>> {
+    return this.parse(await (await this.ComposeQuery(options, fields)).getMany(), false);
   }
 
-  Query(options?: ComposeQueryOptions) {
+  Query(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ) {
     if (options.count) {
-      return this.GetManyAndCount(options);
+      return this.GetManyAndCount(options, fields);
     }
-    return this.GetMany(options);
+    return this.GetMany(options, fields);
   }
 
   /**
    * Compose a TypeORM query from a GraphQL query
-   * @param where The where conditions
    * @param options The other options
+   * @param fields Fields to select
    */
-  ComposeQuery(options?: ComposeQueryOptions): SelectQueryBuilder<Entity> {
-    const queryBuilder = getConnection().createQueryBuilder(this.Model, queryModelName);
+  async ComposeQuery(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ): Promise<SelectQueryBuilder<Entity>> {
+    const conn = getConnection();
+    const queryBuilder = conn.createQueryBuilder(this.Model, queryModelName);
     const relationArgs = new Map();
+    const selectedFields = await this.compileFields(fields);
+
+    let selectsCount = 0;
     let conditionOperator: "or" | "and" = "and";
 
     if (options) {
@@ -118,6 +132,29 @@ export class OrmInterface<Entity> {
       }
     }
 
+    const selectFields = (field: ICompiledFieldNode, parent: string = queryModelName) => {
+      const completeFieldName = `${parent}_${field.name}`;
+      const fieldPath = `${parent}.${field.name}`;
+      if (selectsCount === 0) {
+        queryBuilder.select(fieldPath, completeFieldName);
+      } else {
+        queryBuilder.addSelect(fieldPath, completeFieldName);
+      }
+      field.fields.map((subField) => {
+        selectFields(subField, field.name);
+      });
+      selectsCount++;
+    };
+    // Select the primary key to get datas
+    const { primaryColumns } = conn.getMetadata(this.Model);
+    selectFields({
+      name: primaryColumns[0].databaseName,
+      fields: []
+    });
+    selectedFields.map((field) => {
+      selectFields(field);
+    });
+
     const parseObjToQuery = (obj: Object, mainField: string = queryModelName, parentProp: string = null) => {
       Object.getOwnPropertyNames(obj).map((prop: string) => {
         const value = obj[prop];
@@ -147,11 +184,41 @@ export class OrmInterface<Entity> {
         }
       });
     };
+
     if (options.where) {
       parseObjToQuery(options.where);
     }
 
+    console.log(queryBuilder.getSql());
+    console.log(await queryBuilder.getRawAndEntities());
+
     return queryBuilder;
+  }
+
+  private async compileFields(fields?: ReadonlyArray<FieldNode>): Promise<ICompiledFieldNode[]> {
+    if (fields) {
+      return await fields.reduce(async (arr, field) => {
+        return [
+          ...await arr,
+          await this.compileFieldNode(field)
+        ];
+      }, Promise.resolve([]));
+    }
+    return [];
+  }
+
+  private async compileFieldNode(field: FieldNode | SelectionNode): Promise<ICompiledFieldNode> {
+    const fieldNode = field as FieldNode;
+    let compiledSubFieldNodes: ICompiledFieldNode[] = [];
+    if (fieldNode.selectionSet) {
+      compiledSubFieldNodes = await Promise.all(fieldNode.selectionSet.selections.map((field) => {
+        return this.compileFieldNode(field);
+      }));
+    }
+    return {
+      name: fieldNode.name.value,
+      fields: compiledSubFieldNodes
+    };
   }
 
   private getQueryFieldName(fieldName: string, mainField: string = null, noBase?: boolean): string {
@@ -168,7 +235,7 @@ export class OrmInterface<Entity> {
     return `${this.getQueryFieldName(subField, mainField)} = :${subField}`;
   }
 
-  private parse(items: Object[], count = false) {
+  private parse(items: any[], count = false) {
     if (count) {
       return {
         items: items[0],

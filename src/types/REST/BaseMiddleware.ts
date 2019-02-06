@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction } from "express";
+import { IContext } from "@types";
 
 export abstract class BaseMiddleware {
-  abstract use(req: Request, res: Response, next: NextFunction): any;
+  abstract use(context: IContext, next: NextFunction);
 }

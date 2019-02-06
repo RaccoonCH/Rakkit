@@ -1,15 +1,17 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { Field, ObjectType, ID, InputType } from "rakkitql";
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { Field, ObjectType, ID } from "rakkitql";
 import { Attribute, Package } from "@decorators";
-import { RShorttext, RId } from "@types";
+import { Test } from "./Test.model";
 
 @Package({ name: "Example" })
 @ObjectType()
-@InputType("ExampleInput")
 @Entity({ name: "Example" })
 export class ExampleModel extends BaseEntity {
-  @Attribute(new RId())
-  @Field(type => ID)
+  @Field(type => Test, { nullable: true })
+  @ManyToOne(type => Test, test => test.examples)
+  test: Test;
+
+  @Field(type => Number)
   @PrimaryGeneratedColumn()
   readonly Id: number;
   private _name: string;
@@ -21,7 +23,6 @@ export class ExampleModel extends BaseEntity {
     this.Text = text;
   }
 
-  @Attribute(new RShorttext())
   @Field()
   @Column()
   get Name(): string {
@@ -31,7 +32,6 @@ export class ExampleModel extends BaseEntity {
     this._name = val;
   }
 
-  @Attribute(new RShorttext())
   @Field()
   @Column()
   get Text(): string {

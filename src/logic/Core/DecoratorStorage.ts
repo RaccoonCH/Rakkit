@@ -13,8 +13,10 @@ import {
   BaseMiddleware,
   MiddlewareExecutionTime,
   IType,
-  IOn
+  IOn,
+  HandlerFunction
 } from "@types";
+import { HandlerFunctionHelper } from "../Helpers/HandlerFunctionHelper";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;
@@ -23,8 +25,8 @@ export class DecoratorStorage {
   private _routers: Map<Object, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
   private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
-  private _beforeMiddlewares: Map<Object, RequestHandlerParams> = new Map();
-  private _afterMiddlewares: Map<Object, RequestHandlerParams> = new Map();
+  private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
+  private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _compiledPackages: IPackage[];
   private _compiledRouter: Router = Router();
   private _ons: IOn[] = [];
@@ -177,7 +179,7 @@ export class DecoratorStorage {
     });
   }
 
-  private loadMiddlewares(router: IRouter, middlewares: Map<Object, RequestHandlerParams>) {
+  private loadMiddlewares(router: IRouter, middlewares: Map<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       router.middlewares,
       router.router,
@@ -208,7 +210,7 @@ export class DecoratorStorage {
         ...beforeMiddlewares,
         ...endpoint.functions,
         ...afterMiddlewares
-      ];
+      ].map(HandlerFunctionHelper.getWrappedHandlerFunction);
       router.params.router[endpoint.method.toLowerCase()](
         `/${router.params.path}${endpoint.endpoint}`,
         ...endpoint.functions

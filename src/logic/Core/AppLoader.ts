@@ -1,19 +1,19 @@
-import { RequestHandlerParams } from "express-serve-static-core";
 import { Router, Express } from "express";
 import { sync as GlobSync } from "glob";
-import { IAppConfig, MiddlewareType, ClassOrString } from "@types";
+import { IAppConfig, MiddlewareType, ClassOrString, HandlerFunction } from "@types";
+import { HandlerFunctionHelper } from "@logic";
 
 export class AppLoader {
   static loadMiddlewares(
     middlewaresToLoad: MiddlewareType[],
     expressApp: Express | Router,
-    middlewares: Map<Object, RequestHandlerParams>
+    middlewares: Map<Object, HandlerFunction>
   ) {
     if (middlewaresToLoad) {
       middlewaresToLoad.map((item) => {
         const middleware = middlewares.get(item);
         if (middleware) {
-          expressApp.use(middleware);
+          expressApp.use(HandlerFunctionHelper.getWrappedHandlerFunction(middleware));
         }
       });
     }
