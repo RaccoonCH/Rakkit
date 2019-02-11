@@ -1,10 +1,9 @@
 import { getConnection, ObjectType, SelectQueryBuilder, getMetadataArgsStorage } from "typeorm";
-import { FieldNode, SelectionNode } from "graphql";
+import { FieldNode, SelectionNode, GraphQLResolveInfo } from "graphql";
 import { IRelationQuery, GetResponse, IComposeQueryOptions, ICompiledFieldNode } from "@types";
 
-const queryModelName = "model";
-
 export class TypeormInterface<Entity> {
+  private static queryModelName = "model";
   private _model: ObjectType<Entity>;
 
   get Model() {
@@ -18,28 +17,23 @@ export class TypeormInterface<Entity> {
     this.Model = model;
   }
 
-  async GetManyAndCount(
-    options?: IComposeQueryOptions,
-    fields?: ReadonlyArray<FieldNode>
-  ): Promise<GetResponse<Entity>> {
-    return this.parse(await (await this.ComposeQuery(options, fields)).getManyAndCount(), true);
-  }
-
-  async GetMany(
-    options?: IComposeQueryOptions,
-    fields?: ReadonlyArray<FieldNode>
-  ): Promise<GetResponse<Entity>> {
-    return this.parse(await (await this.ComposeQuery(options, fields)).getMany(), false);
-  }
-
   Query(
     options?: IComposeQueryOptions,
-    fields?: ReadonlyArray<FieldNode>
+    info?: GraphQLResolveInfo
   ) {
-    if (options.count) {
-      return this.GetManyAndCount(options, fields);
+    let fields = undefined;
+    if (info) {
+      // Select fields from {count: number, fields: FieldNode[]}
+      fields = (
+        Array.from(
+          Array.from(info.fieldNodes)[0].selectionSet.selections
+        )[0] as FieldNode
+      ).selectionSet.selections as ReadonlyArray<FieldNode>;
     }
-    return this.GetMany(options, fields);
+    if (options.count) {
+      return this.getManyAndCount(options, fields);
+    }
+    return this.getMany(options, fields);
   }
 
   /**
@@ -52,7 +46,7 @@ export class TypeormInterface<Entity> {
     fields?: ReadonlyArray<FieldNode>
   ): Promise<SelectQueryBuilder<Entity>> {
     const conn = getConnection();
-    const queryBuilder = conn.createQueryBuilder(this.Model, queryModelName);
+    const queryBuilder = conn.createQueryBuilder(this.Model, TypeormInterface.queryModelName);
     const relationArgs = new Map();
     const selectedFields = await this.compileFields(fields);
 
@@ -132,30 +126,32 @@ export class TypeormInterface<Entity> {
       }
     }
 
-    const selectFields = (field: ICompiledFieldNode, parent: string = queryModelName) => {
-      const completeFieldName = `${parent}_${field.name}`;
-      const fieldPath = `${parent}.${field.name}`;
-      if (selectsCount === 0) {
-        queryBuilder.select(fieldPath, completeFieldName);
-      } else {
-        queryBuilder.addSelect(fieldPath, completeFieldName);
-      }
-      field.fields.map((subField) => {
-        selectFields(subField, field.name);
+    if (fields) {
+      const selectFields = (field: ICompiledFieldNode, parent: string = TypeormInterface.queryModelName) => {
+        const completeFieldName = `${parent}_${field.name}`;
+        const fieldPath = `${parent}.${field.name}`;
+        if (selectsCount === 0) {
+          queryBuilder.select(fieldPath, completeFieldName);
+        } else {
+          queryBuilder.addSelect(fieldPath, completeFieldName);
+        }
+        field.fields.map((subField) => {
+          selectFields(subField, field.name);
+        });
+        selectsCount++;
+      };
+      // Select the primary key to get datas
+      const { primaryColumns } = conn.getMetadata(this.Model);
+      selectFields({
+        name: primaryColumns[0].databaseName,
+        fields: []
       });
-      selectsCount++;
-    };
-    // Select the primary key to get datas
-    const { primaryColumns } = conn.getMetadata(this.Model);
-    selectFields({
-      name: primaryColumns[0].databaseName,
-      fields: []
-    });
-    selectedFields.map((field) => {
-      selectFields(field);
-    });
+      selectedFields.map((field) => {
+        selectFields(field);
+      });
+    }
 
-    const parseObjToQuery = (obj: Object, mainField: string = queryModelName, parentProp: string = null) => {
+    const parseObjToQuery = (obj: Object, mainField: string = TypeormInterface.queryModelName, parentProp: string = null) => {
       Object.getOwnPropertyNames(obj).map((prop: string) => {
         const value = obj[prop];
 
@@ -189,9 +185,6 @@ export class TypeormInterface<Entity> {
       parseObjToQuery(options.where);
     }
 
-    console.log(queryBuilder.getSql());
-    console.log(await queryBuilder.getRawAndEntities());
-
     return queryBuilder;
   }
 
@@ -205,6 +198,20 @@ export class TypeormInterface<Entity> {
       }, Promise.resolve([]));
     }
     return [];
+  }
+
+  private async getManyAndCount(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ): Promise<GetResponse<Entity>> {
+    return this.parse(await (await this.ComposeQuery(options, fields)).getManyAndCount(), true);
+  }
+
+  private async getMany(
+    options?: IComposeQueryOptions,
+    fields?: ReadonlyArray<FieldNode>
+  ): Promise<GetResponse<Entity>> {
+    return this.parse(await (await this.ComposeQuery(options, fields)).getMany(), false);
   }
 
   private async compileFieldNode(field: FieldNode | SelectionNode): Promise<ICompiledFieldNode> {
@@ -227,7 +234,7 @@ export class TypeormInterface<Entity> {
     if (mainField) {
       return basic(mainField);
     } else {
-      return fieldProps.length > 1 ? fieldName : basic(noBase ? null : queryModelName);
+      return fieldProps.length > 1 ? fieldName : basic(noBase ? null : TypeormInterface.queryModelName);
     }
   }
 

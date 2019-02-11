@@ -28,7 +28,7 @@ export default class ExampleController {
           select: true
         }
       ]
-    }, (Array.from(Array.from(info.fieldNodes)[0].selectionSet.selections)[0] as FieldNode).selectionSet.selections as ReadonlyArray<FieldNode>);
+    }, info);
   }
 
   @Query(returns => String)
