@@ -1,19 +1,18 @@
 import "reflect-metadata";
-import * as TypeGraphQL from "rakkitql";
 import * as BodyParser from "body-parser";
 import * as SocketIO from "socket.io";
 import * as Express from "express";
 import * as jwt from "express-jwt";
 import * as Path from "path";
 import * as Cors from "cors";
-import { RequestHandlerParams } from "express-serve-static-core";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
 import { ApolloServer } from "apollo-server-express";
 import { createServer, Server } from "http";
+import { buildSchema } from "rakkitql";
+import { IMain, HandlerFunction, IContext } from "@types";
 import { AppLoader, DecoratorStorage } from "@logic";
 import { config } from "@app/RakkitConfig";
-import { IMain, HandlerFunction, IContext } from "@types";
 import { Color } from "@misc";
 
 export class Main extends AppLoader {
@@ -157,7 +156,7 @@ export class Main extends AppLoader {
 
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
-    const schema: GraphQLSchema = await TypeGraphQL.buildSchema({
+    const schema: GraphQLSchema = await buildSchema({
       resolvers: config.resolvers
       // authChecker: ({ context }, roles) =>  {
       //   const user: GetableUser = context.req.user;

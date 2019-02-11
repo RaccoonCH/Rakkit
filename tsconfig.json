@@ -7,6 +7,7 @@
     "outDir": "build",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "declaration": true,
     "lib": [
       "dom",
       "es7",
@@ -20,9 +21,12 @@
       "@decorators": ["src/decorators/index"],
       "@misc": ["src/misc/index"],
       "@api/*": ["app/api/*"],
+      "@modules/*": ["src/modules/*"],
       "@app/*": ["app/*"],
       "@main": ["src/Main"],
-      "@config": ["RakkitConfig"]
+      "@config": ["RakkitConfig"],
+      "@root": ["."],
+      "rakkitql": ["src/modules/rakkitql/src/index"]
     }
   },
   "exclude": [
