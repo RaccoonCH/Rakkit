@@ -83,7 +83,7 @@ export class Main extends AppLoader {
     }
   }
 
-  private loadMiddlewares(middlewares: Map<Object, HandlerFunction>) {
+  private loadMiddlewares(middlewares: ReadonlyMap<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       config.globalMiddlewares,
       this._expressApp,
@@ -119,7 +119,7 @@ export class Main extends AppLoader {
 
       this.loadMiddlewares(DecoratorStorage.Instance.BeforeMiddlewares);
       // Load the api returned router into the /[restEndpoint] route
-      this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter);
+      this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter as Express.Router);
       this.loadMiddlewares(DecoratorStorage.Instance.AfterMiddlewares);
 
       // Use jwt auth middleware
@@ -128,7 +128,7 @@ export class Main extends AppLoader {
         credentialsRequired: false
       }));
 
-      // Invalid token error response
+      // Invalid token error response => TO MAKE A MIDDLEWARE
       this._expressApp.use((
         err: Express.ErrorRequestHandler,
         req: Express.Request,
@@ -172,12 +172,12 @@ export class Main extends AppLoader {
       subscriptions: {
         path: this._graphqlEndpoint
       },
-      context: ({ req, res, next }): IContext => {
+      context: ({ req, res }): IContext => {
         return {
           req,
           res,
-          next,
-          user: req.user // from express-jwt
+          user: req.user, // from express-jwt
+          type: "gql"
         };
       }
     });

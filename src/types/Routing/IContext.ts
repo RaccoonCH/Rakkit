@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
+import { IGraphQLContext } from "@types";
 
-export interface IContext {
+export interface IContext extends Partial<IGraphQLContext> {
+  type: "rest" | "gql";
   req: Request;
   res: Response;
-  next: NextFunction;
   user?: any;
 }

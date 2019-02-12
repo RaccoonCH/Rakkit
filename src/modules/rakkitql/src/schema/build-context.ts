@@ -5,6 +5,7 @@ import { PubSubEngine, PubSub, PubSubOptions } from "graphql-subscriptions";
 import { AuthChecker, AuthMode } from "../interfaces";
 import { Middleware } from "../interfaces/Middleware";
 import { ContainerType, ContainerGetter, IOCContainer } from "../utils/container";
+import { MiddlewareType } from "@types";
 
 export type DateScalarMode = "isoDate" | "timestamp";
 
@@ -24,7 +25,7 @@ export interface BuildContextOptions {
   authChecker?: AuthChecker<any, any>;
   authMode?: AuthMode;
   pubSub?: PubSubEngine | PubSubOptions;
-  globalMiddlewares?: Array<Middleware<any>>;
+  globalMiddlewares?: MiddlewareType[];
   container?: ContainerType | ContainerGetter<any>;
 }
 
@@ -35,7 +36,7 @@ export abstract class BuildContext {
   static authChecker?: AuthChecker<any, any>;
   static authMode: AuthMode;
   static pubSub: PubSubEngine;
-  static globalMiddlewares: Array<Middleware<any>>;
+  static globalMiddlewares: MiddlewareType[];
   static container: IOCContainer;
 
   /**

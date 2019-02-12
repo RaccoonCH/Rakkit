@@ -35,9 +35,11 @@ export * from "./GraphQL/ICompiledFieldNode";
 export * from "./GraphQL/Generics/GetArgs";
 export * from "./GraphQL/Generics/GetResponse";
 
-export * from "./REST/BaseMiddleware";
-export * from "./REST/MiddlewareType";
 export * from "./REST/HttpMethod";
-export * from "./REST/HandlerFunction";
 
+export * from "./Routing/BaseMiddleware";
+export * from "./Routing/MiddlewareType";
+export * from "./Routing/HandlerFunction";
 export * from "./Routing/IContext";
+export * from "./Routing/IGraphQLContext";
+export * from "./Routing/NextFunction";

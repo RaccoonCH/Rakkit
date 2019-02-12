@@ -39,23 +39,31 @@ export class DecoratorStorage {
   }
 
   get Packages() {
-    return this._compiledPackages;
+    return this._compiledPackages as ReadonlyArray<IPackage>;
   }
 
   get MainRouter() {
-    return this._compiledRouter;
+    return this._compiledRouter as Readonly<Router>;
   }
 
   get BeforeMiddlewares() {
-    return this._beforeMiddlewares;
+    return this._beforeMiddlewares as ReadonlyMap<Object, HandlerFunction>;
   }
 
   get AfterMiddlewares() {
-    return this._afterMiddlewares;
+    return this._afterMiddlewares as ReadonlyMap<Object, HandlerFunction>;
+  }
+
+  get Middlewares() {
+    return this._middlewares as ReadonlyMap<Object, IDecorator<IMiddleware>>;
   }
 
   get Ons() {
-    return this._ons;
+    return this._ons as ReadonlyArray<IOn>;
+  }
+
+  get Endpoints() {
+    return this._endpoints as ReadonlyArray<IDecorator<IEndpoint>>;
   }
 
   static getAddEndPointDecorator(method: HttpMethod) {
@@ -202,7 +210,7 @@ export class DecoratorStorage {
 
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
     router.params.router = Router();
-    this.loadMiddlewares(router.params, DecoratorStorage.Instance.BeforeMiddlewares);
+    this.loadMiddlewares(router.params, this._beforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
       const beforeMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "BEFORE");
       const afterMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "AFTER");
@@ -216,7 +224,7 @@ export class DecoratorStorage {
         ...endpoint.functions
       );
     });
-    this.loadMiddlewares(router.params, DecoratorStorage.Instance.AfterMiddlewares);
+    this.loadMiddlewares(router.params, this._afterMiddlewares);
   }
 
   private compile(map: Map<Object, IDecorator<any>>) {

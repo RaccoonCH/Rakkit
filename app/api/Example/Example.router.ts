@@ -5,6 +5,7 @@ import { TestMiddlewares } from "./Example.middlewares";
 import { ExampleModel } from "./Example.model";
 import { Auth } from "./Example.before";
 import { Stat } from "./Example.after";
+import { Before } from "./Example.resolver";
 
 @Router(
   "example"
@@ -13,14 +14,14 @@ export class ExampleRouter {
   @Get("/", [
     Stat
   ])
-  async getAll({ res, next }: IContext) {
+  async getAll({ res }: IContext, next) {
     console.log("Hello");
     res.send(await ExampleModel.find());
     next();
   }
 
-  @Post("/")
+  @Post("/", [Before])
   add(context: IContext, next: NextFunction) {
-    console.log("Hello 2");
+    console.log(context, "Hello 2");
   }
 }

@@ -48,6 +48,90 @@ export class MetadataStorage {
   subTypes: TypeClassMetadata[] = []; // Compiled type for a generic field
   wrapperTypes: TypeClassMetadata[] = []; // Compiled type that represent the GenericType class
 
+  get Fields() {
+    return this.returnArr(this.fields);
+  }
+
+  get GenericFields() {
+    return this.returnArr(this.genericFields);
+  }
+
+  get InputTypes() {
+    return this.returnArr(this.inputTypes);
+  }
+
+  get ObjectTypes() {
+    return this.returnArr(this.objectTypes);
+  }
+
+  get Args() {
+    return this.returnArr(this.args);
+  }
+
+  get Subscritpions() {
+    return this.returnArr(this.subscriptions);
+  }
+
+  get Queries() {
+    return this.returnArr(this.queries);
+  }
+
+  get Middlewares() {
+    return this.returnArr(this.middlewares);
+  }
+
+  get GenericTypes() {
+    return this.returnArr(this.genericTypes);
+  }
+
+  get FieldResolvers() {
+    return this.returnArr(this.fieldResolvers);
+  }
+
+  get ObjectArgs() {
+    return this.returnArr(this.objectArgs);
+  }
+
+  get InterfaceTypes() {
+    return this.returnArr(this.interfaceTypes);
+  }
+
+  get Mutations() {
+    return this.returnArr(this.mutations);
+  }
+
+  get Params() {
+    return this.returnArr(this.params);
+  }
+
+  get WrapperTypes() {
+    return this.returnArr(this.wrapperTypes);
+  }
+
+  get SubTypes() {
+    return this.returnArr(this.subTypes);
+  }
+
+  get ResolverClasses() {
+    return this.returnArr(this.resolverClasses);
+  }
+
+  get Unions() {
+    return this.returnArr(this.unions);
+  }
+
+  get AuthorizedFields() {
+    return this.returnArr(this.authorizedFields);
+  }
+
+  get ArgumentTypes() {
+    return this.returnArr(this.argumentTypes);
+  }
+
+  get Enums() {
+    return this.returnArr(this.enums);
+  }
+
   constructor() {
     ensureReflectMetadataExists();
   }
@@ -389,5 +473,9 @@ export class MetadataStorage {
       return;
     }
     return authorizedField.roles;
+  }
+
+  private returnArr<Type>(arr: Type[]) {
+    return arr as ReadonlyArray<Type>;
   }
 }

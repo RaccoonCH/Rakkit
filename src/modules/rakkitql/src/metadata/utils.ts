@@ -7,6 +7,7 @@ import {
 import { Middleware } from "../interfaces/Middleware";
 import { isThrowing } from "../helpers/isThrowing";
 import { ReflectMetadataMissingError } from "../errors";
+import { MiddlewareType } from "@types";
 
 export function mapSuperResolverHandlers<T extends BaseResolverMetadata>(
   definitions: T[],
@@ -39,10 +40,10 @@ export function mapSuperFieldResolverHandlers(
 
 export function mapMiddlewareMetadataToArray(
   metadata: MiddlewareMetadata[],
-): Array<Middleware<any>> {
+): MiddlewareType[] {
   return metadata
     .map(m => m.middlewares)
-    .reduce<Array<Middleware<any>>>(
+    .reduce<MiddlewareType[]>(
       (middlewares, resultArray) => resultArray.concat(middlewares),
       [],
     );

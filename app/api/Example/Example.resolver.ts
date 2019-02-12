@@ -1,19 +1,27 @@
-import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub, Info } from "rakkitql";
-import { InfoParamMetadata, ParamMetadata } from "rakkitql/dist/metadata/definitions";
+// tslint:disable-next-line:max-line-length
+import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub, Info, MiddlewareInterface, UseMiddleware } from "rakkitql";
 import { PubSubEngine } from "graphql-subscriptions";
 import { Notif, GetResponse, GetArgs } from "@app/types";
 import { TypeormInterface } from "@logic";
-import { IContext } from "@types";
 import { ExampleModel } from "./Example.model";
-import { Auth } from "./Example.before";
 import { GraphQLResolveInfo, FieldNode } from "graphql";
-import { Entity } from "typeorm";
+import { BeforeMiddleware, AfterMiddleware } from "@decorators";
+import { BaseMiddleware, IContext } from "@types";
+
+@BeforeMiddleware()
+export class Before extends BaseMiddleware {
+  async use(ctx: IContext, next) {
+    console.log(ctx, "Before");
+    return next();
+  }
+}
 
 @Resolver(ExampleModel)
 export default class ExampleController {
   private _ormInterface = new TypeormInterface(ExampleModel);
 
   @Query(returns => ExampleModel, { generic: GetResponse })
+  @UseMiddleware(Before)
   async examples(
     @Args({ type: ExampleModel }) args: GetArgs<ExampleModel>,
     @Info() info: GraphQLResolveInfo
@@ -32,9 +40,12 @@ export default class ExampleController {
   }
 
   @Query(returns => String)
-  async hello(@PubSub() pubSub: PubSubEngine) {
+  @UseMiddleware(Before)
+  async hello(@PubSub() pubSub: PubSubEngine, next) {
     await pubSub.publish("EXAMPLE_SUB", {});
-    return "okay";
+    console.log("func");
+    next();
+    return "hellooo";
   }
 
   @Subscription({
@@ -48,7 +59,8 @@ export default class ExampleController {
 
   // The @Root refers to the self element instance
   @FieldResolver()
-  nameToUppercase(@Root() exampleInstance: ExampleModel): string {
+  @UseMiddleware(Before)
+  nameToUppercase(@Root() exampleInstance: ExampleModel, next): string {
     return exampleInstance.Name.toLocaleUpperCase();
   }
 }

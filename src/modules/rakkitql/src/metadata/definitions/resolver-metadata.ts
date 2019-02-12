@@ -8,6 +8,7 @@ import {
 import { ParamMetadata } from "./param-metadata";
 import { Middleware } from "../../interfaces/Middleware";
 import { Complexity } from "../../interfaces";
+import { MiddlewareType } from "@types";
 
 export interface BaseResolverMetadata {
   methodName: string;
@@ -17,7 +18,7 @@ export interface BaseResolverMetadata {
   resolverClassMetadata?: ResolverClassMetadata;
   params?: ParamMetadata[];
   roles?: any[];
-  middlewares?: Array<Middleware<any>>;
+  middlewares?: MiddlewareType[];
 }
 
 export interface ResolverMetadata extends BaseResolverMetadata {

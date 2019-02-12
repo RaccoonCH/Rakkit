@@ -5,9 +5,11 @@ import { ParamMetadata } from "../metadata/definitions";
 import { convertToType } from "../helpers/types";
 import { validateArg } from "./validate-arg";
 import { ResolverData, AuthChecker, AuthMode } from "../interfaces";
-import { Middleware, MiddlewareFn, MiddlewareClass } from "../interfaces/Middleware";
+import { Middleware, MiddlewareClass } from "../interfaces/Middleware";
 import { IOCContainer } from "../utils/container";
 import { AuthMiddleware } from "../helpers/auth-middleware";
+import { DecoratorStorage } from "@logic";
+import { HandlerFunction, IContext, MiddlewareType } from "@types";
 
 export async function getParams(
   params: ParamMetadata[],
@@ -56,7 +58,7 @@ export async function getParams(
 }
 
 export function applyAuthChecker(
-  middlewares: Array<Middleware<any>>,
+  middlewares: MiddlewareType[],
   authMode: AuthMode,
   authChecker?: AuthChecker<any, any>,
   roles?: any[],
@@ -69,20 +71,40 @@ export function applyAuthChecker(
 export async function applyMiddlewares(
   container: IOCContainer,
   resolverData: ResolverData<any>,
-  middlewares: Array<Middleware<any>>,
-  resolverHandlerFunction: () => any,
+  middlewares: MiddlewareType[],
+  resolverHandlerFunction: (...params: any[]) => any,
 ): Promise<any> {
   let middlewaresIndex = -1;
-  async function dispatchHandler(currentIndex: number): Promise<void> {
-    if (currentIndex <= middlewaresIndex) {
-      throw new Error("next() called multiple times");
-    }
-    middlewaresIndex = currentIndex;
-    let handlerFn: MiddlewareFn<any>;
-    if (currentIndex === middlewares.length) {
-      handlerFn = resolverHandlerFunction;
+  const beforeMiddlewares = [];
+  const afterMiddlewares = [];
+  middlewares.map((mw) => {
+    const foundMiddleware = DecoratorStorage.Instance.Middlewares.get(mw);
+    if (foundMiddleware) {
+      switch (foundMiddleware.params.executionTime) {
+        case "BEFORE":
+          beforeMiddlewares.push(mw);
+        break;
+        case "AFTER":
+          afterMiddlewares.push(mw);
+        break;
+      }
     } else {
-      const currentMiddleware = middlewares[currentIndex];
+      beforeMiddlewares.push(mw);
+    }
+  });
+  const allMiddlewares = [
+    ...beforeMiddlewares,
+    resolverHandlerFunction,
+    ...afterMiddlewares
+  ];
+  async function dispatchHandler(currentIndex: number): Promise<void> {
+    if (currentIndex < allMiddlewares.length) {
+      if (currentIndex <= middlewaresIndex) {
+        throw new Error("next() called multiple times");
+      }
+      middlewaresIndex = currentIndex;
+      let handlerFn: HandlerFunction;
+      const currentMiddleware = allMiddlewares[currentIndex];
       // arrow function or class
       if (currentMiddleware.prototype !== undefined) {
         const middlewareClassInstance = container.getInstance(
@@ -91,15 +113,21 @@ export async function applyMiddlewares(
         );
         handlerFn = middlewareClassInstance.use.bind(middlewareClassInstance);
       } else {
-        handlerFn = currentMiddleware as MiddlewareFn<any>;
+        handlerFn = currentMiddleware as HandlerFunction;
       }
+      const handlerParams: IContext = {
+        root: resolverData.root,
+        args: resolverData.args,
+        info: resolverData.info,
+        ...resolverData.context,
+      };
+      let nextResult: any;
+      const result = await handlerFn(handlerParams, async () => {
+        nextResult = await dispatchHandler(currentIndex + 1);
+        return nextResult;
+      });
+      return result !== undefined ? result : nextResult;
     }
-    let nextResult: any;
-    const result = await handlerFn(resolverData, async () => {
-      nextResult = await dispatchHandler(currentIndex + 1);
-      return nextResult;
-    });
-    return result !== undefined ? result : nextResult;
   }
   return dispatchHandler(0);
 }

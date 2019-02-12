@@ -1,6 +1,6 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
-import { Field, ObjectType, ID } from "rakkitql";
-import { Attribute, Package } from "@decorators";
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Field, ObjectType } from "rakkitql";
+import { Package } from "@decorators";
 import { Test } from "./Test.model";
 
 @Package({ name: "Example" })

@@ -27,14 +27,14 @@ export function createHandlerResolver(
   return async (root, args, context, info) => {
     const resolverData: ResolverData<any> = { root, args, context, info };
     const targetInstance = container.getInstance(resolverMetadata.target, resolverData);
-    return applyMiddlewares(container, resolverData, middlewares, async () => {
+    return applyMiddlewares(container, resolverData, middlewares, async (_, next) => {
       const params: any[] = await getParams(
         resolverMetadata.params!,
         resolverData,
         globalValidate,
         pubSub,
       );
-      return targetInstance[resolverMetadata.methodName].apply(targetInstance, params);
+      return targetInstance[resolverMetadata.methodName].apply(targetInstance, [...params, next]);
     });
   };
 }

@@ -1,7 +1,7 @@
-import { ResolverData } from "./ResolverData";
+import { IContext } from "@types";
 
 export type AuthChecker<ContextType = {}, RoleType = string> = (
-  resolverData: ResolverData<ContextType>,
+  resolverData: IContext,
   roles: RoleType[],
 ) => boolean | Promise<boolean>;
 

@@ -35,6 +35,5 @@ export const config: IAppConfig = {
     `${basePath}**/*.ws.ts`
   ],
   globalMiddlewares: [
-    TestMiddlewares.check
   ]
 };

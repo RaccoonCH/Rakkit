@@ -3,11 +3,12 @@ import { Middleware } from "../interfaces/Middleware";
 import { getMetadataStorage } from "../metadata/getMetadataStorage";
 import { getArrayFromOverloadedRest } from "../helpers/decorators";
 import { MethodAndPropDecorator } from "./types";
+import { MiddlewareType } from "@types";
 
-export function UseMiddleware(middlewares: Array<Middleware<any>>): MethodAndPropDecorator;
-export function UseMiddleware(...middlewares: Array<Middleware<any>>): MethodAndPropDecorator;
+export function UseMiddleware(middlewares: MiddlewareType[]): MethodAndPropDecorator;
+export function UseMiddleware(...middlewares: MiddlewareType[]): MethodAndPropDecorator;
 export function UseMiddleware(
-  ...middlewaresOrMiddlewareArray: Array<Middleware<any> | Array<Middleware<any>>>
+  ...middlewaresOrMiddlewareArray: Array<MiddlewareType[] | MiddlewareType>
 ): MethodDecorator | PropertyDecorator {
   const middlewares = getArrayFromOverloadedRest(middlewaresOrMiddlewareArray);
 

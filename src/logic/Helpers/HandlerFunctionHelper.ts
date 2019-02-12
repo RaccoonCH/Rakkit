@@ -5,12 +5,12 @@ export class HandlerFunctionHelper {
   static getWrappedHandlerFunction(handler: HandlerFunction) {
     return (req: Request, res: Response, next: NextFunction) => {
       const context: IContext = {
+        type: "rest",
         req,
         res,
-        next,
         user: req.user
       };
-      handler(context);
+      handler(context, next);
     };
   }
 }

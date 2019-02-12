@@ -1,6 +1,7 @@
-import { getConnection, ObjectType, SelectQueryBuilder, getMetadataArgsStorage } from "typeorm";
+import { getConnection, ObjectType, SelectQueryBuilder } from "typeorm";
 import { FieldNode, SelectionNode, GraphQLResolveInfo } from "graphql";
 import { IRelationQuery, GetResponse, IComposeQueryOptions, ICompiledFieldNode } from "@types";
+import { getMetadataStorage } from "rakkitql";
 
 export class TypeormInterface<Entity> {
   private static queryModelName = "model";
@@ -128,17 +129,21 @@ export class TypeormInterface<Entity> {
 
     if (fields) {
       const selectFields = (field: ICompiledFieldNode, parent: string = TypeormInterface.queryModelName) => {
-        const completeFieldName = `${parent}_${field.name}`;
-        const fieldPath = `${parent}.${field.name}`;
-        if (selectsCount === 0) {
-          queryBuilder.select(fieldPath, completeFieldName);
-        } else {
-          queryBuilder.addSelect(fieldPath, completeFieldName);
+        const a = getMetadataStorage;
+        const foundField = getMetadataStorage().Fields.find((f) => f.target === this._model && f.name === field.name);
+        if (!foundField.fieldResolver) {
+          const completeFieldName = `${parent}_${field.name}`;
+          const fieldPath = `${parent}.${field.name}`;
+          if (selectsCount === 0) {
+            queryBuilder.select(fieldPath, completeFieldName);
+          } else {
+            queryBuilder.addSelect(fieldPath, completeFieldName);
+          }
+          field.fields.map((subField) => {
+            selectFields(subField, field.name);
+          });
+          selectsCount++;
         }
-        field.fields.map((subField) => {
-          selectFields(subField, field.name);
-        });
-        selectsCount++;
       };
       // Select the primary key to get datas
       const { primaryColumns } = conn.getMetadata(this.Model);

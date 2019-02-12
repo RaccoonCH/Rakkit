@@ -1,4 +1,4 @@
-export { MiddlewareFn, NextFn, MiddlewareInterface } from "./Middleware";
+export * from "./Middleware";
 export * from "./AuthChecker";
 export * from "./ClassType";
 export * from "./Complexity";

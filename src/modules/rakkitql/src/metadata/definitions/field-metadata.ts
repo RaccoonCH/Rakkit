@@ -3,6 +3,7 @@ import { TypeValueThunk, TypeOptions } from "../../decorators/types";
 import { Middleware } from "../../interfaces/Middleware";
 import { Complexity } from "../../interfaces";
 import { BaseClassMetadata } from "./types";
+import { MiddlewareType } from "@types";
 
 export interface FieldMetadata extends BaseClassMetadata {
   schemaName: string;
@@ -19,5 +20,5 @@ export interface FieldMetadata extends BaseClassMetadata {
   roles?: any[];
   fieldResolver?: boolean;
   fields?: FieldMetadata[];
-  middlewares?: Array<Middleware<any>>;
+  middlewares?: MiddlewareType[];
 }

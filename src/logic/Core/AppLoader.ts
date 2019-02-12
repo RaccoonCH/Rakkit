@@ -7,7 +7,7 @@ export class AppLoader {
   static loadMiddlewares(
     middlewaresToLoad: MiddlewareType[],
     expressApp: Express | Router,
-    middlewares: Map<Object, HandlerFunction>
+    middlewares: ReadonlyMap<Object, HandlerFunction>
   ) {
     if (middlewaresToLoad) {
       middlewaresToLoad.map((item) => {
