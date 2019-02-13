@@ -1,3 +1,3 @@
-import { BaseMiddleware, HandlerFunction, IType } from "@types";
+import { HandlerFunction, IMiddlewareClass } from "@types";
 
-export type MiddlewareType = IType<BaseMiddleware> | HandlerFunction;
+export type MiddlewareType = IMiddlewareClass | HandlerFunction;

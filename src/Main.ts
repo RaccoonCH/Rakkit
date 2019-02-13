@@ -1,13 +1,14 @@
 import "reflect-metadata";
-import * as BodyParser from "body-parser";
 import * as SocketIO from "socket.io";
-import * as Express from "express";
-import * as jwt from "express-jwt";
 import * as Path from "path";
-import * as Cors from "cors";
+import * as Koa from "koa";
+import * as BodyParser from "koa-bodyparser";
+import * as Cors from "@koa/cors";
+import * as Static from "koa-static";
+import * as Router from "koa-router";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-koa";
 import { createServer, Server } from "http";
 import { buildSchema } from "rakkitql";
 import { IMain, HandlerFunction, IContext } from "@types";
@@ -21,7 +22,8 @@ export class Main extends AppLoader {
   private _port: number;
   private _restEndpoint: string;
   private _graphqlEndpoint: string;
-  private _expressApp: Express.Express;
+  private _koaApp: Koa;
+  private _mainKoaRouter: Router;
   private _httpServer: Server;
   private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
@@ -41,8 +43,8 @@ export class Main extends AppLoader {
     this._restEndpoint = params.restEndpoint || "/rest";
     this._graphqlEndpoint = params.graphqlEndpoint || "/gql";
     this._publicPath = params.publicPath || Path.join(__dirname, "../public");
-    this._expressApp = Express();
-    this._httpServer = createServer(this._expressApp);
+    this._koaApp = new Koa();
+    this._httpServer = createServer(this._koaApp.callback());
   }
 
   /**
@@ -86,7 +88,7 @@ export class Main extends AppLoader {
   private loadMiddlewares(middlewares: ReadonlyMap<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       config.globalMiddlewares,
-      this._expressApp,
+      this._mainKoaRouter,
       middlewares
     );
   }
@@ -109,38 +111,20 @@ export class Main extends AppLoader {
   private async startRest() {
     return new Promise<void>(async (resolve) => {
       if (this._corsEnabled) {
-        this._expressApp.use(Cors());
+        this._koaApp.use(Cors());
       }
-      this._expressApp.use(BodyParser.urlencoded({extended: false}));
-      this._expressApp.use(BodyParser.json());
+      this._koaApp.use(BodyParser());
 
       // Server the public folder to be served as a static folder
-      this._expressApp.use("/", Express.static(this._publicPath));
+      this._koaApp.use(Static(this._publicPath));
+
+      this._mainKoaRouter = new Router({ prefix: this._restEndpoint });
+      this._mainKoaRouter.use(DecoratorStorage.Instance.MainRouter.routes());
 
       this.loadMiddlewares(DecoratorStorage.Instance.BeforeMiddlewares);
       // Load the api returned router into the /[restEndpoint] route
-      this._expressApp.use(this._restEndpoint, DecoratorStorage.Instance.MainRouter as Express.Router);
+      this._koaApp.use(this._mainKoaRouter.routes());
       this.loadMiddlewares(DecoratorStorage.Instance.AfterMiddlewares);
-
-      // Use jwt auth middleware
-      this._expressApp.use(jwt({
-        secret: config.jwtSecret,
-        credentialsRequired: false
-      }));
-
-      // Invalid token error response => TO MAKE A MIDDLEWARE
-      this._expressApp.use((
-        err: Express.ErrorRequestHandler,
-        req: Express.Request,
-        res: Express.Response,
-        next: Express.NextFunction
-      ) => {
-        if (err.name === "UnauthorizedError") {
-          res.status(401).send("unauthorized");
-        } else {
-          next();
-        }
-      });
 
       await this.startWs();
 
@@ -157,7 +141,8 @@ export class Main extends AppLoader {
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
     const schema: GraphQLSchema = await buildSchema({
-      resolvers: config.resolvers
+      resolvers: config.resolvers,
+      globalMiddlewares: config.globalMiddlewares
       // authChecker: ({ context }, roles) =>  {
       //   const user: GetableUser = context.req.user;
       //   if (user) {
@@ -172,17 +157,15 @@ export class Main extends AppLoader {
       subscriptions: {
         path: this._graphqlEndpoint
       },
-      context: ({ req, res }): IContext => {
+      context: ({ context }): IContext => {
         return {
-          req,
-          res,
-          user: req.user, // from express-jwt
+          context,
           type: "gql"
         };
       }
     });
     this._apolloServer.applyMiddleware({
-      app: this._expressApp,
+      app: this._koaApp,
       path: this._graphqlEndpoint
     });
 

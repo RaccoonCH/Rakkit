@@ -1,0 +1,14 @@
+{
+  "name": "rakkitql",
+  "scripts": {
+    "test": "jest --verbose --coverage",
+    "test:ci": "jest --verbose --coverage --ci --forceExit --detectOpenHandles --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "paths": {
+    "@logic": [
+      "../../logic"
+    ]
+  },
+  "devDependencies": {}
+}

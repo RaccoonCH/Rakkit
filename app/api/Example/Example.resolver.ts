@@ -1,24 +1,34 @@
-// tslint:disable-next-line:max-line-length
-import { Query, Resolver, FieldResolver, Root, Args, Subscription, PubSub, Info, MiddlewareInterface, UseMiddleware } from "rakkitql";
+import {
+  Query,
+  Resolver,
+  FieldResolver,
+  Root,
+  Args,
+  Subscription,
+  PubSub,
+  Info,
+  UseMiddleware
+} from "rakkitql";
 import { PubSubEngine } from "graphql-subscriptions";
 import { Notif, GetResponse, GetArgs } from "@app/types";
 import { TypeormInterface } from "@logic";
 import { ExampleModel } from "./Example.model";
-import { GraphQLResolveInfo, FieldNode } from "graphql";
-import { BeforeMiddleware, AfterMiddleware } from "@decorators";
-import { BaseMiddleware, IContext } from "@types";
-
-@BeforeMiddleware()
-export class Before extends BaseMiddleware {
-  async use(ctx: IContext, next) {
-    console.log(ctx, "Before");
-    return next();
-  }
-}
+import { GraphQLResolveInfo } from "graphql";
+import { Before } from "./Example.before";
+import { NextFunction } from "@types";
+import { After } from "./Example.after";
 
 @Resolver(ExampleModel)
-export default class ExampleController {
+export class ExampleController {
   private _ormInterface = new TypeormInterface(ExampleModel);
+
+  @FieldResolver(type => String)
+  async example(
+    @Root() root: ExampleModel
+  ) {
+    root;
+    return "yo";
+  }
 
   @Query(returns => ExampleModel, { generic: GetResponse })
   @UseMiddleware(Before)
@@ -26,7 +36,6 @@ export default class ExampleController {
     @Args({ type: ExampleModel }) args: GetArgs<ExampleModel>,
     @Info() info: GraphQLResolveInfo
   ) {
-    info;
     return this._ormInterface.Query({
       ...args,
       relations: [
@@ -40,12 +49,11 @@ export default class ExampleController {
   }
 
   @Query(returns => String)
-  @UseMiddleware(Before)
-  async hello(@PubSub() pubSub: PubSubEngine, next) {
+  @UseMiddleware(Before, After)
+  async hello(@PubSub() pubSub: PubSubEngine, next: NextFunction) {
     await pubSub.publish("EXAMPLE_SUB", {});
-    console.log("func");
     next();
-    return "hellooo";
+    return "hello";
   }
 
   @Subscription({
@@ -57,7 +65,6 @@ export default class ExampleController {
     };
   }
 
-  // The @Root refers to the self element instance
   @FieldResolver()
   @UseMiddleware(Before)
   nameToUppercase(@Root() exampleInstance: ExampleModel, next): string {

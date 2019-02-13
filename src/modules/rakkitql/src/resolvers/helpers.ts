@@ -1,15 +1,15 @@
 import { PubSubEngine } from "graphql-subscriptions";
 import { ValidatorOptions } from "class-validator";
-
 import { ParamMetadata } from "../metadata/definitions";
 import { convertToType } from "../helpers/types";
 import { validateArg } from "./validate-arg";
 import { ResolverData, AuthChecker, AuthMode } from "../interfaces";
-import { Middleware, MiddlewareClass } from "../interfaces/Middleware";
+import { MiddlewareClass } from "../interfaces/Middleware";
 import { IOCContainer } from "../utils/container";
 import { AuthMiddleware } from "../helpers/auth-middleware";
 import { DecoratorStorage } from "@logic";
 import { HandlerFunction, IContext, MiddlewareType } from "@types";
+import { Subject } from "rxjs";
 
 export async function getParams(
   params: ParamMetadata[],
@@ -75,8 +75,8 @@ export async function applyMiddlewares(
   resolverHandlerFunction: (...params: any[]) => any,
 ): Promise<any> {
   let middlewaresIndex = -1;
-  const beforeMiddlewares = [];
-  const afterMiddlewares = [];
+  const beforeMiddlewares: MiddlewareType[] = [];
+  const afterMiddlewares: MiddlewareType[] = [];
   middlewares.map((mw) => {
     const foundMiddleware = DecoratorStorage.Instance.Middlewares.get(mw);
     if (foundMiddleware) {
@@ -97,11 +97,13 @@ export async function applyMiddlewares(
     resolverHandlerFunction,
     ...afterMiddlewares
   ];
-  async function dispatchHandler(currentIndex: number): Promise<void> {
+  const resultSubject = new Subject();
+  let result: any;
+  async function dispatchHandler(currentIndex: number): Promise<any> {
     if (currentIndex < allMiddlewares.length) {
-      if (currentIndex <= middlewaresIndex) {
-        throw new Error("next() called multiple times");
-      }
+      // if (currentIndex <= middlewaresIndex) {
+      //   throw new Error("next() called multiple times");
+      // }
       middlewaresIndex = currentIndex;
       let handlerFn: HandlerFunction;
       const currentMiddleware = allMiddlewares[currentIndex];
@@ -116,18 +118,23 @@ export async function applyMiddlewares(
         handlerFn = currentMiddleware as HandlerFunction;
       }
       const handlerParams: IContext = {
+        type: "gql",
         root: resolverData.root,
         args: resolverData.args,
         info: resolverData.info,
-        ...resolverData.context,
+        context: resolverData.context
       };
-      let nextResult: any;
-      const result = await handlerFn(handlerParams, async () => {
-        nextResult = await dispatchHandler(currentIndex + 1);
-        return nextResult;
-      });
-      return result !== undefined ? result : nextResult;
+      const nextFn = async () => {
+        const res = await dispatchHandler(currentIndex + 1);
+        if (res) {
+          result = res;
+          resultSubject.complete();
+        }
+      }
+      return handlerFn(handlerParams, nextFn)
     }
   }
-  return dispatchHandler(0);
+  dispatchHandler(0);
+  await resultSubject.toPromise();
+  return result;
 }

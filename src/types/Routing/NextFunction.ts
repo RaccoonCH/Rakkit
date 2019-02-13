@@ -1,1 +1,1 @@
-export type NextFunction = ((err?) => void) | ((err?) => Promise<void>);
+export type NextFunction = () => Promise<any>;

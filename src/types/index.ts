@@ -37,9 +37,10 @@ export * from "./GraphQL/Generics/GetResponse";
 
 export * from "./REST/HttpMethod";
 
-export * from "./Routing/BaseMiddleware";
+export * from "./Routing/IBaseMiddleware";
 export * from "./Routing/MiddlewareType";
 export * from "./Routing/HandlerFunction";
 export * from "./Routing/IContext";
 export * from "./Routing/IGraphQLContext";
 export * from "./Routing/NextFunction";
+export * from "./Routing/IMiddlewareClass";

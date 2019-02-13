@@ -10,9 +10,12 @@ module.exports = {
   collectCoverage: false,
   collectCoverageFrom: [
     "<rootDir>/src/**/*.ts",
-    "!<rootDir>/src/**/*.d.ts",
-    "!<rootDir>/src/browser-shim.ts",
+    "!<rootDir>/src/**/*.d.ts"
   ],
   coverageDirectory: "<rootDir>/coverage",
   testEnvironment: "node",
+  moduleNameMapper: {
+    '^@logic$': '<rootDir>/../../logic',
+    '^rakkitql$': '<rootDir>',
+  }
 };

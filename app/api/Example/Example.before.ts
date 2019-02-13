@@ -1,10 +1,10 @@
-import { BaseMiddleware, IContext } from "@types";
 import { BeforeMiddleware } from "@decorators";
+import { IBaseMiddleware, IContext, NextFunction } from "@types";
 
 @BeforeMiddleware()
-export class Auth extends BaseMiddleware {
-  use({ next }: IContext) {
-    console.log("mid");
+export class Before implements IBaseMiddleware {
+  async use(ctx: IContext, next: NextFunction) {
+    console.log("Before");
     next();
   }
 }

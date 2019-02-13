@@ -1,16 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import { HandlerFunction, IContext } from "@types";
+import { HandlerFunction, IContext, NextFunction } from "@types";
+import { Context, Middleware } from "koa";
 
 export class HandlerFunctionHelper {
-  static getWrappedHandlerFunction(handler: HandlerFunction) {
-    return (req: Request, res: Response, next: NextFunction) => {
-      const context: IContext = {
+  static getWrappedHandlerFunction(handler: HandlerFunction): Middleware {
+    return (context: Context, next: NextFunction) => {
+      const ctx: IContext = {
         type: "rest",
-        req,
-        res,
-        user: req.user
+        context
       };
-      handler(context, next);
+      handler(ctx, next);
     };
   }
 }

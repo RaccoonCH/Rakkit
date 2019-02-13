@@ -1,21 +1,27 @@
-import { Router, Express } from "express";
+import * as Router from "koa-router";
 import { sync as GlobSync } from "glob";
 import { IAppConfig, MiddlewareType, ClassOrString, HandlerFunction } from "@types";
 import { HandlerFunctionHelper } from "@logic";
+import { Middleware, ParameterizedContext } from "koa";
 
 export class AppLoader {
   static loadMiddlewares(
     middlewaresToLoad: MiddlewareType[],
-    expressApp: Express | Router,
+    router: Router,
     middlewares: ReadonlyMap<Object, HandlerFunction>
   ) {
     if (middlewaresToLoad) {
-      middlewaresToLoad.map((item) => {
-        const middleware = middlewares.get(item);
+      const mws = middlewaresToLoad.reduce((prev, curr) => {
+        const middleware = middlewares.get(curr);
         if (middleware) {
-          expressApp.use(HandlerFunctionHelper.getWrappedHandlerFunction(middleware));
+          return [
+            ...prev,
+            HandlerFunctionHelper.getWrappedHandlerFunction(middleware)
+          ];
         }
-      });
+        return prev;
+      }, []);
+      router.use(mws);
     }
   }
 

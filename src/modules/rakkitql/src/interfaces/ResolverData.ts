@@ -7,6 +7,6 @@ export interface ArgsDictionary {
 export interface ResolverData<ContextType = {}> {
   root: any;
   args: ArgsDictionary;
-  context: ContextType;
+  context?: ContextType;
   info: GraphQLResolveInfo;
 }

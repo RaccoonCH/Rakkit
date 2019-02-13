@@ -1,9 +1,8 @@
-import { Request, Response } from "express";
 import { IGraphQLContext } from "@types";
+import { Context } from "koa";
 
 export interface IContext extends Partial<IGraphQLContext> {
   type: "rest" | "gql";
-  req: Request;
-  res: Response;
+  context: Context;
   user?: any;
 }

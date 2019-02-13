@@ -1,8 +1,5 @@
-import { createConnection, getConnectionOptions } from "typeorm";
+import { createConnection } from "typeorm";
 import { IAppConfig } from "@types";
-import { Auth } from "@api/Example/Example.before";
-import { Stat } from "@api/Example/Example.after";
-import { TestMiddlewares } from "@api/Example/Example.middlewares";
 
 const basePath = `${__dirname}/api/`;
 

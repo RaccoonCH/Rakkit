@@ -1,27 +1,13 @@
-import { NextFunction } from "express";
-import { Router, Get, Post } from "@decorators";
-import { IContext } from "@types";
-import { TestMiddlewares } from "./Example.middlewares";
-import { ExampleModel } from "./Example.model";
-import { Auth } from "./Example.before";
-import { Stat } from "./Example.after";
-import { Before } from "./Example.resolver";
+import { Router, Get } from "@decorators";
+import { IContext, NextFunction } from "@types";
+import { Before } from "./Example.before";
+import { After } from "./Example.after";
 
-@Router(
-  "example"
-)
+@Router("example", [Before, After])
 export class ExampleRouter {
-  @Get("/", [
-    Stat
-  ])
-  async getAll({ res }: IContext, next) {
-    console.log("Hello");
-    res.send(await ExampleModel.find());
+  @Get("/")
+  async getAll({ context }: IContext, next: NextFunction) {
+    console.log("hello");
     next();
-  }
-
-  @Post("/", [Before])
-  add(context: IContext, next: NextFunction) {
-    console.log(context, "Hello 2");
   }
 }

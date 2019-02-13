@@ -1,5 +1,5 @@
+import * as Router from "koa-router";
 import { MiddlewareType, IEndpoint } from "@types";
-import { Router } from "express";
 
 export interface IRouter {
   path: string;

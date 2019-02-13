@@ -39,6 +39,7 @@
     "interface-name": [true, "never-prefix"],
     "ordered-imports": false,
     "no-unused-expression": false,
-    "callable-types": false
+    "callable-types": false,
+    "no-empty": false
   }
 }
