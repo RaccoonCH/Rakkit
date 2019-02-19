@@ -25,7 +25,7 @@ At the heart of the project there is a [type-graphql](https://github.com/19majke
 ### Features (Full typed, class based)  
 - GraphQL API Creation
 - Rest API Creation ([koa](https://koajs.com/) base)
-- Websocket support (socket.io)
+- Websocket support ([socket.io](https://socket.io/))
 - Typeorm interface to optimize and execute SQL queries with GraphQL
 
 ### Contributing  

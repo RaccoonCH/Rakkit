@@ -1,6 +1,6 @@
 {
-  "name": "rakkit_fw",
-  "version": "1.0.2",
+  "name": "rakkit",
+  "version": "0.0.0",
   "description": "Rakkit framework",
   "main": "build/index.js",
   "types": "build/index.d.ts",
