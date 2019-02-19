@@ -1,7 +1,7 @@
 <p align="center">
   <img src="logo.png" width="220" alt="Nest Logo"/>
   <br>
-  A simple backend framework written in <b>TypeScript</b> to build amazing server-side application that provide <b>GraphQL / REST API</b> and <b>Websocket</b> tools. 
+  A simple backend framework written in <b>TypeScript</b> that provide <b>GraphQL / REST API</b> and <b>Websocket</b> tools to build amazing server-side application
 </p>
   
   
