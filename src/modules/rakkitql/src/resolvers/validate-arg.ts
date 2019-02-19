@@ -26,6 +26,7 @@ export async function validateArg<T extends Object>(
     await validateOrReject(arg, validatorOptions);
     return arg;
   } catch (err) {
+    console.log(err)
     throw new ArgumentValidationError(err);
   }
 }

@@ -7,7 +7,7 @@
   
 ### Getting started  
 ```
-npm i -rakkit
+npm i rakkit
 ```
 ```
 yarn add rakkit

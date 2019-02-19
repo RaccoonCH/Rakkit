@@ -1,11 +1,17 @@
 {
-  "moduleFileExtensions": [
-    "ts",
-    "tsx",
-    "js"
-  ],
+  "verbose": true,
   "transform": {
-    "\\.(ts|tsx)$": "ts-jest"
+    "^.+\\.tsx?$": "ts-jest"
   },
-  "testRegex": "/tests/.*\\.test.(ts|tsx|js)$"
+  "testMatch": ["**/functional/**/*.ts", "**/units/**/*.ts"],
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+  "rootDir": "./",
+  "roots": ["<rootDir>/tests", "<rootDir>/src"],
+  "collectCoverage": false,
+  "collectCoverageFrom": [
+    "<rootDir>/src/**/*.ts",
+    "!<rootDir>/src/**/*.d.ts"
+  ],
+  "coverageDirectory": "<rootDir>/coverage",
+  "testEnvironment": "node"
 }

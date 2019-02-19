@@ -25,7 +25,7 @@
   "scripts": {
     "start": "ts-node -T src/Rakkit.ts",
     "new:rp": "ts-node scripts/new",
-    "test": "jest --config jest.config.json --detectOpenHandles"
+    "tests": "jest --config jest.config.json --detectOpenHandles --runInBand --outputFile=tests.results.json"
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",
