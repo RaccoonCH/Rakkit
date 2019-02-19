@@ -1,4 +1,4 @@
-import { IContext, NextFunction } from "@types";
+import { IContext, NextFunction } from "..";
 
 export type HandlerFunction = (
   context: IContext,

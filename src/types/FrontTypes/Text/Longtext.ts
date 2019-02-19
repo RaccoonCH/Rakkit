@@ -1,4 +1,4 @@
-import { FrontType, IText } from "@types";
+import { FrontType, IText } from "../..";
 
 export class RLongtext extends FrontType implements IText {
   readonly placeholder: string;

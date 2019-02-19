@@ -1,3 +1,3 @@
-import { DecoratorStorage } from "@logic";
+import { DecoratorStorage } from "../../logic";
 
 export const AfterMiddleware = DecoratorStorage.getAddMiddlewareDecorator("AFTER");

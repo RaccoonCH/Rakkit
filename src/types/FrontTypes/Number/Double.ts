@@ -1,4 +1,4 @@
-import  { FrontType, INumber } from "@types";
+import  { FrontType, INumber } from "../..";
 
 export class RDouble extends FrontType implements INumber {
   readonly precision?: number;

@@ -1,4 +1,4 @@
-import { FrontType } from "@types";
+import { FrontType } from "../../..";
 
 export interface IAttribute {
   name?: string;

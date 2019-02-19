@@ -1,7 +1,7 @@
 import { getConnection, ObjectType, SelectQueryBuilder } from "typeorm";
 import { FieldNode, SelectionNode, GraphQLResolveInfo } from "graphql";
-import { IRelationQuery, GetResponse, IComposeQueryOptions, ICompiledFieldNode } from "@types";
-import { getMetadataStorage } from "rakkitql";
+import { IRelationQuery, GetResponse, IComposeQueryOptions, ICompiledFieldNode } from "../../../types";
+import { getMetadataStorage } from "../../../modules/rakkitql";
 
 export class TypeormInterface<Entity> {
   private static queryModelName = "model";

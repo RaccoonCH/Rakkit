@@ -9,7 +9,9 @@ export * from "./Decorators/Params/REST/IRouterParams";
 export * from "./Decorators/Params/REST/IMiddlewareParams";
 export * from "./Decorators/REST/IEndpoint";
 export * from "./Decorators/REST/IRouter";
-export * from "./Decorators/REST/IMiddleware";
+export * from "./Decorators/Routing/IMiddleware";
+export * from "./Decorators/Routing/IUsedMiddleware";
+export * from "./Decorators/Routing/IClassPath";
 export * from "./Decorators/WS/IOn";
 export * from "./Decorators/IDecorator";
 

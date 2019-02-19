@@ -1,4 +1,4 @@
-import { FrontType } from "@types";
+import { FrontType } from "../..";
 
 export class RPassword extends FrontType {
   readonly maskText: string = "rakkit";

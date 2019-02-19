@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import { OrmInterface } from "@logic";
+import { TypeormInterface } from "./../src/logic";
 import { Test } from "./class";
 
 const testInstances = [];

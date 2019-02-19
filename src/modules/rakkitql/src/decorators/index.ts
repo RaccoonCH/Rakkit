@@ -17,6 +17,7 @@ export { Resolver } from "./Resolver";
 export { Root } from "./Root";
 export { Subscription } from "./Subscription";
 export { createUnionType } from "./unions";
-export { UseMiddleware } from "./UseMiddleware";
+export { UseMiddlewareRakkitQL } from "./UseMiddlewareRakkitQL";
 export { GenericType } from "./GenericType";
 export { GenericField } from "./GenericField";
+export * from "./types";

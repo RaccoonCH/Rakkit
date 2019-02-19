@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from "graphql";
-import { ArgsDictionary } from "rakkitql";
+import { ArgsDictionary } from "../../modules/rakkitql";
 
 export interface IGraphQLContext {
   root: any;

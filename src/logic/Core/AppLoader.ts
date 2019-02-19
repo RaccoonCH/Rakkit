@@ -1,8 +1,7 @@
 import * as Router from "koa-router";
 import { sync as GlobSync } from "glob";
-import { IAppConfig, MiddlewareType, ClassOrString, HandlerFunction } from "@types";
-import { HandlerFunctionHelper } from "@logic";
-import { Middleware, ParameterizedContext } from "koa";
+import { IAppConfig, MiddlewareType, ClassOrString, HandlerFunction } from "../../types";
+import { HandlerFunctionHelper } from "../../logic";
 
 export class AppLoader {
   static loadMiddlewares(

@@ -8,8 +8,8 @@ export function getInstalledGraphQLVersion(): string {
 }
 
 export function getPeerDependencyGraphQLRequirement(): string {
-  const ownPackageJson = require("../../../../../package.json");
   try {
+    const ownPackageJson = require("../../../../../package.json");
     return ownPackageJson.peerDependencies.graphql;
   } catch (err) {
     return "";

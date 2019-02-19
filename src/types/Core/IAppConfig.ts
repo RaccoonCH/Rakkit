@@ -1,4 +1,4 @@
-import { IMain, MiddlewareType } from "@types";
+import { IMain, MiddlewareType } from "../..";
 
 export type ClassOrString = (Function | string);
 

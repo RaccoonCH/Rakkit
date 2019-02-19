@@ -1,5 +1,5 @@
-import { FrontType, IAttribute } from "@types";
-import { DecoratorStorage } from "@logic";
+import { FrontType, IAttribute } from "../../types";
+import { DecoratorStorage } from "../../logic";
 
 /**
  * Pupulate the attributes into an object,

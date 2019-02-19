@@ -78,6 +78,7 @@ export interface GenericFieldOptions extends GenericBaseOptions {
 }
 
 export type MethodAndPropDecorator = PropertyDecorator & MethodDecorator;
+export type AnyDecorator = MethodAndPropDecorator & ClassDecorator;
 
 export interface ResolverClassOptions {
   isAbstract?: boolean;

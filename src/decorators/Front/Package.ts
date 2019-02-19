@@ -1,5 +1,5 @@
-import { IPackage } from "@types";
-import { DecoratorStorage } from "@logic";
+import { DecoratorStorage } from "../../logic";
+import { IPackage } from "../../types";
 
 /**
  * Declare a RakkitPackge to show into front-end

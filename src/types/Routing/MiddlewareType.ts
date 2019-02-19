@@ -1,3 +1,3 @@
-import { HandlerFunction, IMiddlewareClass } from "@types";
+import { HandlerFunction, IMiddlewareClass } from "..";
 
 export type MiddlewareType = IMiddlewareClass | HandlerFunction;

@@ -1,14 +1,14 @@
+import { HandlerFunction, IContext, MiddlewareType } from "../../../../types";
+import { ResolverData, AuthChecker, AuthMode } from "../interfaces";
+import { AuthMiddleware } from "../helpers/auth-middleware";
+import { MiddlewareClass } from "../interfaces/Middleware";
+import { ParamMetadata } from "../metadata/definitions";
+import { DecoratorStorage } from "../../../../logic";
 import { PubSubEngine } from "graphql-subscriptions";
 import { ValidatorOptions } from "class-validator";
-import { ParamMetadata } from "../metadata/definitions";
+import { IOCContainer } from "../utils/container";
 import { convertToType } from "../helpers/types";
 import { validateArg } from "./validate-arg";
-import { ResolverData, AuthChecker, AuthMode } from "../interfaces";
-import { MiddlewareClass } from "../interfaces/Middleware";
-import { IOCContainer } from "../utils/container";
-import { AuthMiddleware } from "../helpers/auth-middleware";
-import { DecoratorStorage } from "@logic";
-import { HandlerFunction, IContext, MiddlewareType } from "@types";
 import { Subject } from "rxjs";
 
 export async function getParams(
@@ -99,6 +99,14 @@ export async function applyMiddlewares(
   ];
   const resultSubject = new Subject();
   let result: any;
+  async function validateResult(func: Promise<any>) {
+    const res = await func;
+    if (res) {
+      result = res;
+      resultSubject.complete();
+    }
+    return res;
+  }
   async function dispatchHandler(currentIndex: number): Promise<any> {
     if (currentIndex < allMiddlewares.length) {
       // if (currentIndex <= middlewaresIndex) {
@@ -124,14 +132,10 @@ export async function applyMiddlewares(
         info: resolverData.info,
         context: resolverData.context
       };
-      const nextFn = async () => {
-        const res = await dispatchHandler(currentIndex + 1);
-        if (res) {
-          result = res;
-          resultSubject.complete();
-        }
-      }
-      return handlerFn(handlerParams, nextFn)
+      const nextFn = async () => validateResult(
+        await dispatchHandler(currentIndex + 1)
+      )
+      return validateResult(handlerFn(handlerParams, nextFn));
     }
   }
   dispatchHandler(0);

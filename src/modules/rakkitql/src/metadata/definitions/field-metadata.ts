@@ -1,9 +1,8 @@
-import { ParamMetadata } from "./param-metadata";
 import { TypeValueThunk, TypeOptions } from "../../decorators/types";
-import { Middleware } from "../../interfaces/Middleware";
+import { MiddlewareType } from "../../../../../types";
+import { ParamMetadata } from "./param-metadata";
 import { Complexity } from "../../interfaces";
 import { BaseClassMetadata } from "./types";
-import { MiddlewareType } from "@types";
 
 export interface FieldMetadata extends BaseClassMetadata {
   schemaName: string;

@@ -13,23 +13,11 @@
       "es7",
       "esnext.asynciterable"
     ],
-    "moduleResolution": "node",
-    "baseUrl": "./",
-    "paths": {
-      "@logic": ["src/logic/index"],
-      "@types": ["src/types/index"],
-      "@decorators": ["src/decorators/index"],
-      "@misc": ["src/misc/index"],
-      "@api/*": ["app/api/*"],
-      "@modules/*": ["src/modules/*"],
-      "@app/*": ["app/*"],
-      "@main": ["src/Main"],
-      "@config": ["RakkitConfig"],
-      "@root": ["."],
-      "rakkitql": ["src/modules/rakkitql/src/index"]
-    }
+    "moduleResolution": "node"
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests",
+    "scripts"
   ]
 }

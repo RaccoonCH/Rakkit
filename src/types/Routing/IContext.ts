@@ -1,4 +1,4 @@
-import { IGraphQLContext } from "@types";
+import { IGraphQLContext } from "..";
 import { Context } from "koa";
 
 export interface IContext extends Partial<IGraphQLContext> {

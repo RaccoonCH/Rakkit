@@ -1,4 +1,4 @@
-import  { FrontType } from "@types";
+import  { FrontType } from "../..";
 
 export class RDate extends FrontType {
   readonly placeholder: string;

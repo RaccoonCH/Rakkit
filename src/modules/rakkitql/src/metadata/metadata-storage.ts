@@ -247,11 +247,10 @@ export class MetadataStorage {
         field.params = this.params.filter(
           param => param.target === field.target && field.name === param.methodName,
         );
-        field.middlewares = mapMiddlewareMetadataToArray(
-          this.middlewares.filter(
-            middleware => middleware.target === field.target && middleware.fieldName === field.name,
-          ),
+        const fieldMiddlewares = this.middlewares.filter(
+          middleware => middleware.target === field.target && middleware.fieldName === field.name
         );
+        field.middlewares = mapMiddlewareMetadataToArray(fieldMiddlewares);
       });
       def.fields = fields;
     }
@@ -380,8 +379,8 @@ export class MetadataStorage {
       def.roles = this.findFieldRoles(def.target, def.methodName);
       def.middlewares = mapMiddlewareMetadataToArray(
         this.middlewares.filter(
-          middleware => middleware.target === def.target && def.methodName === middleware.fieldName,
-        ),
+          middleware => (middleware.target === def.target && def.methodName === middleware.fieldName) || def.target === middleware.target
+        ).sort(middleware => middleware.isClass ? 1 : -1),
       );
     });
   }

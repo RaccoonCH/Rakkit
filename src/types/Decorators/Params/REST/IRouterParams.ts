@@ -1,4 +1,4 @@
-import { MiddlewareType } from "@types";
+import { MiddlewareType } from "../../..";
 
 export interface IRouterParams {
   middlewares?: MiddlewareType[];

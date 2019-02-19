@@ -1,4 +1,4 @@
-import { DecoratorStorage } from "@logic";
+import { DecoratorStorage } from "../../logic";
 
 export const On = (message: "connection" | string): Function => {
   return (target: Object, key: string, descriptor: PropertyDescriptor): void => {

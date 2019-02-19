@@ -1,4 +1,4 @@
-import { IContext } from "@types";
+import { IContext } from "../../../../types";
 
 export type AuthChecker<ContextType = {}, RoleType = string> = (
   resolverData: IContext,

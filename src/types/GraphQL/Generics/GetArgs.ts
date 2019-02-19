@@ -1,5 +1,5 @@
-import { Field, GenericType, GenericField } from "rakkitql";
-import { OrderByArgs } from "@types";
+import { Field, GenericType, GenericField } from "../../../modules/rakkitql";
+import { OrderByArgs } from "../..";
 
 @GenericType({
   transformFields: { nullable: true }

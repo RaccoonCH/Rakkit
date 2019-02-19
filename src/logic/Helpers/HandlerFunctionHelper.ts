@@ -1,5 +1,5 @@
-import { HandlerFunction, IContext, NextFunction } from "@types";
 import { Context, Middleware } from "koa";
+import { HandlerFunction, IContext, NextFunction } from "../../types";
 
 export class HandlerFunctionHelper {
   static getWrappedHandlerFunction(handler: HandlerFunction): Middleware {

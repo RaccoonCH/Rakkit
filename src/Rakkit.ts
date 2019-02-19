@@ -10,14 +10,13 @@ import { SubscriptionServer } from "subscriptions-transport-ws";
 import { GraphQLSchema, subscribe, execute } from "graphql";
 import { ApolloServer } from "apollo-server-koa";
 import { createServer, Server } from "http";
-import { buildSchema } from "rakkitql";
-import { IMain, HandlerFunction, IContext } from "@types";
-import { AppLoader, DecoratorStorage } from "@logic";
-import { config } from "@app/RakkitConfig";
-import { Color } from "@misc";
+import { buildSchema } from "./modules/rakkitql";
+import { HandlerFunction, IContext, IAppConfig } from "./types";
+import { AppLoader, DecoratorStorage } from "./logic";
+import { Color } from "./misc";
 
-export class Main extends AppLoader {
-  protected static _instance: Main;
+export class Rakkit extends AppLoader {
+  protected static _instance: Rakkit;
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
@@ -29,14 +28,17 @@ export class Main extends AppLoader {
   private _corsEnabled?: boolean;
   private _socketio: SocketIO.Server;
   private _publicPath: string;
+  private _config: IAppConfig;
   private _subscriptionServer: SubscriptionServer;
 
-  static get Instance(): Main {
+  static get Instance() {
     return this._instance;
   }
 
-  private constructor(params: IMain) {
+  private constructor(config: IAppConfig) {
     super();
+    this._config = config || {};
+    const params = this._config.startOptions || {};
     this._corsEnabled = params.corsEnabled || true;
     this._host = params.host || "localhost";
     this._port = params.port || 4000;
@@ -50,11 +52,11 @@ export class Main extends AppLoader {
   /**
    * Start the application (Express, GraphQL, ...)
    */
-  static async start(params?: IMain): Promise<Main> {
+  static async start(config?: IAppConfig): Promise<Rakkit> {
     if (!this.Instance) {
-      this._instance = new Main(params || {});
+      this._instance = new Rakkit(config);
     }
-    if (config.ormConnection) {
+    if (this.Instance._config.ormConnection) {
       try {
         await config.ormConnection();
       } catch (err) {
@@ -62,7 +64,7 @@ export class Main extends AppLoader {
       }
     }
 
-    this.Instance.LoadControllers(config);
+    this.Instance.LoadControllers(this.Instance._config);
     await DecoratorStorage.Instance.BuildAll();
 
     this.Instance.startAllServices();
@@ -77,17 +79,17 @@ export class Main extends AppLoader {
   }
 
   private async startAllServices() {
-    if (config.routers && config.routers.length > 0) {
+    if (Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0) {
       await this.startRest();
     }
-    if (config.resolvers && config.resolvers.length > 0) {
+    if (Rakkit.Instance._config.resolvers && Rakkit.Instance._config.resolvers.length > 0) {
       await this.startGraphQl();
     }
   }
 
   private loadMiddlewares(middlewares: ReadonlyMap<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
-      config.globalMiddlewares,
+      this._config.globalMiddlewares,
       this._mainKoaRouter,
       middlewares
     );
@@ -141,8 +143,8 @@ export class Main extends AppLoader {
   private async startGraphQl() {
     // Build TypeGraphQL schema to use it
     const schema: GraphQLSchema = await buildSchema({
-      resolvers: config.resolvers,
-      globalMiddlewares: config.globalMiddlewares
+      resolvers: this._config.resolvers,
+      globalMiddlewares: this._config.globalMiddlewares
       // authChecker: ({ context }, roles) =>  {
       //   const user: GetableUser = context.req.user;
       //   if (user) {
@@ -184,5 +186,3 @@ export class Main extends AppLoader {
     ));
   }
 }
-
-Main.start(config.startOptions);

@@ -1,4 +1,4 @@
-import { Field, InputType } from "rakkitql";
+import { Field, InputType } from "../../modules/rakkitql";
 
 @InputType()
 export abstract class OrderByArgs {

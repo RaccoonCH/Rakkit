@@ -1,4 +1,4 @@
-import { Field, GenericType, GenericField } from "rakkitql";
+import { Field, GenericType, GenericField } from "../../../modules/rakkitql";
 
 @GenericType({
   gqlType: "ObjectType",

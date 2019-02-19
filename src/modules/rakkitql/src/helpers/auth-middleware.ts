@@ -1,7 +1,6 @@
-import { MiddlewareFn } from "../interfaces/Middleware";
-import { AuthChecker, AuthMode } from "../interfaces";
 import { UnauthorizedError, ForbiddenError } from "../errors";
-import { HandlerFunction } from "@types";
+import { AuthChecker, AuthMode } from "../interfaces";
+import { HandlerFunction } from "../../../../types";
 
 export function AuthMiddleware(
   authChecker: AuthChecker<any, any>,

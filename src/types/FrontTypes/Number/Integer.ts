@@ -1,4 +1,4 @@
-import  { FrontType, INumber } from "@types";
+import  { FrontType, INumber } from "../..";
 
 export class RInteger extends FrontType implements INumber {
   readonly min?: number;

@@ -1,9 +1,8 @@
-import { MiddlewareType, HttpMethod } from "@types";
-import { Middleware } from "koa";
+import { MiddlewareType, HttpMethod } from "../..";
 
 export interface IEndpoint {
   endpoint: string;
   method: HttpMethod;
-  functions: Middleware[];
-  middlewares: MiddlewareType[];
+  functions: Function[];
+  middlewares?: MiddlewareType[];
 }

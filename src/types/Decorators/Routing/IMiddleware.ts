@@ -1,4 +1,4 @@
-import { MiddlewareExecutionTime, HandlerFunction } from "@types";
+import { MiddlewareExecutionTime, HandlerFunction } from "../..";
 
 export interface IMiddleware {
   executionTime: MiddlewareExecutionTime;

@@ -9,3 +9,6 @@ export * from "./REST/Router";
 
 export * from "./Routing/BeforeMiddleware";
 export * from "./Routing/AfterMiddleware";
+export * from "./Routing/UseMiddleware";
+
+export * from "./WS/On";

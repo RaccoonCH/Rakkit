@@ -1,5 +1,5 @@
 import * as Router from "koa-router";
-import { AppLoader, HandlerFunctionHelper } from "@logic";
+import { AppLoader, HandlerFunctionHelper } from "../../logic";
 import {
   IDecorator,
   IPackage,
@@ -12,9 +12,9 @@ import {
   MiddlewareExecutionTime,
   IOn,
   HandlerFunction,
-  IMiddlewareClass
-} from "@types";
-import { Main } from "@main";
+  IMiddlewareClass,
+  IUsedMiddleware
+} from "../../types";
 import { Middleware } from "koa";
 
 export class DecoratorStorage {
@@ -26,6 +26,7 @@ export class DecoratorStorage {
   private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
   private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
+  private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
   private _compiledPackages: IPackage[];
   private _compiledRouter: Router = new Router();
   private _ons: IOn[] = [];
@@ -66,7 +67,7 @@ export class DecoratorStorage {
   }
 
   static getAddEndPointDecorator(method: HttpMethod) {
-    return (endpoint: string, middlewares?: MiddlewareType[]): Function => {
+    return (endpoint: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
         this.Instance.AddEndpoint({
           class: target.constructor,
@@ -75,7 +76,7 @@ export class DecoratorStorage {
             endpoint,
             method,
             functions: [descriptor.value],
-            middlewares: middlewares || []
+            middlewares: []
           }
         });
       };
@@ -128,6 +129,10 @@ export class DecoratorStorage {
     this._ons.push(item.params);
   }
 
+  AddUsedMiddleware(item: IDecorator<IUsedMiddleware>) {
+    this._usedMiddlewares.push(item);
+  }
+
   AddMiddleware(item: IDecorator<IMiddleware>) {
     switch (item.params.executionTime) {
       case "AFTER":
@@ -156,6 +161,13 @@ export class DecoratorStorage {
   private async buildRouters() {
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
+      const mws = this._usedMiddlewares.filter((usedMw) => {
+        return (
+          usedMw.class === item.class &&
+          item.params.functions[0] === usedMw.params.applyOn
+        );
+      });
+      item.params.middlewares = this.extractMiddlewares(mws);
       const alreadyMerged = router.params.endpoints.find(
         endpoint => endpoint.functions.indexOf(item.params.functions[0]) > -1
       );
@@ -181,6 +193,13 @@ export class DecoratorStorage {
     });
     const routers = Array.from(this._routers.values());
     routers.map((item) => {
+      const mws = this._usedMiddlewares.filter((usedMw) => {
+        return (
+          usedMw.class === item.class &&
+          usedMw.class === usedMw.params.applyOn
+        );
+      });
+      item.params.middlewares = this.extractMiddlewares(mws);
       this.mountEndpointsToRouter(item);
       this._compiledRouter.use(
         `/${item.params.path}`,
@@ -234,5 +253,12 @@ export class DecoratorStorage {
     return Array.from(map.values()).map((item) => {
       return item.params;
     });
+  }
+
+  private extractMiddlewares(arr: IDecorator<IUsedMiddleware>[]): MiddlewareType[] {
+    return arr.reduce((prev, curr) => [
+      ...prev,
+      ...curr.params.middlewares
+    ], []);
   }
 }

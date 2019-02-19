@@ -5,10 +5,9 @@ import {
   SubscriptionFilterFunc,
   SubscriptionTopicFunc,
 } from "../../decorators/types";
+import { MiddlewareType } from "../../../../../types";
 import { ParamMetadata } from "./param-metadata";
-import { Middleware } from "../../interfaces/Middleware";
 import { Complexity } from "../../interfaces";
-import { MiddlewareType } from "@types";
 
 export interface BaseResolverMetadata {
   methodName: string;
