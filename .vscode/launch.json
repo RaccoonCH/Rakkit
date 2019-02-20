@@ -13,6 +13,26 @@
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "--inspect=9228",
+        "${workspaceRoot}/node_modules/jest/bin/jest.js",
+        "--config",
+        "${workspaceRoot}/jest.config.json",
+        "--runInBand",
+        "--forceExit",
+        "--coverage",
+        "--verbose",
+        "--detectOpenHandles"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9228
     }
   ]
 }

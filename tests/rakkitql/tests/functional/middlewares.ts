@@ -13,8 +13,7 @@ import {
   NextFn,
   getMetadataStorage
 } from "../../../../src/modules/rakkitql";
-import { MiddlewareType, IBaseMiddleware } from "../../../../src";
-import { IContext } from "../../../../build";
+import { MiddlewareType, IBaseMiddleware, IContext } from "../../../../src";
 
 describe("Middlewares", () => {
   let schema: GraphQLSchema;

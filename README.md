@@ -48,3 +48,9 @@ You can simply clone the project and submit a pull request, we will analyze it a
 - Travis CI Integration
 - Codecov integration
 - Provide examples
+
+
+### Chat with us
+
+- [Discord](https://discord.gg/szRhf3C)
+- [Gitter](https://gitter.im/_rakkit)

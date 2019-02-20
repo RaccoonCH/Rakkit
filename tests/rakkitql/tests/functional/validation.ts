@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MaxLength, Max, Min } from "class-validator";
-import { GraphQLSchema, graphql } from "graphql";
+import { GraphQLSchema, graphql, graphqlSync } from "graphql";
 import {
   InputType,
   Field,
@@ -14,7 +14,7 @@ import {
   Args,
   ArgsType,
   getMetadataStorage
-} from "../../../../src/modules/rakkitql";
+} from "../../../../src";
 
 describe("Validation", () => {
   describe("Functional", () => {
@@ -129,6 +129,7 @@ describe("Validation", () => {
     }`;
 
       const result = await graphql(schema, mutation);
+      console.log(result);
       expect(result.data).toBeNull();
       expect(result.errors).toHaveLength(1);
 
