@@ -187,7 +187,7 @@ export class DecoratorStorage {
             ];
           }, []))
         ];
-        item.params.functions = mergedFunctions;
+        item.params.functions = mergedFunctions.map((func) => func.bind(item.class));
         router.params.endpoints.push(item.params);
       }
     });
