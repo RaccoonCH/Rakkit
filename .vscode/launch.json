@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Debug TS",
       "protocol": "inspector",
-      "args": ["${workspaceRoot}/app/App.ts"],
+      "args": ["${workspaceRoot}/examples/normal/src/App.ts"],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "internalConsoleOptions": "openOnSessionStart"

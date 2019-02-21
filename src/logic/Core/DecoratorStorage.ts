@@ -1,4 +1,6 @@
+import { ClassType } from "class-transformer/ClassTransformer";
 import * as Router from "koa-router";
+import { Middleware } from "koa";
 import { AppLoader, HandlerFunctionHelper } from "../../logic";
 import {
   IDecorator,
@@ -13,10 +15,10 @@ import {
   IOn,
   HandlerFunction,
   IMiddlewareClass,
-  IUsedMiddleware
+  IUsedMiddleware,
+  IService,
+  IInject
 } from "../../types";
-import { Middleware } from "koa";
-import { ClassType } from "class-transformer/ClassTransformer";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;
@@ -28,6 +30,8 @@ export class DecoratorStorage {
   private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
+  private _services: Map<Object, IDecorator<IService>> = new Map();
+  private _injections: Map<Object, IDecorator<IInject>> = new Map();
   private _compiledPackages: IPackage[];
   private _compiledRouter: Router = new Router();
   private _ons: IOn[] = [];
@@ -65,6 +69,10 @@ export class DecoratorStorage {
 
   get Endpoints() {
     return this._endpoints as ReadonlyArray<IDecorator<IEndpoint>>;
+  }
+
+  get Services() {
+    return this._services as ReadonlyMap<Object, IDecorator<IService>>;
   }
 
   static getAddEndPointDecorator(method: HttpMethod) {
@@ -119,11 +127,11 @@ export class DecoratorStorage {
   }
 
   AddRouter(item: IDecorator<IRouter>) {
+    this.addAsService(item);
     this._routers.set(item.class, {
       ...item,
       params: {
-        ...item.params,
-        classInstance: new (item.class as ClassType<any>)()
+        ...item.params
       }
     });
   }
@@ -140,6 +148,14 @@ export class DecoratorStorage {
     this._usedMiddlewares.push(item);
   }
 
+  AddService(item: IDecorator<IService>) {
+    this._services.set(item.class, item);
+  }
+
+  AddInjection(item: IDecorator<IInject>) {
+    this._injections.set(item.params.injectionType, item);
+  }
+
   AddMiddleware(item: IDecorator<IMiddleware>) {
     switch (item.params.executionTime) {
       case "AFTER":
@@ -153,8 +169,19 @@ export class DecoratorStorage {
   }
 
   async BuildAll() {
+    this.buildInjection();
     this.buildPackages();
     this.buildRouters();
+  }
+
+  private addAsService(item: IDecorator<any>) {
+    const service = {
+      ...item,
+      params: {
+        instance: new (item.class as ClassType<any>)()
+      }
+    };
+    this.AddService(service);
   }
 
   private async buildPackages() {
@@ -163,6 +190,17 @@ export class DecoratorStorage {
       packageItem.params.attributes.push(item.params);
     });
     this._compiledPackages = this.compile(this._packages);
+  }
+
+  private buildInjection() {
+    this._injections.forEach((value, key) => {
+      const destinationService = this._services.get(value.class);
+      const valueService = this._services.get(key);
+      if (destinationService && valueService) {
+        const instance = valueService.params.instance;
+        destinationService.params.instance[value.key] = instance;
+      }
+    });
   }
 
   private async buildRouters() {
@@ -194,9 +232,8 @@ export class DecoratorStorage {
             ];
           }, []))
         ];
-        item.params.functions = mergedFunctions.map(
-          (func) => func.bind(this._routers.get(item.class).params.classInstance)
-        );
+        // BIND CONTEXT
+        item.params.functions = this.bindContext(item, mergedFunctions);
         router.params.endpoints.push(item.params);
       }
     });
@@ -223,6 +260,12 @@ export class DecoratorStorage {
       router.middlewares,
       router.router,
       middlewares
+    );
+  }
+
+  private bindContext(context: IDecorator<any>, fns: Function[]) {
+    return fns.map(
+      (fn) => fn.bind(this._services.get(context.class).params.instance)
     );
   }
 

@@ -5,6 +5,5 @@ export interface IEndpoint {
   endpoint: string;
   method: HttpMethod;
   functions: Function[];
-  routerInstanc?: ClassType<any>;
   middlewares?: MiddlewareType[];
 }

@@ -6,7 +6,7 @@ export const Router = (path: string): Function => {
       class: target,
       key: target.name,
       params: {
-        path,
+        path: path.replace(/^\/|\/$/g, ""), // Remove first and last "/"
         endpoints: []
         // extends: params.extends,
       }

@@ -7,7 +7,9 @@
   "author": "Owen Calvin",
   "license": "MIT",
   "private": false,
-  "files": ["*"],
+  "files": [
+    "*"
+  ],
   "contributors": [
     {
       "email": "owen@raccoon.ch",

@@ -1,3 +1,6 @@
+export * from "./DI/Inject";
+export * from "./DI/Service";
+
 export * from "./Front/Attribute";
 export * from "./Front/Package";
 

@@ -2,6 +2,8 @@ export * from "./Core/IAppConfig";
 export * from "./Core/IMain";
 export * from "./Core/IType";
 
+export * from "./Decorators/DI/IInject";
+export * from "./Decorators/DI/IService";
 export * from "./Decorators/Front/IAttribute";
 export * from "./Decorators/Front/IPackage";
 export * from "./Decorators/Params/REST/IEndpointParams";
