@@ -1,6 +1,6 @@
 {
   "name": "rakkit",
-  "version": "0.0.2",
+  "version": "0.0.7",
   "description": "🌐 A server-side framework to build amazing apps",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
