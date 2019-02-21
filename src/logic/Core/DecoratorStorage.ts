@@ -16,6 +16,7 @@ import {
   IUsedMiddleware
 } from "../../types";
 import { Middleware } from "koa";
+import { ClassType } from "class-transformer/ClassTransformer";
 
 export class DecoratorStorage {
   private static _instance: DecoratorStorage;
@@ -118,7 +119,13 @@ export class DecoratorStorage {
   }
 
   AddRouter(item: IDecorator<IRouter>) {
-    this._routers.set(item.class, item);
+    this._routers.set(item.class, {
+      ...item,
+      params: {
+        ...item.params,
+        classInstance: new (item.class as ClassType<any>)()
+      }
+    });
   }
 
   AddEndpoint(item: IDecorator<IEndpoint>) {
@@ -187,7 +194,9 @@ export class DecoratorStorage {
             ];
           }, []))
         ];
-        item.params.functions = mergedFunctions.map((func) => func.bind(item.class));
+        item.params.functions = mergedFunctions.map(
+          (func) => func.bind(this._routers.get(item.class).params.classInstance)
+        );
         router.params.endpoints.push(item.params);
       }
     });

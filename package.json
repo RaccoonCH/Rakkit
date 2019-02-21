@@ -1,12 +1,13 @@
 {
   "name": "rakkit",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "🌐 A server-side framework to build amazing apps",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "author": "Owen Calvin",
   "license": "MIT",
   "private": false,
+  "files": ["*"],
   "contributors": [
     {
       "email": "owen@raccoon.ch",
