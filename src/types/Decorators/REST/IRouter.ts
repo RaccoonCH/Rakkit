@@ -6,6 +6,6 @@ export interface IRouter {
   path: string;
   endpoints?: IEndpoint[];
   router?: Router;
-  classInstance: ClassType<any>;
+  classInstance?: ClassType<any>;
   middlewares?: MiddlewareType[];
 }
