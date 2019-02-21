@@ -1,6 +1,6 @@
 {
   "name": "rakkit",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "🌐 A server-side framework to build amazing apps",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -49,6 +49,7 @@
     "graphql": "^14.1.1"
   },
   "dependencies": {
+    "reflect-metadata": "^0.1.12",
     "@koa/cors": "^2.2.3",
     "apollo-server-koa": "^2.4.0",
     "class-validator": ">=0.9.1",
@@ -84,7 +85,6 @@
     "graphql-tag": "^2.10.0",
     "jest": "^23.6.0",
     "mysql": "^2.16.0",
-    "reflect-metadata": "^0.1.12",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
     "tslint": "^5.12.1",
