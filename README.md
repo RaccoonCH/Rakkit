@@ -24,12 +24,10 @@ Initially this tool was to be used to create a homemade Headless CMS. But as the
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
 
 
-### Features (Full typed, class based)  
+### Features (Full typed, class based with decorated)  
 
-- GraphQL API Creation
 - Rest API Creation ([koa](https://koajs.com/) base)
 - Websocket support ([socket.io](https://socket.io/))
-- Typeorm interface to optimize and execute SQL queries with GraphQL
 
 
 ### Contributing  
