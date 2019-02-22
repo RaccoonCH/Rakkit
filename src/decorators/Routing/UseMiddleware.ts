@@ -1,29 +1,19 @@
-import {
-  getMetadataStorage,
-  AnyDecorator,
-  SymbolKeysNotSupportedError
-} from "../../modules/rakkitql";
 import { MiddlewareType } from "../../types";
-import { DecoratorStorage } from "../../logic";
+import { MetadataStorage } from "../../logic";
 
-export function UseMiddleware(
-  ...middlewares: MiddlewareType[]
-): AnyDecorator {
-  return (prototype: Function, propertyKey?, descriptor?: TypedPropertyDescriptor<any>) => {
-    if (typeof propertyKey === "symbol") {
-      throw new SymbolKeysNotSupportedError();
-    }
-
+/**
+ * Use some middlewares to execute before the endpoint method
+ */
+export function UseMiddleware(...middlewares: MiddlewareType[]) {
+  return (prototype: Function | Object, propertyKey?, descriptor?: TypedPropertyDescriptor<any>) => {
     const mw = {
       target: propertyKey ? prototype.constructor : prototype,
-      fieldName: propertyKey || prototype.name,
+      fieldName: propertyKey || (prototype as Function).name,
       isClass: !propertyKey,
       middlewares
     };
 
-    getMetadataStorage().collectMiddlewareMetadata(mw);
-
-    DecoratorStorage.Instance.AddUsedMiddleware({
+    MetadataStorage.Instance.AddUsedMiddleware({
       class: mw.target,
       key: mw.fieldName,
       params: {

@@ -1,8 +1,12 @@
-import { DecoratorStorage } from "../../logic";
+import { MetadataStorage } from "../../logic";
 
+/**
+ * Declare a router and mount it to the app main router
+ * @param path The endpoint of the router
+ */
 export const Router = (path: string): Function => {
   return (target: Function): void => {
-    DecoratorStorage.Instance.AddRouter({
+    MetadataStorage.Instance.AddRouter({
       class: target,
       key: target.name,
       params: {

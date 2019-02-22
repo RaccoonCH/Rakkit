@@ -1,3 +1,6 @@
-import { DecoratorStorage } from "../../logic";
+import { MetadataStorage } from "../../logic";
 
-export const Delete = DecoratorStorage.getAddEndPointDecorator("DELETE");
+/**
+ * Declare a DELETE endpoint
+ */
+export const Delete = MetadataStorage.getAddEndPointDecorator("DELETE");

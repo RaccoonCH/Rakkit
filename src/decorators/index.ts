@@ -1,9 +1,6 @@
 export * from "./DI/Inject";
 export * from "./DI/Service";
 
-export * from "./Front/Attribute";
-export * from "./Front/Package";
-
 export * from "./REST/Delete";
 export * from "./REST/Get";
 export * from "./REST/Put";

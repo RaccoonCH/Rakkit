@@ -1,3 +1,6 @@
-import { DecoratorStorage } from "../../logic";
+import { MetadataStorage } from "../../logic";
 
-export const Post = DecoratorStorage.getAddEndPointDecorator("POST");
+/**
+ * Declare a POST endpoint
+ */
+export const Post = MetadataStorage.getAddEndPointDecorator("POST");

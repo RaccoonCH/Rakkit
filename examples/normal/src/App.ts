@@ -1,7 +1,7 @@
 import { Rakkit } from "../../../src";
 
 export class App {
-  private routers = [`${__dirname}/api/**/*Router.ts`];
+  private routers = [`${__dirname}/routers/*`];
 
   start() {
     Rakkit.start({

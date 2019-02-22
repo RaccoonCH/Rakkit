@@ -1,13 +1,17 @@
-import { ClassType } from "class-transformer/ClassTransformer";
-import { DecoratorStorage } from "../../logic";
+import { MetadataStorage } from "../../logic";
+import { IClassType } from "../../types";
 
+/**
+ * Declare a service that is a singleton, an instance is initialized and
+ * you can access to it by the @Inject middleware in a class or a another service.
+ */
 export const Service = (): Function => {
   return (target: Function): void => {
-    DecoratorStorage.Instance.AddService({
+    MetadataStorage.Instance.AddService({
       class: target,
       key: target.name,
       params: {
-        instance: new (target as ClassType<any>)()
+        instance: new (target as IClassType<any>)()
       }
     });
   };

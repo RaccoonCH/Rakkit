@@ -1,8 +1,5 @@
 export * from "./Core/AppLoader";
-export * from "./Core/FileUtils";
-export * from "./Core/DecoratorStorage";
-
-export * from "./GraphQL/Interfaces/TypeormInterface";
+export * from "./Core/MetadataStorage";
 
 export * from "./Helpers/ErrorHelper";
 export * from "./Helpers/HandlerFunctionHelper";

@@ -1,8 +1,6 @@
-import { IGraphQLContext } from "..";
 import { Context } from "koa";
 
-export interface IContext extends Partial<IGraphQLContext> {
-  type: "rest" | "gql";
+export interface IContext {
+  type: "rest";
   context: Context;
-  user?: any;
 }

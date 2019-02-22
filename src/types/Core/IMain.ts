@@ -3,7 +3,5 @@ export interface IMain {
   host?: string;
   port?: number;
   publicPath?: string;
-  apiPath?: string;
   restEndpoint?: string;
-  graphqlEndpoint?: string;
 }

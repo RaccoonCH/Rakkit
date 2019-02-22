@@ -6,13 +6,9 @@ import * as BodyParser from "koa-bodyparser";
 import * as Cors from "@koa/cors";
 import * as Static from "koa-static";
 import * as Router from "koa-router";
-import { SubscriptionServer } from "subscriptions-transport-ws";
-import { GraphQLSchema, subscribe, execute } from "graphql";
-import { ApolloServer } from "apollo-server-koa";
 import { createServer, Server } from "http";
-import { buildSchema } from "./modules/rakkitql";
 import { HandlerFunction, IContext, IAppConfig } from "./types";
-import { AppLoader, DecoratorStorage } from "./logic";
+import { AppLoader, MetadataStorage } from "./logic";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
@@ -20,16 +16,13 @@ export class Rakkit extends AppLoader {
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
-  private _graphqlEndpoint: string;
   private _koaApp: Koa;
   private _mainKoaRouter: Router;
   private _httpServer: Server;
-  private _apolloServer?: ApolloServer;
   private _corsEnabled?: boolean;
   private _socketio: SocketIO.Server;
   private _publicPath: string;
   private _config: IAppConfig;
-  private _subscriptionServer: SubscriptionServer;
 
   static get Instance() {
     return this._instance;
@@ -43,7 +36,6 @@ export class Rakkit extends AppLoader {
     this._host = params.host || "localhost";
     this._port = params.port || 4000;
     this._restEndpoint = params.restEndpoint || "/rest";
-    this._graphqlEndpoint = params.graphqlEndpoint || "/gql";
     this._publicPath = params.publicPath || Path.join(__dirname, "../public");
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
@@ -56,24 +48,14 @@ export class Rakkit extends AppLoader {
     if (!this.Instance) {
       this._instance = new Rakkit(config);
     }
-    if (this.Instance._config.ormConnection) {
-      try {
-        await config.ormConnection();
-      } catch (err) {
-        console.log(err);
-      }
-    }
 
     this.Instance.LoadControllers(this.Instance._config);
-    await DecoratorStorage.Instance.BuildAll();
+    await MetadataStorage.Instance.BuildAll();
 
     this.Instance.startAllServices();
     return this.Instance;
   }
 
-  /**
-   * Restart REST and GraphQL service
-   */
   async Restart() {
     return this.startAllServices();
   }
@@ -81,9 +63,6 @@ export class Rakkit extends AppLoader {
   private async startAllServices() {
     if (Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0) {
       await this.startRest();
-    }
-    if (Rakkit.Instance._config.resolvers && Rakkit.Instance._config.resolvers.length > 0) {
-      await this.startGraphQl();
     }
   }
 
@@ -98,7 +77,7 @@ export class Rakkit extends AppLoader {
   private async startWs() {
     this._socketio = SocketIO(this._httpServer);
     this._socketio.on("connection", (socket) => {
-      DecoratorStorage.Instance.Ons.map((item) => {
+      MetadataStorage.Instance.Ons.map((item) => {
         if (item.message !== "connection") {
           socket.on(item.message, (message: any) => {
             item.function(socket, message);
@@ -121,12 +100,12 @@ export class Rakkit extends AppLoader {
       this._koaApp.use(Static(this._publicPath));
 
       this._mainKoaRouter = new Router({ prefix: this._restEndpoint });
-      this._mainKoaRouter.use(DecoratorStorage.Instance.MainRouter.routes());
+      this._mainKoaRouter.use(MetadataStorage.Instance.MainRouter.routes());
 
-      this.loadMiddlewares(DecoratorStorage.Instance.BeforeMiddlewares);
+      this.loadMiddlewares(MetadataStorage.Instance.BeforeMiddlewares);
       // Load the api returned router into the /[restEndpoint] route
       this._koaApp.use(this._mainKoaRouter.routes());
-      this.loadMiddlewares(DecoratorStorage.Instance.AfterMiddlewares);
+      this.loadMiddlewares(MetadataStorage.Instance.AfterMiddlewares);
 
       await this.startWs();
 
@@ -135,54 +114,11 @@ export class Rakkit extends AppLoader {
           `REST:     Started on http://${this._host}:${this._port}${this._restEndpoint}`,
           "fg.black", "bg.green"
         ));
+        Array.from(MetadataStorage.Instance.Routers.values()).map((router) => {
+          console.log(`✅ ${router.params.path}`);
+        });
         resolve();
       });
     });
-  }
-
-  private async startGraphQl() {
-    // Build TypeGraphQL schema to use it
-    const schema: GraphQLSchema = await buildSchema({
-      resolvers: this._config.resolvers,
-      globalMiddlewares: this._config.globalMiddlewares
-      // authChecker: ({ context }, roles) =>  {
-      //   const user: GetableUser = context.req.user;
-      //   if (user) {
-      //     const authorizedRole: Array<string> = (roles.length <= 0 ? [ process.env.DefaultRequiredRole ] : roles);
-      //     return authorizedRole.includes(user.Role);
-      //   }
-      //   return false;
-      // }
-    });
-    this._apolloServer = new ApolloServer({
-      schema,
-      subscriptions: {
-        path: this._graphqlEndpoint
-      },
-      context: ({ context }): IContext => {
-        return {
-          context,
-          type: "gql"
-        };
-      }
-    });
-    this._apolloServer.applyMiddleware({
-      app: this._koaApp,
-      path: this._graphqlEndpoint
-    });
-
-    this._subscriptionServer = new SubscriptionServer({
-      execute,
-      subscribe,
-      schema
-    }, {
-      server: this._httpServer,
-      path: this._graphqlEndpoint
-    });
-
-    console.log(Color(
-      `GraphQL:  Started on http://${this._host}:${this._port}${this._apolloServer.graphqlPath}\n`,
-      "fg.black", "bg.green"
-    ));
   }
 }
