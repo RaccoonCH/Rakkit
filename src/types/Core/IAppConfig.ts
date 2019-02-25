@@ -1,9 +1,14 @@
-import { IMain, MiddlewareType } from "../..";
+import { MiddlewareType } from "../..";
 
 export type ClassOrString = (Function | string);
 
 export interface IAppConfig {
-  startOptions?: IMain;
+  corsEnabled?: boolean;
+  host?: string;
+  port?: number;
+  publicPath?: string;
+  restEndpoint?: string;
+  wsEndpoint?: string;
   routers?: ClassOrString[];
   websockets?: ClassOrString[];
   globalMiddlewares?: MiddlewareType[];

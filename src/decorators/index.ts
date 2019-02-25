@@ -12,3 +12,4 @@ export * from "./Routing/AfterMiddleware";
 export * from "./Routing/UseMiddleware";
 
 export * from "./WS/On";
+export * from "./WS/Websocket";

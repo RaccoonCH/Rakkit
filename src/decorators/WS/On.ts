@@ -6,7 +6,7 @@ import { MetadataStorage } from "../../logic";
 export const On = (message: "connection" | string): Function => {
   return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
     MetadataStorage.Instance.AddOn({
-      class: target,
+      class: target.constructor,
       key,
       params: {
         message,

@@ -1,5 +1,4 @@
 export * from "./Core/IAppConfig";
-export * from "./Core/IMain";
 export * from "./Core/IType";
 export * from "./Core/IClassType";
 
@@ -14,6 +13,7 @@ export * from "./Decorators/Routing/IMiddleware";
 export * from "./Decorators/Routing/IUsedMiddleware";
 export * from "./Decorators/Routing/IClassPath";
 export * from "./Decorators/WS/IOn";
+export * from "./Decorators/WS/IWebsocket";
 export * from "./Decorators/IDecorator";
 
 export * from "./REST/HttpMethod";

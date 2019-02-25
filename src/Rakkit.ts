@@ -13,13 +13,14 @@ import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
   protected static _instance: Rakkit;
+  private _corsEnabled?: boolean;
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
+  private _wsEndpoint: string;
   private _koaApp: Koa;
   private _mainKoaRouter: Router;
   private _httpServer: Server;
-  private _corsEnabled?: boolean;
   private _socketio: SocketIO.Server;
   private _publicPath: string;
   private _config: IAppConfig;
@@ -31,12 +32,12 @@ export class Rakkit extends AppLoader {
   private constructor(config: IAppConfig) {
     super();
     this._config = config || {};
-    const params = this._config.startOptions || {};
-    this._corsEnabled = params.corsEnabled || true;
-    this._host = params.host || "localhost";
-    this._port = params.port || 4000;
-    this._restEndpoint = params.restEndpoint || "/rest";
-    this._publicPath = params.publicPath || Path.join(__dirname, "../public");
+    this._corsEnabled = config.corsEnabled || true;
+    this._host = config.host || "localhost";
+    this._port = config.port || 4000;
+    this._restEndpoint = config.restEndpoint || "/rest";
+    this._wsEndpoint = config.wsEndpoint || "/ws";
+    this._publicPath = config.publicPath || Path.join(__dirname, "../public");
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
   }
@@ -61,8 +62,20 @@ export class Rakkit extends AppLoader {
   }
 
   private async startAllServices() {
-    if (Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0) {
+    const startRest = Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0;
+    const startWs = Rakkit.Instance._config.websockets && Rakkit.Instance._config.websockets.length > 0;
+    if (startRest) {
       await this.startRest();
+      this.startMessage("REST", this._restEndpoint);
+    }
+    if (startWs) {
+      await this.startWs();
+      this.startMessage("WS  ", this._wsEndpoint);
+    }
+    if (startRest) {
+      Array.from(MetadataStorage.Instance.Routers.values()).map((router) => {
+        console.log(`Router: ${router.params.path} ✅`);
+      });
     }
   }
 
@@ -75,15 +88,17 @@ export class Rakkit extends AppLoader {
   }
 
   private async startWs() {
-    this._socketio = SocketIO(this._httpServer);
+    this._socketio = SocketIO(this._httpServer, {
+      path: this._wsEndpoint
+    });
     this._socketio.on("connection", (socket) => {
       MetadataStorage.Instance.Ons.map((item) => {
-        if (item.message !== "connection") {
-          socket.on(item.message, (message: any) => {
-            item.function(socket, message);
+        if (item.params.message !== "connection") {
+          socket.on(item.params.message, (message: any) => {
+            item.params.function(socket, message);
           });
         } else {
-          item.function(socket);
+          item.params.function(socket);
         }
       });
     });
@@ -107,18 +122,16 @@ export class Rakkit extends AppLoader {
       this._koaApp.use(this._mainKoaRouter.routes());
       this.loadMiddlewares(MetadataStorage.Instance.AfterMiddlewares);
 
-      await this.startWs();
-
       this._httpServer.listen(this._port, this._host, () => {
-        console.log(Color(
-          `REST:     Started on http://${this._host}:${this._port}${this._restEndpoint}`,
-          "fg.black", "bg.green"
-        ));
-        Array.from(MetadataStorage.Instance.Routers.values()).map((router) => {
-          console.log(`✅ ${router.params.path}`);
-        });
         resolve();
       });
     });
+  }
+
+  private startMessage(type: string, suffix: string) {
+    console.log(Color(
+      `${type}: Started on http://${this._host}:${this._port}${suffix}`,
+      "fg.black", "bg.green"
+    ));
   }
 }

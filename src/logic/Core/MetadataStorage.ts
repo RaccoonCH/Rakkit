@@ -14,26 +14,34 @@ import {
   MiddlewareExecutionTime,
   IOn,
   HandlerFunction,
-  IMiddlewareClass,
   IUsedMiddleware,
   IService,
   IInject,
-  IClassType
+  IClassType,
+  IWebsocket,
+  IBaseMiddleware
 } from "../../types";
 
 export class MetadataStorage {
+  //#region Declarations
   private static _instance: MetadataStorage;
+  // REST
   private _routers: Map<Object, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
   private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
   private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
-  private _services: Map<Object, IDecorator<IService>> = new Map();
-  private _injections: Map<Object, IDecorator<IInject>> = new Map();
   private _compiledRouter: Router = new Router();
-  private _ons: IOn[] = [];
+  // DI
+  private _services: Map<Object, IDecorator<IService>> = new Map();
+  private _injections: IDecorator<IInject>[] = [];
+  // WS
+  private _websockets: Map<Object, IDecorator<IWebsocket>> = new Map();
+  private _ons: IDecorator<IOn>[] = [];
+  //#endregion
 
+  //#region Getters
   static get Instance() {
     if (!this._instance) {
       this._instance = new MetadataStorage();
@@ -58,7 +66,7 @@ export class MetadataStorage {
   }
 
   get Ons() {
-    return this._ons as ReadonlyArray<IOn>;
+    return this._ons as ReadonlyArray<IDecorator<IOn>>;
   }
 
   get Endpoints() {
@@ -72,7 +80,9 @@ export class MetadataStorage {
   get Routers() {
     return this._routers as ReadonlyMap<Object, IDecorator<IRouter>>;
   }
+  //#endregion
 
+  //#region Decorators functions
   static getAddEndPointDecorator(method: HttpMethod) {
     return (endpoint: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
@@ -93,27 +103,27 @@ export class MetadataStorage {
   static getAddMiddlewareDecorator(executionTime: MiddlewareExecutionTime) {
     return (): Function => {
       return (target: Function, key: string, descriptor: PropertyDescriptor): void => {
-        const finalKey = key || target.name;
-        let finalClass = target;
-        let func;
-        if (key && descriptor) {
-          func = descriptor.value;
-          finalClass = func;
-        } else {
-          const ItemClass: IMiddlewareClass = target as IMiddlewareClass;
-          const instance = new ItemClass();
-          func = instance.use;
-        }
+        const isClass = !key;
+        const finalKey = isClass ? target.name : key;
+        const finalFunc = isClass ? target : descriptor.value;
         this.Instance.AddMiddleware({
-          class: finalClass,
+          class: finalFunc,
           key: finalKey,
           params: {
             executionTime,
-            function: func
+            function: finalFunc,
+            isClass
           }
         });
       };
     };
+  }
+  //#endregion
+
+  //#region Add-ers
+  AddWebsocket(item: IDecorator<IWebsocket>) {
+    this.addAsService(item);
+    this._websockets.set(item.class, item);
   }
 
   AddRouter(item: IDecorator<IRouter>) {
@@ -126,27 +136,13 @@ export class MetadataStorage {
     });
   }
 
-  AddEndpoint(item: IDecorator<IEndpoint>) {
-    this._endpoints.push(item);
-  }
-
-  AddOn(item: IDecorator<IOn>) {
-    this._ons.push(item.params);
-  }
-
-  AddUsedMiddleware(item: IDecorator<IUsedMiddleware>) {
-    this._usedMiddlewares.push(item);
-  }
-
-  AddService(item: IDecorator<IService>) {
-    this._services.set(item.class, item);
-  }
-
-  AddInjection(item: IDecorator<IInject>) {
-    this._injections.set(item.params.injectionType, item);
-  }
-
   AddMiddleware(item: IDecorator<IMiddleware>) {
+    // If middleware is a class, instanciate it and use the "use" method as the middleware
+    if (item.params.isClass) {
+      const instance = this.addAsService(item);
+      item.params.isClass = false;
+      item.params.function = (instance as IBaseMiddleware).use.bind(instance);
+    }
     switch (item.params.executionTime) {
       case "AFTER":
         this._afterMiddlewares.set(item.class, item.params.function);
@@ -158,28 +154,48 @@ export class MetadataStorage {
     this._middlewares.set(item.class, item);
   }
 
+  AddService(item: IDecorator<IService>) {
+    this._services.set(item.class, item);
+  }
+
+  AddUsedMiddleware(item: IDecorator<IUsedMiddleware>) {
+    this._usedMiddlewares.push(item);
+  }
+
+  AddEndpoint(item: IDecorator<IEndpoint>) {
+    this._endpoints.push(item);
+  }
+
+  AddOn(item: IDecorator<IOn>) {
+    this._ons.push(item);
+  }
+
+  AddInjection(item: IDecorator<IInject>) {
+    this._injections.push(item);
+  }
+  //#endregion
+
+  //#region Build
   async BuildAll() {
-    this.buildInjection();
+    this.buildInjections();
     this.buildRouters();
+    this.buildWebsockets();
   }
 
-  private addAsService(item: IDecorator<any>) {
-    const service = {
-      ...item,
-      params: {
-        instance: new (item.class as IClassType<any>)()
-      }
-    };
-    this.AddService(service);
+  private buildWebsockets() {
+    this._ons.map((item) => {
+      const wsClass = this._websockets.get(item.class);
+      item.params.function = this.bindContext(wsClass, item.params.function);
+    });
   }
 
-  private buildInjection() {
-    this._injections.forEach((value, key) => {
-      const destinationService = this._services.get(value.class);
-      const valueService = this._services.get(key);
+  private buildInjections() {
+    this._injections.map((item) => {
+      const destinationService = this._services.get(item.class);
+      const valueService = this._services.get(item.params.injectionType);
       if (destinationService && valueService) {
         const instance = valueService.params.instance;
-        destinationService.params.instance[value.key] = instance;
+        destinationService.params.instance[item.key] = instance;
       }
     });
   }
@@ -198,6 +214,8 @@ export class MetadataStorage {
         endpoint => endpoint.functions.indexOf(item.params.functions[0]) > -1
       );
       if (!alreadyMerged) {
+        // If multiple method are decorated with the same method and endpoint
+        // merge the functions
         const endpointsToMerge = this._endpoints.filter((mergeItem) => {
           return item !== mergeItem &&
             item.class === mergeItem.class &&
@@ -213,7 +231,6 @@ export class MetadataStorage {
             ];
           }, []))
         ];
-        // BIND CONTEXT
         item.params.functions = this.bindContext(item, mergedFunctions);
         router.params.endpoints.push(item.params);
       }
@@ -235,7 +252,9 @@ export class MetadataStorage {
       );
     });
   }
+  //#endregion
 
+  //#region Util methods
   private loadMiddlewares(router: IRouter, middlewares: Map<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       router.middlewares,
@@ -244,10 +263,16 @@ export class MetadataStorage {
     );
   }
 
-  private bindContext(context: IDecorator<any>, fns: Function[]) {
-    return fns.map(
-      (fn) => fn.bind(this._services.get(context.class).params.instance)
-    );
+  private bindContext(context: IDecorator<any>, fn: Function): Function;
+  private bindContext(context: IDecorator<any>, fns: Function[]): Function[];
+  private bindContext(context: IDecorator<any>, fnsOrFn: Function[] | Function) : Function[] | Function {
+    const instance = this._services.get(context.class).params.instance;
+    if (Array.isArray(fnsOrFn)) {
+      return fnsOrFn.map(
+        (fn) => fn.bind(instance)
+      );
+    }
+    return fnsOrFn.bind(instance);
   }
 
   private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
@@ -282,16 +307,23 @@ export class MetadataStorage {
     this.loadMiddlewares(router.params, this._afterMiddlewares);
   }
 
-  private compile(map: Map<Object, IDecorator<any>>) {
-    return Array.from(map.values()).map((item) => {
-      return item.params;
-    });
-  }
-
   private extractMiddlewares(arr: IDecorator<IUsedMiddleware>[]): MiddlewareType[] {
     return arr.reduce((prev, curr) => [
       ...prev,
       ...curr.params.middlewares
     ], []);
   }
+
+  private addAsService(item: IDecorator<any>) {
+    const instance = new (item.class as IClassType<any>)();
+    const service = {
+      ...item,
+      params: {
+        instance
+      }
+    };
+    this.AddService(service);
+    return instance;
+  }
+  //#endregion
 }

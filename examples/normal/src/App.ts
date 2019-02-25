@@ -1,11 +1,13 @@
 import { Rakkit } from "../../../src";
 
 export class App {
-  private routers = [`${__dirname}/routers/*`];
+  private _routers = [`${__dirname}/routers/*`];
+  private _websockets = [`${__dirname}/websockets/*`];
 
   start() {
     Rakkit.start({
-      routers: this.routers
+      routers: this._routers,
+      websockets: this._websockets
     });
   }
 }
