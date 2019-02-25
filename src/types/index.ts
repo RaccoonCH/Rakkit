@@ -24,3 +24,5 @@ export * from "./Routing/HandlerFunction";
 export * from "./Routing/IContext";
 export * from "./Routing/NextFunction";
 export * from "./Routing/IMiddlewareClass";
+
+export * from "./WS/Socket";

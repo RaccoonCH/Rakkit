@@ -1,0 +1,22 @@
+import { On, Websocket, Socket } from "../../src";
+
+@Websocket()
+export class TestWs {
+  @On("connection")
+  connection(socket: Socket) {
+    console.log(`Socket: ${socket.id} connected`);
+    socket.emit("connected");
+  }
+
+  @On("hello")
+  hello(socket: Socket) {
+    socket.emit("world");
+  }
+
+  @On("params")
+  params(socket: Socket, params: { datas: boolean }) {
+    socket.emit("params", {
+      error: !params.datas
+    });
+  }
+}

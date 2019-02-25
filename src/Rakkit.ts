@@ -7,7 +7,7 @@ import * as Cors from "@koa/cors";
 import * as Static from "koa-static";
 import * as Router from "koa-router";
 import { createServer, Server } from "http";
-import { HandlerFunction, IContext, IAppConfig } from "./types";
+import { HandlerFunction, IAppConfig } from "./types";
 import { AppLoader, MetadataStorage } from "./logic";
 import { Color } from "./misc";
 
@@ -64,6 +64,9 @@ export class Rakkit extends AppLoader {
   private async startAllServices() {
     const startRest = Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0;
     const startWs = Rakkit.Instance._config.websockets && Rakkit.Instance._config.websockets.length > 0;
+    if (startRest || startWs) {
+      this._httpServer.listen(this._port, this._host);
+    }
     if (startRest) {
       await this.startRest();
       this.startMessage("REST", this._restEndpoint);
@@ -122,9 +125,7 @@ export class Rakkit extends AppLoader {
       this._koaApp.use(this._mainKoaRouter.routes());
       this.loadMiddlewares(MetadataStorage.Instance.AfterMiddlewares);
 
-      this._httpServer.listen(this._port, this._host, () => {
-        resolve();
-      });
+      resolve();
     });
   }
 

@@ -1,9 +1,9 @@
-import { Socket } from "socket.io";
 import { ExampleService } from "../services/ExampleService";
 import {
   Websocket,
   On,
-  Inject
+  Inject,
+  Socket
 } from "../../../../src";
 
 @Websocket()
