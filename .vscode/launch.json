@@ -7,15 +7,27 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug TS",
+      "name": "Debug app",
       "protocol": "inspector",
       "args": ["${workspaceRoot}/examples/basic/src/App.ts"],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "name": "Debug test classes",
+      "protocol": "inspector",
+      "args": ["${workspaceRoot}/tests/ClassesForTesting/DebugClasses.ts"],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Debug tests",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
@@ -27,7 +39,7 @@
         "--verbose",
         "--detectOpenHandles",
         "--config",
-        "${workspaceRoot}/jest.config.json",
+        "${workspaceRoot}/jest.config.json"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",

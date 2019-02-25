@@ -6,9 +6,11 @@ const getDirName = (path) => {
 
 export const Start = async (config?: IAppConfig) => {
   const wsGlob = getDirName("*Ws.ts");
+  const routerGlob = getDirName("*Router.ts");
   return Rakkit.start({
     ...(config || {}),
     port: 3000,
-    websockets: [wsGlob]
+    websockets: [wsGlob],
+    routers: [routerGlob]
   });
 };

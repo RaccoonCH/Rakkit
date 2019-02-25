@@ -57,6 +57,11 @@ export class Rakkit extends AppLoader {
     return this.Instance;
   }
 
+  static stop() {
+    this.Instance._socketio.close();
+    this.Instance._httpServer.close();
+  }
+
   async Restart() {
     return this.startAllServices();
   }

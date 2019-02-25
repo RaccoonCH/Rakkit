@@ -21,7 +21,7 @@ export * from "./REST/HttpMethod";
 export * from "./Routing/IBaseMiddleware";
 export * from "./Routing/MiddlewareType";
 export * from "./Routing/HandlerFunction";
-export * from "./Routing/IContext";
+export * from "./Routing/Context";
 export * from "./Routing/NextFunction";
 export * from "./Routing/IMiddlewareClass";
 

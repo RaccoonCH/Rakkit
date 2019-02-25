@@ -86,14 +86,17 @@ export class MetadataStorage {
   static getAddEndPointDecorator(method: HttpMethod) {
     return (endpoint: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
+        let finalEndpoint = endpoint;
+        if (endpoint[0] !== "/") {
+          finalEndpoint = `/${endpoint}`;
+        }
         this.Instance.AddEndpoint({
           class: target.constructor,
           key,
           params: {
-            endpoint,
+            endpoint: finalEndpoint,
             method,
-            functions: [descriptor.value],
-            middlewares: []
+            functions: [descriptor.value]
           }
         });
       };
@@ -203,13 +206,8 @@ export class MetadataStorage {
   private async buildRouters() {
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
-      const mws = this._usedMiddlewares.filter((usedMw) => {
-        return (
-          usedMw.class === item.class &&
-          item.params.functions[0] === usedMw.params.applyOn
-        );
-      });
-      item.params.middlewares = this.extractMiddlewares(mws);
+      item.params.functions = this.getEndpointFunctions(item);
+      // ERROR: ALREADY MERGE WHEN SAME MIDDLEWARE
       const alreadyMerged = router.params.endpoints.find(
         endpoint => endpoint.functions.indexOf(item.params.functions[0]) > -1
       );
@@ -222,21 +220,15 @@ export class MetadataStorage {
             item.params.endpoint === mergeItem.params.endpoint &&
             item.params.method === mergeItem.params.method;
         });
-        const mergedFunctions: Middleware[] = [
-          ...item.params.functions,
-          ...(endpointsToMerge.reduce((prev, item) => {
-            return [
-              ...prev,
-              ...item.params.functions
-            ];
-          }, []))
-        ];
-        item.params.functions = this.bindContext(item, mergedFunctions);
+        endpointsToMerge.map((endpoint) => {
+          item.params.functions = item.params.functions.concat(this.getEndpointFunctions(endpoint));
+        });
         router.params.endpoints.push(item.params);
       }
     });
     const routers = Array.from(this._routers.values());
     routers.map((item) => {
+      // getUsedMiddleware merge
       const mws = this._usedMiddlewares.filter((usedMw) => {
         return (
           usedMw.class === item.class &&
@@ -255,6 +247,26 @@ export class MetadataStorage {
   //#endregion
 
   //#region Util methods
+  private getUsedMiddlewares(endpoint: IDecorator<IEndpoint>) {
+    return this._usedMiddlewares.filter((usedMw) => {
+      return (
+        usedMw.class === endpoint.class &&
+        endpoint.params.functions[0] === usedMw.params.applyOn
+      );
+    });
+  }
+
+  private getEndpointFunctions(endpoint: IDecorator<IEndpoint>) {
+    const endpointUsedMiddlewares = this.getUsedMiddlewares(endpoint);
+    const endpointMiddlewares = this.extractMiddlewares(endpointUsedMiddlewares);
+    const compiledMergedEnpoint: Function[] = [
+      ...this.getBeforeMiddlewares(endpointMiddlewares),
+      ...this.bindContext(endpoint, endpoint.params.functions),
+      ...this.getAfterMiddlewares(endpointMiddlewares)
+    ];
+    return compiledMergedEnpoint;
+  }
+
   private loadMiddlewares(router: IRouter, middlewares: Map<Object, HandlerFunction>) {
     AppLoader.loadMiddlewares(
       router.middlewares,
@@ -288,20 +300,21 @@ export class MetadataStorage {
     }, []);
   }
 
+  private getBeforeMiddlewares(middlewares: MiddlewareType[]) {
+    return this.getBeforeAfterMiddlewares(middlewares, "BEFORE");
+  }
+
+  private getAfterMiddlewares(middlewares: MiddlewareType[]) {
+    return this.getBeforeAfterMiddlewares(middlewares, "AFTER");
+  }
+
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
     router.params.router = new Router();
     this.loadMiddlewares(router.params, this._beforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
-      const beforeMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "BEFORE");
-      const afterMiddlewares = this.getBeforeAfterMiddlewares(endpoint.middlewares, "AFTER");
-      endpoint.functions = [
-        ...beforeMiddlewares,
-        ...endpoint.functions,
-        ...afterMiddlewares
-      ].map(HandlerFunctionHelper.getWrappedHandlerFunction);
       router.params.router[endpoint.method.toLowerCase()](
         `${endpoint.endpoint}`,
-        ...endpoint.functions
+        ...endpoint.functions.map(HandlerFunctionHelper.getWrappedHandlerFunction)
       );
     });
     this.loadMiddlewares(router.params, this._afterMiddlewares);

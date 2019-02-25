@@ -1,12 +1,14 @@
 import {
   IBaseMiddleware,
-  IContext,
-  AfterMiddleware
+  Context,
+  AfterMiddleware,
+  NextFunction
 } from "../../../../src";
 
 @AfterMiddleware()
 export class GoodbyeMiddleware implements IBaseMiddleware {
-  async use (context: IContext) {
+  async use (context: Context, next: NextFunction) {
     console.log("Goodbye");
+    next();
   }
 }

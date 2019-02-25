@@ -1,8 +1,7 @@
-import { MiddlewareType, HttpMethod } from "../..";
+import { HttpMethod } from "../..";
 
 export interface IEndpoint {
   endpoint: string;
   method: HttpMethod;
   functions: Function[];
-  middlewares?: MiddlewareType[];
 }

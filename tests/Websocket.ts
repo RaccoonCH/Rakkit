@@ -1,19 +1,19 @@
-import { Rakkit } from "../src/Rakkit";
 import { connect as SocketConnect } from "socket.io-client";
 import { Start } from "./ClassesForTesting/Start";
+import { Rakkit } from "../src";
 
 describe("Websocket", async () => {
   let socketConnection: SocketIOClient.Socket;
-  let rakkitInstance: Rakkit;
 
   beforeAll(async () => {
-    rakkitInstance = await Start();
+    await Start();
     socketConnection = SocketConnect("http://localhost:3000", {
       path: "/ws"
     });
   });
 
   afterAll(() => {
+    Rakkit.stop();
     socketConnection.close();
   });
 

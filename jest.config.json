@@ -1,5 +1,5 @@
 {
-  "verbose": false,
+  "verbose": true,
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
@@ -7,7 +7,7 @@
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "rootDir": "./",
   "roots": ["<rootDir>/tests"],
-  "collectCoverage": false,
+  "collectCoverage": true,
   "collectCoverageFrom": [
     "<rootDir>/src/**/*.ts",
     "!<rootDir>/src/**/*.d.ts"

@@ -3,7 +3,7 @@ import {
   Router,
   Get,
   Inject,
-  IContext,
+  Context,
   NextFunction,
   UseMiddleware
 } from "../../../../src";
@@ -17,8 +17,16 @@ export class ExampleRouter {
   private _routerService: ExampleService;
 
   @Get("/")
-  @UseMiddleware(GoodbyeMiddleware)
-  get({ context }: IContext, next: NextFunction) {
+  @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
+  get(context: Context, next: NextFunction) {
+    console.log(this._routerService);
+    context.body = "Hello world";
+    next();
+  }
+
+  @Get("/")
+  @UseMiddleware(GoodbyeMiddleware, HelloMiddleware)
+  get2(context: Context, next: NextFunction) {
     console.log(this._routerService);
     context.body = "Hello world";
     next();
