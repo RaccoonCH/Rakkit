@@ -193,7 +193,7 @@ Initially this tool was made in order to create a homemade Headless CMS. But as 
 ## Philosophy  
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
 
-## Features (Full typed, class based with decorated)  
+## Features (full typed, class based with decorated)  
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/) base)
 - Websocket app creation ([socket.io](https://socket.io/))
