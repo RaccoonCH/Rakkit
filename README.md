@@ -1,7 +1,7 @@
 <p align="center">
   <img src="logo.png" width="220" alt="Nest Logo"/>
   <br>
-  A simple backend library written in <b>TypeScript</b> that provide <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
+  A simple backend library written in <b>TypeScript</b> that provides <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
   <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
@@ -31,7 +31,7 @@ yarn add rakkit
 
 ## Code
 Imports are skipped for code clarity.
-For all examples we need to have a starting point:  
+For each example we need to have a starting point:  
 ```typescript
 import { Rakkit } from "rakkit"
 
@@ -42,7 +42,7 @@ Rakkit.start({
   ]
 })
 ```
-And we have this on the terminal: 
+And below is the terminal output: 
 ```shell
 PUBLIC: http://localhost:4000
 REST  : http://localhost:4000/rest
@@ -80,11 +80,11 @@ class PeopleRouter {
 ```
 
 #### Middlewares
-In this example we have two middlewares, the @BeforeMiddleware use method are executed before the @Get("/") and the @AfterMiddleware one's are executed after it.  
-You have tree levels of middleware, on the endpoint (@Get, @Post, @Put, @Delete), on the router (@Router) and globaly (All router of your application). In this example we illustrated each level.  
-The middlewares are executed by their order in the list that is passed in the @UseMiddleware decorator.  
-"Global middlewares" wrapps "router middlewares" (global BeforeMiddleware are executed before the router BeforeMiddleware and global AfterMiddleware are executed after the router AfterMiddleware).
-"Router middlewares" wrapps "enpoint middlewares".  
+In this example we have two middlewares, the @BeforeMiddleware use methods that are executed before the @Get("/") and for the @AfterMiddleware they are executed after it.  
+You have three levels of middleware, on the endpoint (@Get, @Post, @Put, @Delete), on the router (@Router) and globaly (All router of your application). In this example we illustrate each level.  
+Middleware are executed in the order of the list that is passed in the @UseMiddleware decorator.  
+"Global middlewares" wrap "router middlewares" (global BeforeMiddleware are executed before the router BeforeMiddleware and global AfterMiddleware are executed after the router AfterMiddleware).
+"Router middleware" wraps "enpoint middlewares".  
 
 
 _BeforeMiddleware.ts_
@@ -145,8 +145,8 @@ class PeopleRouter {
 ```
 
 #### With a service and DI
-A services is a singleton that you can inject into your classes if they are also declared as a @Service or as a @Router, @Websocket, @AfterMiddleware, @BeforeMiddleware.  
-You can assign an id to the service (`@Service(id?: string | number)`) if you need to have multiple instances of the classing running at the same time. You can also retrieve the specified instance with the @Inject decorator (`@Service(id?: string | number)`).
+A service is a singleton that you can inject into your classes if they are also declared as a @Service or as a @Router, @Websocket, @AfterMiddleware, @BeforeMiddleware.  
+You can assign an id to the service (`@Service(id?: string | number)`) if you need to have multiple instances of the class running at the same time. You can also retrieve the specified instance with the @Inject decorator (`@Service(id?: string | number)`).
 
 _PeopleService.ts_
 ```typescript
@@ -188,12 +188,12 @@ class PeopleRouter {
 ```
 
 ## The project history  
-Initially this tool was to be used to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we chose to make it an independent tool to benefit the community and progress on a better basis.
+Initially this tool was made in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we choose to make it an independent tool to benefit the community and progress on a better basis.
 
 ## Philosophy  
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
 
-## Features (Full typed, class based with decorated)  
+## Features (full typed, class based with decorated)  
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/) base)
 - Websocket app creation ([socket.io](https://socket.io/))
