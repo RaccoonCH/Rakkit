@@ -2,7 +2,7 @@
   <img src="logo.png" width="220" alt="Nest Logo"/>
   <br>
   A simple backend library written in <b>TypeScript</b> that provide <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
-  <p align="justify">
+  <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
     </a>
