@@ -19,7 +19,10 @@ import {
   IInject,
   IClassType,
   IWebsocket,
-  IBaseMiddleware
+  IBaseMiddleware,
+  IType,
+  InstanceOf,
+  IDiId
 } from "../../types";
 import { Middleware } from "koa";
 
@@ -35,7 +38,7 @@ export class MetadataStorage {
   private _endpoints: IDecorator<IEndpoint>[] = [];
   private _compiledRouter: Router = new Router();
   // DI
-  private _services: Map<Object, IDecorator<IService>> = new Map();
+  private _services: IDecorator<IService<any>>[] = [];
   private _injections: IDecorator<IInject>[] = [];
   // WS
   private _websockets: Map<Object, IDecorator<IWebsocket>> = new Map();
@@ -75,7 +78,7 @@ export class MetadataStorage {
   }
 
   get Services() {
-    return this._services as ReadonlyMap<Object, IDecorator<IService>>;
+    return this._services as ReadonlyArray<IDecorator<IService<any>>>;
   }
 
   get Routers() {
@@ -83,7 +86,7 @@ export class MetadataStorage {
   }
   //#endregion
 
-  //#region Decorators functions
+  //#region Static methods
   static getAddEndPointDecorator(method: HttpMethod) {
     return (endpoint: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
@@ -118,6 +121,26 @@ export class MetadataStorage {
       };
     };
   }
+
+  static getService(service: IDecorator<IDiId>): IService<any>;
+  static getService<ClassType>(
+    classType: ClassType,
+    id?: string | number
+  ) : IService< InstanceOf<ClassType> >;
+  static getService<ClassType>(
+    classtypeOrService: ClassType | IDecorator<IDiId>,
+    id?: string | number
+  ) {
+    const isService = typeof classtypeOrService !== "function";
+    const comparedClassType = isService ? (classtypeOrService as IDecorator<any>).class : classtypeOrService;
+    const comparedName = isService ? (classtypeOrService as IDecorator<IDiId>).params.id : id;
+    const service = this.Instance._services.find((service) =>
+      service.class === comparedClassType && service.params.id === comparedName
+    );
+    if (service) {
+      return service.params;
+    }
+  }
   //#endregion
 
   //#region Add-ers
@@ -127,7 +150,7 @@ export class MetadataStorage {
   }
 
   AddRouter(item: IDecorator<IRouter>) {
-    item.params.path = this.fixRouterPath(item.params.path);
+    item.params.path = this.normalizePath(item.params.path);
     const routerAlreadyExists = this.getRoutersByPath(item.params.path).length >= 1;
     if (routerAlreadyExists) {
       throw new Error(`Multiple routers have the path: ${item.params.path}`);
@@ -155,15 +178,15 @@ export class MetadataStorage {
     this._middlewares.set(item.class, item);
   }
 
-  AddService(item: IDecorator<IService>) {
-    const serviceAlreadyExists = this._services.get(item.class);
+  AddService(item: IDecorator<IService<any>>) {
+    const serviceAlreadyExists = MetadataStorage.getService(item);
     if (serviceAlreadyExists) {
       throw new Error(`
         ${item.class.constructor.name} is already declared as a service don't decorate it twice
         (@Websocket, @Router, @AfterMiddleware, @BeforeMiddleware is implicitly decorated by @Service)
       `);
     } else {
-      this._services.set(item.class, item);
+      this._services.push(item);
     }
   }
 
@@ -172,7 +195,7 @@ export class MetadataStorage {
   }
 
   AddEndpoint(item: IDecorator<IEndpoint>) {
-    item.params.endpoint = this.fixRouterPath(item.params.endpoint);
+    item.params.endpoint = this.normalizePath(item.params.endpoint);
     this._endpoints.push(item);
   }
 
@@ -208,11 +231,11 @@ export class MetadataStorage {
 
   private buildInjections() {
     this._injections.map((item) => {
-      const destinationService = this._services.get(item.class);
-      const valueService = this._services.get(item.params.injectionType);
+      const destinationService = MetadataStorage.getService(item.class, undefined);
+      const valueService = MetadataStorage.getService(item.params.injectionType, item.params.id);
       if (destinationService && valueService) {
-        const instance = valueService.params.instance;
-        destinationService.params.instance[item.key] = instance;
+        const instance = valueService.instance;
+        destinationService.instance[item.key] = instance;
       }
     });
   }
@@ -305,7 +328,7 @@ export class MetadataStorage {
   private bindContext(context: IDecorator<any>, fn: Function): Function;
   private bindContext(context: IDecorator<any>, fns: Function[]): Function[];
   private bindContext(context: IDecorator<any>, fnsOrFn: Function[] | Function) : Function[] | Function {
-    const instance = this._services.get(context.class).params.instance;
+    const instance = MetadataStorage.getService(context).instance;
     if (Array.isArray(fnsOrFn)) {
       return fnsOrFn.map(
         (fn) => fn.bind(instance)
@@ -355,11 +378,16 @@ export class MetadataStorage {
     ], []);
   }
 
+  /**
+   * Declare a class as a service, you can inject items and use it as a service
+   * @param item
+   */
   private addAsService(item: IDecorator<any>) {
     const instance = new (item.class as IClassType<any>)();
     const service = {
       ...item,
       params: {
+        id: undefined,
         instance
       }
     };
@@ -367,7 +395,11 @@ export class MetadataStorage {
     return instance;
   }
 
-  private fixRouterPath(path: string) {
+  /**
+   * Normalize the path of a router or an endpoint
+   * @param path The path string (example: "/router")
+   */
+  private normalizePath(path: string) {
     let finalPath = path.toLowerCase().trim();
     if (path[0] !== "/") {
       finalPath = `/${path}`;
@@ -378,6 +410,10 @@ export class MetadataStorage {
     return finalPath;
   }
 
+  /**
+   * Get a router by his path
+   * @param path The router path
+   */
   private getRoutersByPath(path: string) {
     return Array.from(this._routers.values()).filter((router) =>
       router.params.path === path

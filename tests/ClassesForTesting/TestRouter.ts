@@ -4,11 +4,18 @@ import {
   Context,
   Post,
   Put,
-  Delete
+  Delete,
+  Inject
 } from "../../src";
+import { TestService } from "./TestService";
 
 @Router("test")
 export class TestMiddlewareRouter {
+  @Inject()
+  _a: TestService;
+  @Inject(1)
+  _b: TestService;
+
   @Get("/")
   get(context: Context) {
     context.body = this.getReturnedBody(context);

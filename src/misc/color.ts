@@ -21,7 +21,7 @@ const textCustom = {
     white: 47
   },
 
-  cmds: {
+  cmd: {
     reset: 0,
     bright: 1,
     dim: 2,
@@ -43,7 +43,7 @@ export const Color = (text, ...params: string[]): string => {
     const v = p.split(".");
     resText += getCode(textCustom[v[0]][v[1]]);
   });
-  resText += text + getCode(textCustom.cmds.reset);
+  resText += text + getCode(textCustom.cmd.reset);
   return resText;
 };
 

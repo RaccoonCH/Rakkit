@@ -1,14 +1,14 @@
 import "reflect-metadata";
-import * as SocketIO from "socket.io";
-import * as Path from "path";
-import * as Koa from "koa";
 import * as BodyParser from "koa-bodyparser";
-import * as Cors from "@koa/cors";
+import * as SocketIO from "socket.io";
 import * as Static from "koa-static";
 import * as Router from "koa-router";
+import * as Cors from "@koa/cors";
+import * as Path from "path";
+import * as Koa from "koa";
 import { createServer, Server } from "http";
-import { HandlerFunction, IAppConfig } from "./types";
 import { AppLoader, MetadataStorage } from "./logic";
+import { IAppConfig } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
@@ -32,6 +32,10 @@ export class Rakkit extends AppLoader {
 
   get Config() {
     return this._config as Readonly<IAppConfig>;
+  }
+
+  get Url() {
+    return `http://${this._host}:${this._port}`;
   }
 
   private constructor(config: IAppConfig) {
@@ -78,16 +82,23 @@ export class Rakkit extends AppLoader {
     }
     if (startRest) {
       await this.startRest();
-      this.startMessage("REST", this._restEndpoint);
+      this.startMessage("PUBLIC", "");
+      this.startMessage("REST  ", this._restEndpoint);
     }
     if (startWs) {
       await this.startWs();
-      this.startMessage("WS  ", this._wsEndpoint);
+      this.startMessage("WS    ", this._wsEndpoint);
     }
     if (startRest && !this._silent) {
-      Array.from(MetadataStorage.Instance.Routers.values()).map((router) => {
-        console.log(`Router: ${router.params.path} ✅`);
-      });
+      const routers = Array.from(MetadataStorage.Instance.Routers.values());
+      if (routers.length > 0) {
+        console.log(
+          Color("\nRouters:", "cmd.underscore")
+        );
+        routers.map((router) => {
+          console.log(`✅  ${this.Url}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
+        });
+      }
     }
   }
 
@@ -127,7 +138,7 @@ export class Rakkit extends AppLoader {
   private startMessage(type: string, suffix: string) {
     if (!this._silent) {
       console.log(Color(
-        `${type}: Started on http://${this._host}:${this._port}${suffix}`,
+        `${type}: ${this.Url}${suffix}`,
         "fg.black", "bg.green"
       ));
     }

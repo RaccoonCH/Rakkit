@@ -7,7 +7,7 @@ import {
 import { TestService } from "./TestService";
 
 @Websocket()
-export class TestWs {
+export class TestDiWs {
   @Inject()
   private _testService: TestService;
 

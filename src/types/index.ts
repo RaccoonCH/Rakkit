@@ -1,9 +1,11 @@
 export * from "./Core/IAppConfig";
 export * from "./Core/IType";
 export * from "./Core/IClassType";
+export * from "./Core/InstanceOf";
 
 export * from "./Decorators/DI/IInject";
 export * from "./Decorators/DI/IService";
+export * from "./Decorators/DI/IDiId";
 export * from "./Decorators/Params/REST/IEndpointParams";
 export * from "./Decorators/Params/REST/IRouterParams";
 export * from "./Decorators/Params/REST/IMiddlewareParams";

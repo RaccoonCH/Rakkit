@@ -2,7 +2,7 @@ import { connect as SocketConnect } from "socket.io-client";
 import Axios, { AxiosInstance } from "axios";
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { Start } from "./Utils/Start";
-import { Rakkit } from "../src";
+import { Rakkit, Service, Inject, MetadataStorage } from "../src";
 
 const basicReturnedObject = {
   testDi: true,
@@ -45,5 +45,46 @@ describe("DI", async () => {
       });
       done();
     });
+  });
+
+  it("should inject service with the specified ID", async () => {
+    Rakkit.stop();
+
+    @Service()
+    @Service(1)
+    class Storage {
+      prop = "a";
+    }
+
+    @Service()
+    class FirstReceiver {
+      @Inject()
+      private _firstStorageInstance: Storage;
+      @Inject(1)
+      private _secondStorageInstance: Storage;
+
+      check() {
+        this._firstStorageInstance.prop = "fr";
+        this._secondStorageInstance.prop = "sr";
+      }
+    }
+
+    @Service()
+    class SecondReceiver {
+      @Inject()
+      private _firstStorageInstance: Storage;
+      @Inject(1)
+      private _secondStorageInstance: Storage;
+
+      check() {
+        expect(this._firstStorageInstance.prop).toBe("fr");
+        expect(this._secondStorageInstance.prop).toBe("sr");
+      }
+    }
+
+    await Rakkit.start();
+
+    MetadataStorage.getService(FirstReceiver).instance.check();
+    MetadataStorage.getService(SecondReceiver).instance.check();
   });
 });

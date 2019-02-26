@@ -1,3 +1,4 @@
-export interface IService {
-  instance?: Function;
+export interface IService<Instance> {
+  id?: string | number;
+  instance?: Instance;
 }

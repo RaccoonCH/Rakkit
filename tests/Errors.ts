@@ -63,8 +63,25 @@ describe("Error", async () => {
           silent: true
         });
         Rakkit.stop();
+        done.fail();
       } catch (err) {
         done();
+      }
+    });
+    it("should not throw service already exists error", async (done) => {
+      try {
+        @Service(1)
+        @Websocket()
+        class WsB {
+        }
+        await Rakkit.start({
+          websockets: [ WsB ],
+          silent: true
+        });
+        Rakkit.stop();
+        done();
+      } catch (err) {
+        done.fail(err);
       }
     });
   });
