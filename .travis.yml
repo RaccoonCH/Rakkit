@@ -8,7 +8,6 @@ jobs:
       before_install:
         - npm i -g codecov
       script:
-        - npm run verify
         - npm run test
       after_success:
         - codecov
