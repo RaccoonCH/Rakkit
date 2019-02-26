@@ -188,7 +188,7 @@ class PeopleRouter {
 ```
 
 ## The project history  
-Initially this tool was used in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we choose to make it an independent tool to benefit the community and progress on a better basis.
+Initially this tool was made in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we choose to make it an independent tool to benefit the community and progress on a better basis.
 
 ## Philosophy  
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
