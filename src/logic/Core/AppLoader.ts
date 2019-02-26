@@ -40,6 +40,8 @@ export class AppLoader {
         if (typeof controller === "string") {
           const filePaths = GlobSync(controller);
           filePaths.map(require);
+        } else {
+          controller;
         }
       });
     }

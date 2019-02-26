@@ -64,12 +64,10 @@ export class Rakkit extends AppLoader {
   }
 
   static stop() {
-    this.Instance._socketio.close();
+    if (this.Instance._socketio) {
+      this.Instance._socketio.close();
+    }
     this.Instance._httpServer.close();
-  }
-
-  async Restart() {
-    return this.startAllServices();
   }
 
   private async startAllServices() {

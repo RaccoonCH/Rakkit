@@ -87,15 +87,11 @@ export class MetadataStorage {
   static getAddEndPointDecorator(method: HttpMethod) {
     return (endpoint: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
-        let finalEndpoint = endpoint;
-        if (endpoint[0] !== "/") {
-          finalEndpoint = `/${endpoint}`;
-        }
         this.Instance.AddEndpoint({
           class: target.constructor,
           key,
           params: {
-            endpoint: finalEndpoint,
+            endpoint,
             method,
             functions: [descriptor.value]
           }
@@ -131,13 +127,14 @@ export class MetadataStorage {
   }
 
   AddRouter(item: IDecorator<IRouter>) {
-    this.addAsService(item);
-    this._routers.set(item.class, {
-      ...item,
-      params: {
-        ...item.params
-      }
-    });
+    item.params.path = this.fixRouterPath(item.params.path);
+    const routerAlreadyExists = this.getRoutersByPath(item.params.path).length >= 1;
+    if (routerAlreadyExists) {
+      throw new Error(`Multiple routers have the path: ${item.params.path}`);
+    } else {
+      this.addAsService(item);
+      this._routers.set(item.class, item);
+    }
   }
 
   AddMiddleware(item: IDecorator<IMiddleware>) {
@@ -159,7 +156,15 @@ export class MetadataStorage {
   }
 
   AddService(item: IDecorator<IService>) {
-    this._services.set(item.class, item);
+    const serviceAlreadyExists = this._services.get(item.class);
+    if (serviceAlreadyExists) {
+      throw new Error(`
+        ${item.class.constructor.name} is already declared as a service don't decorate it twice
+        (@Websocket, @Router, @AfterMiddleware, @BeforeMiddleware is implicitly decorated by @Service)
+      `);
+    } else {
+      this._services.set(item.class, item);
+    }
   }
 
   AddUsedMiddleware(item: IDecorator<IUsedMiddleware>) {
@@ -167,11 +172,19 @@ export class MetadataStorage {
   }
 
   AddEndpoint(item: IDecorator<IEndpoint>) {
+    item.params.endpoint = this.fixRouterPath(item.params.endpoint);
     this._endpoints.push(item);
   }
 
   AddOn(item: IDecorator<IOn>) {
-    this._ons.push(item);
+    const onAlreadyExists = this._ons.find((on) =>
+      on.params.message === item.params.message
+    );
+    if (onAlreadyExists) {
+      throw new Error(`An @On() method with the same message: "${item.params.message}" already exists`);
+    } else {
+      this._ons.push(item);
+    }
   }
 
   AddInjection(item: IDecorator<IInject>) {
@@ -241,7 +254,7 @@ export class MetadataStorage {
       item.params.middlewares = this.extractMiddlewares(mws);
       this.mountEndpointsToRouter(item);
       this._compiledRouter.use(
-        `/${item.params.path}`,
+        item.params.path,
         item.params.router.routes(),
         item.params.router.allowedMethods()
       );
@@ -352,6 +365,23 @@ export class MetadataStorage {
     };
     this.AddService(service);
     return instance;
+  }
+
+  private fixRouterPath(path: string) {
+    let finalPath = path.toLowerCase().trim();
+    if (path[0] !== "/") {
+      finalPath = `/${path}`;
+    }
+    if (finalPath[finalPath.length - 1] === "/" && finalPath.length > 1) {
+      finalPath = finalPath.substr(0, finalPath.length - 2);
+    }
+    return finalPath;
+  }
+
+  private getRoutersByPath(path: string) {
+    return Array.from(this._routers.values()).filter((router) =>
+      router.params.path === path
+    );
   }
   //#endregion
 }
