@@ -10,9 +10,9 @@ describe("Websocket", async () => {
     socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
   });
 
-  afterAll(() => {
-    Rakkit.stop();
+  afterAll(async () => {
     socketConnection.close();
+    await Rakkit.stop();
   });
 
   it("should trigger the connection", async (done) => {

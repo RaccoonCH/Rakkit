@@ -1,6 +1,10 @@
 import { Rakkit, Router, Websocket, On, Service } from "../src";
 
 describe("Error", async () => {
+  afterAll(async () => {
+    await Rakkit.stop();
+  });
+
   describe("Router", () => {
     it("should throw router same path error", async (done) => {
       try {
@@ -17,9 +21,11 @@ describe("Error", async () => {
           ],
           silent: true
         });
-        Rakkit.stop();
+        done.fail();
       } catch (err) {
         done();
+      } finally {
+        await Rakkit.stop();
       }
     });
   });
@@ -44,9 +50,10 @@ describe("Error", async () => {
           ],
           silent: true
         });
-        Rakkit.stop();
       } catch (err) {
         done();
+      } finally {
+        await Rakkit.stop();
       }
     });
   });
@@ -62,10 +69,11 @@ describe("Error", async () => {
           websockets: [ WsB ],
           silent: true
         });
-        Rakkit.stop();
         done.fail();
       } catch (err) {
         done();
+      } finally {
+        await Rakkit.stop();
       }
     });
     it("should not throw service already exists error", async (done) => {
@@ -78,10 +86,11 @@ describe("Error", async () => {
           websockets: [ WsB ],
           silent: true
         });
-        Rakkit.stop();
         done();
       } catch (err) {
         done.fail(err);
+      } finally {
+        await Rakkit.stop();
       }
     });
   });

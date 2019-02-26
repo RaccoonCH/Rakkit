@@ -42,8 +42,8 @@ describe("REST Middlewares", async () => {
     });
   });
 
-  afterAll(() => {
-    Rakkit.stop();
+  afterAll(async () => {
+    await Rakkit.stop();
   });
 
   it("should receive the returned body", async () => {

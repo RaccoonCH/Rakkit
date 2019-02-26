@@ -20,14 +20,14 @@ describe("REST", async () => {
   let api: AxiosInstance;
 
   beforeAll(async () => {
-    await Start();
     api = Axios.create({
       baseURL: "http://localhost:3000/rest/test"
     });
+    await Start();
   });
 
-  afterAll(() => {
-    Rakkit.stop();
+  afterAll(async () => {
+    await Rakkit.stop();
   });
 
   describe("GET", () => {

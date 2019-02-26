@@ -11,6 +11,39 @@ const basicReturnedObject = {
   firstBeforeRouter: true
 };
 
+
+@Service()
+@Service(1)
+class Storage {
+  prop = "a";
+}
+
+@Service()
+class FirstReceiver {
+  @Inject()
+  private _firstStorageInstance: Storage;
+  @Inject(1)
+  private _secondStorageInstance: Storage;
+
+  check() {
+    this._firstStorageInstance.prop = "fr";
+    this._secondStorageInstance.prop = "sr";
+  }
+}
+
+@Service()
+class SecondReceiver {
+  @Inject()
+  private _firstStorageInstance: Storage;
+  @Inject(1)
+  private _secondStorageInstance: Storage;
+
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._secondStorageInstance.prop).toBe("sr");
+  }
+}
+
 describe("DI", async () => {
   let api: AxiosInstance;
   let socketConnection: SocketIOClient.Socket;
@@ -27,8 +60,9 @@ describe("DI", async () => {
     });
   });
 
-  afterAll(() => {
-    Rakkit.stop();
+  afterAll(async () => {
+    socketConnection.close();
+    await Rakkit.stop();
   });
 
   it("should inject service to router and middlewares using the same instance", async () => {
@@ -48,42 +82,6 @@ describe("DI", async () => {
   });
 
   it("should inject service with the specified ID", async () => {
-    Rakkit.stop();
-
-    @Service()
-    @Service(1)
-    class Storage {
-      prop = "a";
-    }
-
-    @Service()
-    class FirstReceiver {
-      @Inject()
-      private _firstStorageInstance: Storage;
-      @Inject(1)
-      private _secondStorageInstance: Storage;
-
-      check() {
-        this._firstStorageInstance.prop = "fr";
-        this._secondStorageInstance.prop = "sr";
-      }
-    }
-
-    @Service()
-    class SecondReceiver {
-      @Inject()
-      private _firstStorageInstance: Storage;
-      @Inject(1)
-      private _secondStorageInstance: Storage;
-
-      check() {
-        expect(this._firstStorageInstance.prop).toBe("fr");
-        expect(this._secondStorageInstance.prop).toBe("sr");
-      }
-    }
-
-    await Rakkit.start();
-
     MetadataStorage.getService(FirstReceiver).instance.check();
     MetadataStorage.getService(SecondReceiver).instance.check();
   });

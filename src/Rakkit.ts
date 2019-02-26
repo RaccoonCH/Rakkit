@@ -67,11 +67,18 @@ export class Rakkit extends AppLoader {
     return this.Instance;
   }
 
-  static stop() {
-    if (this.Instance._socketio) {
-      this.Instance._socketio.close();
+  static async stop() {
+    if (this.Instance) {
+      if (this.Instance._socketio) {
+        await new Promise((resolve) => {
+          this.Instance._socketio.close(resolve);
+        });
+      }
+      await new Promise((resolve) => {
+        this.Instance._httpServer.close(resolve);
+      });
     }
-    this.Instance._httpServer.close();
+    return this._instance;
   }
 
   private async startAllServices() {
