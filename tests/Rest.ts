@@ -1,14 +1,28 @@
 import Axios, { AxiosInstance } from "axios";
-import { Start } from "./ClassesForTesting/Start";
-import { Rakkit } from "../src";
+import { Start } from "./Utils/Start";
+import { Rakkit, HttpMethod } from "../src";
+
+const bodyData = {
+  body: "datas"
+};
+
+const getBody = (method: HttpMethod, param?: string, body?: boolean) => {
+  return {
+    method,
+    params: param ? {
+      param
+    } : {},
+    body: body ? bodyData : {}
+  };
+};
 
 describe("REST", async () => {
   let api: AxiosInstance;
 
   beforeAll(async () => {
-    const r = await Start();
+    await Start();
     api = Axios.create({
-      baseURL: "http://localhost:3000/rest"
+      baseURL: "http://localhost:3000/rest/test"
     });
   });
 
@@ -16,23 +30,63 @@ describe("REST", async () => {
     Rakkit.stop();
   });
 
-  it("should receive the returned body", async () => {
-    const res = (await api.get("/test")).data;
-    expect(res).toBe("hello world");
+  describe("GET", () => {
+    it("should receive the returned body", async () => {
+      const res = (await api.get("/")).data;
+      expect(res).toEqual(
+        getBody("GET")
+      );
+    });
+    it("should receive the url params", async () => {
+      const res = (await api.get("/myparam")).data;
+      expect(res).toEqual(
+        getBody("GET", "myparam")
+      );
+    });
   });
 
-  it("should pass to each middleware", async () => {
-    const res = (await api.get("/test/mw")).data;
-    expect(res).toBe("b1;b2;0;a1;a2;");
+  describe("DELETE", () => {
+    it("should receive the returned body", async () => {
+      const res = (await api.delete("/")).data;
+      expect(res).toEqual(
+        getBody("DELETE")
+      );
+    });
+    it("should receive the url params", async () => {
+      const res = (await api.delete("/myparam")).data;
+      expect(res).toEqual(
+        getBody("DELETE", "myparam")
+      );
+    });
   });
 
-  it("should merge endpoints if it has the same endpoint and method", async () => {
-    const res = (await api.get("/test/merge")).data;
-    expect(res).toBe("-1;0;");
+  describe("POST", () => {
+    it("should receive the returned body", async () => {
+      const res = (await api.post("/", bodyData)).data;
+      expect(res).toEqual(
+        getBody("POST", undefined, true)
+      );
+    });
+    it("should receive the url params", async () => {
+      const res = (await api.post("/myparam", bodyData)).data;
+      expect(res).toEqual(
+        getBody("POST", "myparam", true)
+      );
+    });
   });
 
-  it("should merge endpoints if it has the same endpoint and method and use middleware", async () => {
-    const res = (await api.get("/test/merge-mw")).data;
-    expect(res).toBe("b1;-1;a1;b2;0;a2");
+  describe("PUT", () => {
+    it("should receive the returned body", async () => {
+      const res = (await api.put("/", bodyData)).data;
+      expect(res).toEqual(
+        getBody("PUT", undefined, true)
+      );
+    });
+    it("should receive the url params", async () => {
+      const res = (await api.put("/myparam", bodyData)).data;
+      expect(res).toEqual(
+        getBody("PUT", "myparam", true)
+      );
+    });
   });
 });

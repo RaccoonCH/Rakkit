@@ -1,7 +1,7 @@
 import { Rakkit, IAppConfig } from "../../src";
 
 const getDirName = (path) => {
-  return `${__dirname}/${path}`;
+  return `${__dirname}/../ClassesForTesting/${path}`;
 };
 
 export const Start = async (config?: IAppConfig) => {
@@ -11,6 +11,7 @@ export const Start = async (config?: IAppConfig) => {
     ...(config || {}),
     port: 3000,
     websockets: [wsGlob],
-    routers: [routerGlob]
+    routers: [routerGlob],
+    silent: true
   });
 };

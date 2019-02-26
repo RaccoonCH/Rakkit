@@ -1,5 +1,5 @@
 import { connect as SocketConnect } from "socket.io-client";
-import { Start } from "./ClassesForTesting/Start";
+import { Start } from "./Utils/Start";
 import { Rakkit } from "../src";
 
 describe("Websocket", async () => {
@@ -7,9 +7,7 @@ describe("Websocket", async () => {
 
   beforeAll(async () => {
     await Start();
-    socketConnection = SocketConnect("http://localhost:3000", {
-      path: "/ws"
-    });
+    socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
   });
 
   afterAll(() => {

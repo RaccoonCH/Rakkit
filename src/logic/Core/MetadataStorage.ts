@@ -1,5 +1,5 @@
+import { Rakkit } from "../../Rakkit";
 import * as Router from "koa-router";
-import { Middleware } from "koa";
 import {
   AppLoader,
   HandlerFunctionHelper
@@ -21,17 +21,18 @@ import {
   IWebsocket,
   IBaseMiddleware
 } from "../../types";
+import { Middleware } from "koa";
 
 export class MetadataStorage {
   //#region Declarations
   private static _instance: MetadataStorage;
   // REST
-  private _routers: Map<Object, IDecorator<IRouter>> = new Map();
-  private _endpoints: IDecorator<IEndpoint>[] = [];
   private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
   private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
+  private _routers: Map<Object, IDecorator<IRouter>> = new Map();
+  private _endpoints: IDecorator<IEndpoint>[] = [];
   private _compiledRouter: Router = new Router();
   // DI
   private _services: Map<Object, IDecorator<IService>> = new Map();
@@ -206,11 +207,13 @@ export class MetadataStorage {
   private async buildRouters() {
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
-      item.params.functions = this.getEndpointFunctions(item);
-      // ERROR: ALREADY MERGE WHEN SAME MIDDLEWARE
-      const alreadyMerged = router.params.endpoints.find(
-        endpoint => endpoint.functions.indexOf(item.params.functions[0]) > -1
+      // Look if the endpoint is already merged to another endpoinr
+      const alreadyMerged = router.params.endpoints.find(endpoint =>
+        endpoint.params.endpoint === item.params.endpoint &&
+        endpoint.params.method === item.params.method &&
+        endpoint.class === item.class
       );
+      item.params.functions = this.getEndpointFunctions(item);
       if (!alreadyMerged) {
         // If multiple method are decorated with the same method and endpoint
         // merge the functions
@@ -223,7 +226,7 @@ export class MetadataStorage {
         endpointsToMerge.map((endpoint) => {
           item.params.functions = item.params.functions.concat(this.getEndpointFunctions(endpoint));
         });
-        router.params.endpoints.push(item.params);
+        router.params.endpoints.push(item);
       }
     });
     const routers = Array.from(this._routers.values());
@@ -243,6 +246,17 @@ export class MetadataStorage {
         item.params.router.allowedMethods()
       );
     });
+    const globalMiddlewares = Rakkit.Instance.Config.globalMiddlewares;
+    if (globalMiddlewares &&  globalMiddlewares.length > 0) {
+      // Mount global middlewares to the main router
+      const globalBeforeMiddlewares = this.getBeforeMiddlewares(globalMiddlewares);
+      const globalAfterMiddlewares = this.getAfterMiddlewares(globalMiddlewares);
+      const router = this._compiledRouter;
+      this._compiledRouter = new Router();
+      this._compiledRouter.use(...globalBeforeMiddlewares);
+      this._compiledRouter.use(router.routes());
+      this._compiledRouter.use(...globalAfterMiddlewares);
+    }
   }
   //#endregion
 
@@ -288,7 +302,7 @@ export class MetadataStorage {
   }
 
   private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
-    return middlewares.reduce((arr, item) => {
+    return middlewares.reduce<Middleware[]>((arr, item) => {
       const foundMiddleware = this._middlewares.get(item);
       if (foundMiddleware.params.executionTime === beforeAfter) {
         return [
@@ -312,9 +326,10 @@ export class MetadataStorage {
     router.params.router = new Router();
     this.loadMiddlewares(router.params, this._beforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
-      router.params.router[endpoint.method.toLowerCase()](
-        `${endpoint.endpoint}`,
-        ...endpoint.functions.map(HandlerFunctionHelper.getWrappedHandlerFunction)
+      const method = endpoint.params.method.toLowerCase();
+      router.params.router[method](
+        `${endpoint.params.endpoint}`,
+        ...endpoint.params.functions.map(HandlerFunctionHelper.getWrappedHandlerFunction)
       );
     });
     this.loadMiddlewares(router.params, this._afterMiddlewares);

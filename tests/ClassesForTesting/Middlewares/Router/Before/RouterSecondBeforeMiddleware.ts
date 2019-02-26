@@ -3,12 +3,12 @@ import {
   IBaseMiddleware,
   Context,
   NextFunction
-} from "../../../src";
+} from "../../../../../src";
 
 @BeforeMiddleware()
-export class SecondBeforeMiddleware implements IBaseMiddleware {
+export class RouterSecondBeforeMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
-    context.body += "b2;";
+    context.body += "rb2;";
     next();
   }
 }

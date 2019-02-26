@@ -1,2 +1,2 @@
-import { Start } from "./Start";
+import { Start } from "../Utils/Start";
 Start();

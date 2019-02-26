@@ -1,49 +1,55 @@
-import { Router, Get, Context, UseMiddleware, NextFunction } from "../../src";
-import { FirstAfterMiddleware } from "./AfterMiddleware/FirstMiddleware";
-import { FirstBeforeMiddleware } from "./BeforeMiddlewares/FirstMiddleware";
-import { SecondBeforeMiddleware } from "./BeforeMiddlewares/SecondMiddleware";
-import { SecondAfterMiddleware } from "./AfterMiddleware/SecondMiddleware";
+import {
+  Router,
+  Get,
+  Context,
+  Post,
+  Put,
+  Delete
+} from "../../src";
 
 @Router("test")
-export class TestRouter {
+export class TestMiddlewareRouter {
   @Get("/")
   get(context: Context) {
-    context.body = "hello world";
-    context.status = 200;
+    context.body = this.getReturnedBody(context);
+  }
+  @Get("/:param")
+  getParam(context: Context) {
+    context.body = this.getReturnedBody(context);
   }
 
-  @Get("/mw")
-  @UseMiddleware(
-    FirstAfterMiddleware,
-    FirstBeforeMiddleware,
-    SecondBeforeMiddleware,
-    SecondAfterMiddleware
-  )
-  getMw(context: Context, next: NextFunction) {
-    context.body += "0;";
-    next();
+  @Post("/")
+  post(context: Context) {
+    context.body = this.getReturnedBody(context);
+  }
+  @Post("/:param")
+  postParam(context: Context) {
+    context.body = this.getReturnedBody(context);
   }
 
-  @Get("/merge")
-  merge1(context: Context, next: NextFunction) {
-    context.body = "-1;";
-    next();
+  @Put("/")
+  put(context: Context) {
+    context.body = this.getReturnedBody(context);
   }
-  @Get("/merge")
-  merge2(context: Context) {
-    context.body += "0;";
+  @Put("/:param")
+  putParam(context: Context) {
+    context.body = this.getReturnedBody(context);
   }
 
-  @Get("/merge-mw")
-  @UseMiddleware(FirstBeforeMiddleware, FirstAfterMiddleware)
-  mergeMw1(context: Context, next: NextFunction) {
-    context.body += "-1;";
-    next();
+  @Delete("/")
+  delete(context: Context) {
+    context.body = this.getReturnedBody(context);
   }
-  @Get("/merge-mw")
-  @UseMiddleware(SecondBeforeMiddleware, SecondAfterMiddleware)
-  mergeMw2(context: Context, next: NextFunction) {
-    context.body += "0;";
-    next();
+  @Delete("/:param")
+  deleteParam(context: Context) {
+    context.body = this.getReturnedBody(context);
+  }
+
+  private getReturnedBody(context: Context) {
+    return {
+      method: context.method,
+      params: context.params,
+      body: context.request.body
+    };
   }
 }

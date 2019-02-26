@@ -1,10 +1,13 @@
-import { On, Websocket, Socket } from "../../src";
+import {
+  On,
+  Websocket,
+  Socket
+} from "../../src";
 
 @Websocket()
 export class TestWs {
   @On("connection")
   connection(socket: Socket) {
-    console.log(`Socket: ${socket.id} connected`);
     socket.emit("connected");
   }
 

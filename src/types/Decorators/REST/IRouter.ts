@@ -1,9 +1,13 @@
 import * as Router from "koa-router";
-import { IEndpoint, MiddlewareType } from "../..";
+import {
+  IEndpoint,
+  MiddlewareType,
+  IDecorator
+} from "../..";
 
 export interface IRouter {
   path: string;
-  endpoints?: IEndpoint[];
+  endpoints?: IDecorator<IEndpoint>[];
   router?: Router;
   middlewares?: MiddlewareType[];
 }

@@ -23,10 +23,15 @@ export class Rakkit extends AppLoader {
   private _httpServer: Server;
   private _socketio: SocketIO.Server;
   private _publicPath: string;
+  private _silent: boolean;
   private _config: IAppConfig;
 
   static get Instance() {
     return this._instance;
+  }
+
+  get Config() {
+    return this._config as Readonly<IAppConfig>;
   }
 
   private constructor(config: IAppConfig) {
@@ -38,6 +43,7 @@ export class Rakkit extends AppLoader {
     this._restEndpoint = config.restEndpoint || "/rest";
     this._wsEndpoint = config.wsEndpoint || "/ws";
     this._publicPath = config.publicPath || Path.join(__dirname, "../public");
+    this._silent = config.silent || false;
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
   }
@@ -80,19 +86,11 @@ export class Rakkit extends AppLoader {
       await this.startWs();
       this.startMessage("WS  ", this._wsEndpoint);
     }
-    if (startRest) {
+    if (startRest && !this._silent) {
       Array.from(MetadataStorage.Instance.Routers.values()).map((router) => {
         console.log(`Router: ${router.params.path} ✅`);
       });
     }
-  }
-
-  private loadMiddlewares(middlewares: ReadonlyMap<Object, HandlerFunction>) {
-    AppLoader.loadMiddlewares(
-      this._config.globalMiddlewares,
-      this._mainKoaRouter,
-      middlewares
-    );
   }
 
   private async startWs() {
@@ -121,23 +119,19 @@ export class Rakkit extends AppLoader {
 
       // Server the public folder to be served as a static folder
       this._koaApp.use(Static(this._publicPath));
-
       this._mainKoaRouter = new Router({ prefix: this._restEndpoint });
       this._mainKoaRouter.use(MetadataStorage.Instance.MainRouter.routes());
-
-      this.loadMiddlewares(MetadataStorage.Instance.BeforeMiddlewares);
-      // Load the api returned router into the /[restEndpoint] route
       this._koaApp.use(this._mainKoaRouter.routes());
-      this.loadMiddlewares(MetadataStorage.Instance.AfterMiddlewares);
-
       resolve();
     });
   }
 
   private startMessage(type: string, suffix: string) {
-    console.log(Color(
-      `${type}: Started on http://${this._host}:${this._port}${suffix}`,
-      "fg.black", "bg.green"
-    ));
+    if (!this._silent) {
+      console.log(Color(
+        `${type}: Started on http://${this._host}:${this._port}${suffix}`,
+        "fg.black", "bg.green"
+      ));
+    }
   }
 }
