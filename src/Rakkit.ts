@@ -103,7 +103,7 @@ export class Rakkit extends AppLoader {
           Color("\nRouters:", "cmd.underscore")
         );
         routers.map((router) => {
-          console.log(`✅  ${this.Url}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
+          console.log(`✅  ${this.Url}${this._restEndpoint}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
         });
       }
     }
