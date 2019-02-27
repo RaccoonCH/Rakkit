@@ -1,0 +1,2 @@
+- Translations
+  - [:fr: Français](/fr/)

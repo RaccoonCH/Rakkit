@@ -16,7 +16,7 @@ export class TestMiddlewareRouter {
   @Inject(1)
   _b: TestService;
 
-  @Get("/")
+  @Get()
   get(context: Context) {
     context.body = this.getReturnedBody(context);
   }
@@ -43,7 +43,7 @@ export class TestMiddlewareRouter {
     context.body = this.getReturnedBody(context);
   }
 
-  @Delete("/")
+  @Delete()
   delete(context: Context) {
     context.body = this.getReturnedBody(context);
   }

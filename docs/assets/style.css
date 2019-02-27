@@ -1,0 +1,12 @@
+:root {
+  --docsifytabs-border-color: transparent;
+  --docsifytabs-tab-highlight-color: #56c88f;
+}
+
+* {
+  outline: none;
+}
+
+.app-nav {
+  display: block !important;
+}

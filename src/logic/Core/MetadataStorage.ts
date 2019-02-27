@@ -88,13 +88,13 @@ export class MetadataStorage {
 
   //#region Static methods
   static getAddEndPointDecorator(method: HttpMethod) {
-    return (endpoint: string): Function => {
+    return (endpoint?: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
         this.Instance.AddEndpoint({
           class: target.constructor,
           key,
           params: {
-            endpoint,
+            endpoint: endpoint || "/",
             method,
             functions: [descriptor.value]
           }
