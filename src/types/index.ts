@@ -20,6 +20,8 @@ export * from "./Decorators/WS/IWebsocket";
 export * from "./Decorators/IDecorator";
 
 export * from "./REST/HttpMethod";
+export * from "./REST/CorsOptions";
+export * from "./REST/PublicOptions";
 
 export * from "./Routing/IBaseMiddleware";
 export * from "./Routing/MiddlewareType";

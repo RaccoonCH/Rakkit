@@ -4,25 +4,24 @@ import * as SocketIO from "socket.io";
 import * as Static from "koa-static";
 import * as Router from "koa-router";
 import * as Cors from "@koa/cors";
-import * as Path from "path";
 import * as Koa from "koa";
 import { createServer, Server } from "http";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig } from "./types";
+import { IAppConfig, CorsOptions, PublicOptions } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
   protected static _instance: Rakkit;
-  private _corsEnabled?: boolean;
+  private _cors: CorsOptions;
+  private _public: PublicOptions;
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
   private _wsEndpoint: string;
   private _koaApp: Koa;
-  private _mainKoaRouter: Router;
+  private _mainRestRouter: Router;
   private _httpServer: Server;
   private _socketio: SocketIO.Server;
-  private _publicPath: string;
   private _silent: boolean;
   private _config: IAppConfig;
 
@@ -41,12 +40,13 @@ export class Rakkit extends AppLoader {
   private constructor(config: IAppConfig) {
     super();
     this._config = config || {};
-    this._corsEnabled = config.corsEnabled || true;
+    this._cors = config.cors || { disabled: false };
+    this._public = config.public || { disabled: true };
+    this._public.endpoint = this._public.endpoint || "";
     this._host = config.host || "localhost";
     this._port = config.port || 4000;
     this._restEndpoint = config.restEndpoint || "/rest";
     this._wsEndpoint = config.wsEndpoint || "/ws";
-    this._publicPath = config.publicPath || Path.join(__dirname, "../public");
     this._silent = config.silent || false;
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
@@ -89,7 +89,9 @@ export class Rakkit extends AppLoader {
     }
     if (startRest) {
       await this.startRest();
-      this.startMessage("PUBLIC", "");
+      if (!this._public.disabled) {
+        this.startMessage("PUBLIC", this._public.endpoint);
+      }
       this.startMessage("REST  ", this._restEndpoint);
     }
     if (startWs) {
@@ -128,16 +130,23 @@ export class Rakkit extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
-      if (this._corsEnabled) {
-        this._koaApp.use(Cors());
+      if (!this._cors.disabled) {
+        this._koaApp.use(
+          Cors(this._cors)
+        );
       }
       this._koaApp.use(BodyParser());
+      this._mainRestRouter = new Router({ prefix: this._restEndpoint });
+      this._mainRestRouter.use(MetadataStorage.Instance.MainRouter.routes());
+      this._koaApp.use(this._mainRestRouter.routes());
 
-      // Server the public folder to be served as a static folder
-      this._koaApp.use(Static(this._publicPath));
-      this._mainKoaRouter = new Router({ prefix: this._restEndpoint });
-      this._mainKoaRouter.use(MetadataStorage.Instance.MainRouter.routes());
-      this._koaApp.use(this._mainKoaRouter.routes());
+      if (!this._public.disabled) {
+        const publicRouter = new Router({
+          prefix: "/"
+        });
+        publicRouter.all("*", Static(this._public.path));
+        this._koaApp.use(publicRouter.routes());
+      }
       resolve();
     });
   }

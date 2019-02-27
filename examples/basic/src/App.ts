@@ -1,4 +1,5 @@
 import { Rakkit } from "../../../src";
+import { join as Join } from "path";
 
 export class App {
   private _websockets = [`${__dirname}/websockets/*`];
@@ -7,7 +8,10 @@ export class App {
   start() {
     Rakkit.start({
       websockets: this._websockets,
-      routers: this._routers
+      routers: this._routers,
+      public: {
+        path: Join(__dirname, "public")
+      }
     });
   }
 }

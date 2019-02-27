@@ -1,13 +1,17 @@
-import { MiddlewareType } from "../..";
+import {
+  MiddlewareType,
+  CorsOptions,
+  PublicOptions
+} from "../..";
 
 export type ClassOrString = (Function | string);
 
 export interface IAppConfig {
   silent?: boolean;
-  corsEnabled?: boolean;
+  cors?: CorsOptions;
   host?: string;
   port?: number;
-  publicPath?: string;
+  public?: PublicOptions;
   restEndpoint?: string;
   wsEndpoint?: string;
   routers?: ClassOrString[];
