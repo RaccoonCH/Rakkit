@@ -12,6 +12,6 @@ export const Start = async (config?: IAppConfig) => {
     port: 3000,
     websockets: [wsGlob],
     routers: [routerGlob],
-    silent: true
+    silent: false // False for codecov
   });
 };
