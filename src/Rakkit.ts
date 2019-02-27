@@ -7,7 +7,7 @@ import * as Cors from "@koa/cors";
 import * as Koa from "koa";
 import { createServer, Server } from "http";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig, CorsOptions, PublicOptions } from "./types";
+import { IAppConfig, CorsOptions, PublicOptions, WsOptions } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
@@ -17,7 +17,7 @@ export class Rakkit extends AppLoader {
   private _host: string;
   private _port: number;
   private _restEndpoint: string;
-  private _wsEndpoint: string;
+  private _socketioOptions: WsOptions;
   private _koaApp: Koa;
   private _mainRestRouter: Router;
   private _httpServer: Server;
@@ -41,17 +41,18 @@ export class Rakkit extends AppLoader {
     return this._socketio;
   }
 
-  private constructor(config: IAppConfig) {
+  private constructor(config?: IAppConfig) {
     super();
     this._config = config || {};
-    this._cors = config.cors || { disabled: false };
-    this._public = config.public || { disabled: true };
+    this._cors = this._config.cors || { disabled: false };
+    this._public = this._config.public || { disabled: true };
     this._public.endpoint = this._public.endpoint || "";
-    this._host = config.host || "localhost";
-    this._port = config.port || 4000;
-    this._restEndpoint = config.restEndpoint || "/rest";
-    this._wsEndpoint = config.wsEndpoint || "/ws";
-    this._silent = config.silent || false;
+    this._host = this._config.host || "localhost";
+    this._port = this._config.port || 4000;
+    this._restEndpoint = this._config.restEndpoint || "/rest";
+    this._socketioOptions = this._config.SocketioOptions || {};
+    this._socketioOptions.path = this._socketioOptions.path || "/ws";
+    this._silent = this._config.silent || false;
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
   }
@@ -60,7 +61,7 @@ export class Rakkit extends AppLoader {
    * Start the application (Express, GraphQL, ...)
    */
   static async start(config?: IAppConfig): Promise<Rakkit> {
-    if (!this.Instance) {
+    if (!this.Instance || config) {
       this._instance = new Rakkit(config);
     }
 
@@ -100,7 +101,7 @@ export class Rakkit extends AppLoader {
     }
     if (startWs) {
       await this.startWs();
-      this.startMessage("WS    ", this._wsEndpoint);
+      this.startMessage("WS    ", this._socketioOptions.path);
     }
     if (startRest && !this._silent) {
       const routers = Array.from(MetadataStorage.Instance.Routers.values());
@@ -116,18 +117,20 @@ export class Rakkit extends AppLoader {
   }
 
   private async startWs() {
-    this._socketio = SocketIo(this._httpServer, {
-      path: this._wsEndpoint
-    });
-    this._socketio.on("connection", (socket) => {
-      MetadataStorage.Instance.Ons.map((item) => {
-        if (item.params.message !== "connection") {
-          socket.on(item.params.message, (message: any) => {
-            item.params.function(socket, message);
-          });
-        } else {
-          item.params.function(socket);
-        }
+    this._socketio = SocketIo(this._httpServer, this._socketioOptions);
+    Array.from(MetadataStorage.Instance.Websockets.values()).map((ws) => {
+      const nsp = this._socketio.of(ws.params.namespace);
+      nsp.on("connection", (socket) => {
+        console.log(`Connected to room ${ws.params.namespace}`);
+        ws.params.ons.map(({ params }) => {
+          if (params.event !== "connection") {
+            socket.on(params.event, (datas: any) => {
+              params.function(socket, datas);
+            });
+          } else {
+            params.function(socket);
+          }
+        });
       });
     });
   }

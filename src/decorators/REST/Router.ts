@@ -4,7 +4,7 @@ import { MetadataStorage } from "../../logic";
  * Declare a router and mount it to the app main router
  * @param path The endpoint of the router
  */
-export const Router = (path: string): Function => {
+export function Router(path: string): Function {
   return (target: Function): void => {
     MetadataStorage.Instance.AddRouter({
       class: target,
@@ -16,4 +16,4 @@ export const Router = (path: string): Function => {
       }
     });
   };
-};
+}

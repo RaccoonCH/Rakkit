@@ -1,7 +1,8 @@
 import {
   MiddlewareType,
   CorsOptions,
-  PublicOptions
+  PublicOptions,
+  WsOptions
 } from "../..";
 
 export type ClassOrString = (Function | string);
@@ -13,7 +14,7 @@ export interface IAppConfig {
   port?: number;
   public?: PublicOptions;
   restEndpoint?: string;
-  wsEndpoint?: string;
+  SocketioOptions?: WsOptions;
   routers?: ClassOrString[];
   websockets?: ClassOrString[];
   globalMiddlewares?: MiddlewareType[];

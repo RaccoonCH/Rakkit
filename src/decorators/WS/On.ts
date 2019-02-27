@@ -3,15 +3,17 @@ import { MetadataStorage } from "../../logic";
 /**
  * Subscribe to a socket.io event
  */
-export const On = (message: "connection" | string): Function => {
+export function On(event: string);
+export function On(event: "connection");
+export function On(event: "connection" | string): Function {
   return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
     MetadataStorage.Instance.AddOn({
       class: target.constructor,
       key,
       params: {
-        message,
+        event,
         function: descriptor.value
       }
     });
   };
-};
+}

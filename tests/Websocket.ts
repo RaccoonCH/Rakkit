@@ -4,37 +4,70 @@ import { Rakkit } from "../src";
 
 describe("Websocket", async () => {
   let socketConnection: SocketIOClient.Socket;
+  let roomSocketConnection: SocketIOClient.Socket;
 
   beforeAll(async () => {
     await Start();
-    socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
   });
 
   afterAll(async () => {
     socketConnection.close();
+    roomSocketConnection.close();
     await Rakkit.stop();
   });
 
-  it("should trigger the connection", async (done) => {
-    socketConnection.on("connected", () => {
-      done();
+  describe("Without room", () => {
+    it("should trigger the connection", async (done) => {
+      socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
+      socketConnection.on("connected", () => {
+        done();
+      });
+    });
+
+    it("should trigger the specified method by message", async (done) => {
+      socketConnection.emit("hello");
+      socketConnection.on("world", () => {
+        done();
+      });
+    });
+
+    it("should pass datas through parameters", async (done) => {
+      socketConnection.emit("params", {
+        datas: true
+      });
+      socketConnection.on("params", (datas) => {
+        expect(datas).toEqual({
+          error: false
+        });
+        done();
+      });
     });
   });
 
-  it("should trigger the specified method by message", async (done) => {
-    socketConnection.emit("hello");
-    socketConnection.on("world", () => {
-      done();
+  describe("With room", () => {
+    it("should trigger the connection", async (done) => {
+      roomSocketConnection = SocketConnect("http://localhost:3000/my-room", { path: "/ws" });
+      roomSocketConnection.on("room-connected", () => {
+        done();
+      });
     });
-  });
 
-  it("should pass datas through parameters", async () => {
-    socketConnection.emit("params", {
-      datas: true
+    it("should trigger the specified method by message", async (done) => {
+      roomSocketConnection.emit("room-hello");
+      roomSocketConnection.on("room-world", () => {
+        done();
+      });
     });
-    socketConnection.on("params", (datas) => {
-      expect(datas).toEqual({
-        error: false
+
+    it("should pass datas through parameters", async (done) => {
+      roomSocketConnection.emit("room-params", {
+        datas: true
+      });
+      roomSocketConnection.on("room-params", (datas) => {
+        expect(datas).toEqual({
+          error: false
+        });
+        done();
       });
     });
   });

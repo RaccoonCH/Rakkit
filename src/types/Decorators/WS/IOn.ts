@@ -1,4 +1,4 @@
 export interface IOn {
-  message: string;
+  event: string;
   function: Function;
 }

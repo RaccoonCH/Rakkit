@@ -85,6 +85,10 @@ export class MetadataStorage {
   get Routers() {
     return this._routers as ReadonlyMap<Object, IDecorator<IRouter>>;
   }
+
+  get Websockets() {
+    return this._websockets as ReadonlyMap<Object, IDecorator<IWebsocket>>;
+  }
   //#endregion
 
   //#region Static methods
@@ -176,6 +180,7 @@ export class MetadataStorage {
 
   //#region Add-ers
   AddWebsocket(item: IDecorator<IWebsocket>) {
+    item.params.namespace = this.normalizePath(item.params.namespace);
     MetadataStorage.addAsService(item);
     this._websockets.set(item.class, item);
   }
@@ -232,14 +237,7 @@ export class MetadataStorage {
   }
 
   AddOn(item: IDecorator<IOn>) {
-    const onAlreadyExists = this._ons.find((on) =>
-      on.params.message === item.params.message
-    );
-    if (onAlreadyExists) {
-      throw new Error(`An @On() method with the same message: "${item.params.message}" already exists`);
-    } else {
-      this._ons.push(item);
-    }
+    this._ons.push(item);
   }
 
   AddInjection(item: IDecorator<IInject>) {
@@ -257,13 +255,23 @@ export class MetadataStorage {
   private buildWebsockets() {
     this._ons.map((item) => {
       const wsClass = this._websockets.get(item.class);
+      const duplicates = this._ons.filter((on) => {
+        const onClass = this._websockets.get(on.class);
+        return (
+          item.params.event === on.params.event &&
+          wsClass.params.namespace === onClass.params.namespace
+        );
+      });
+      if (duplicates.length > 1) {
+        throw new Error(`The "${item.params.event}" @On event with the namespace "${wsClass.params.namespace}" already exists`);
+      }
       item.params.function = this.bindContext(wsClass, item.params.function);
+      wsClass.params.ons.push(item);
     });
   }
 
   private buildInjections() {
     this._injections.map((item) => {
-      const isArray = item.params.ids.length > 1;
       const destinationService = MetadataStorage.getService(item.class, undefined);
       if (destinationService) {
         const services = item.params.ids.reduce((prev, id) => {
@@ -426,10 +434,10 @@ export class MetadataStorage {
    * Normalize the path of a router or an endpoint
    * @param path The path string (example: "/router")
    */
-  private normalizePath(path: string) {
-    let finalPath = path.toLowerCase().trim();
-    if (path[0] !== "/") {
-      finalPath = `/${path}`;
+  private normalizePath(path?: string) {
+    let finalPath = path ? path.toLowerCase().trim() : "";
+    if (finalPath[0] !== "/") {
+      finalPath = `/${finalPath}`;
     }
     if (finalPath[finalPath.length - 1] === "/" && finalPath.length > 1) {
       finalPath = finalPath.substr(0, finalPath.length - 2);
