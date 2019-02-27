@@ -182,8 +182,9 @@ export class MetadataStorage {
     const serviceAlreadyExists = MetadataStorage.getService(item);
     if (serviceAlreadyExists) {
       throw new Error(`
-        ${item.class.constructor.name} is already declared as a service don't decorate it twice
-        (@Websocket, @Router, @AfterMiddleware, @BeforeMiddleware is implicitly decorated by @Service)
+        ${(serviceAlreadyExists.instance as Object).constructor.name} with the id "${serviceAlreadyExists.id}"
+        is already declared as a service don't decorate it twice.
+        @Websocket, @Router, @AfterMiddleware, @BeforeMiddleware is implicitly decorated by @Service
       `);
     } else {
       this._services.push(item);
@@ -231,11 +232,23 @@ export class MetadataStorage {
 
   private buildInjections() {
     this._injections.map((item) => {
+      const isArray = item.params.ids.length > 1;
       const destinationService = MetadataStorage.getService(item.class, undefined);
-      const valueService = MetadataStorage.getService(item.params.injectionType, item.params.id);
-      if (destinationService && valueService) {
-        const instance = valueService.instance;
-        destinationService.instance[item.key] = instance;
+      if (destinationService) {
+        const services = item.params.ids.reduce((prev, id) => {
+          const service = MetadataStorage.getService(item.params.injectionType, id);
+          if (service) {
+            return [
+              ...prev,
+              service.instance
+            ];
+          } else {
+            throw new Error(`The service ${item.params.injectionType.name} with the id ${id} doesn't exists`);
+          }
+        }, []);
+        destinationService.instance[item.key] = item.params.isArray ? services : services[0];
+      } else {
+        throw new Error(`The class ${item.class.constructor.name} should be declared as a service`);
       }
     });
   }

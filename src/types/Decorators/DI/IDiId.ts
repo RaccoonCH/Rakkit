@@ -1,3 +1,5 @@
+import { DiId } from "../..";
+
 export interface IDiId {
-  id?: string | number;
+  id?: DiId;
 }

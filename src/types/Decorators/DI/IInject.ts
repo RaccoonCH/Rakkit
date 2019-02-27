@@ -1,5 +1,7 @@
-import { IDiId } from "../..";
+import { DiId } from "../..";
 
-export interface IInject extends IDiId {
+export interface IInject {
+  ids: DiId[];
+  isArray: boolean;
   injectionType: Function;
 }

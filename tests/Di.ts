@@ -2,7 +2,7 @@ import { connect as SocketConnect } from "socket.io-client";
 import Axios, { AxiosInstance } from "axios";
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { Start } from "./Utils/Start";
-import { Rakkit, Service, Inject, MetadataStorage } from "../src";
+import { Rakkit, Service, Inject, MetadataStorage, Websocket } from "../src";
 
 const basicReturnedObject = {
   testDi: true,
@@ -11,9 +11,8 @@ const basicReturnedObject = {
   firstBeforeRouter: true
 };
 
-
 @Service()
-@Service(1)
+@Service(1, "a")
 class Storage {
   prop = "a";
 }
@@ -24,10 +23,13 @@ class FirstReceiver {
   private _firstStorageInstance: Storage;
   @Inject(1)
   private _secondStorageInstance: Storage;
+  @Inject("a")
+  private _thirdStorageInstance: Storage;
 
   check() {
     this._firstStorageInstance.prop = "fr";
     this._secondStorageInstance.prop = "sr";
+    this._thirdStorageInstance.prop = "tr";
   }
 }
 
@@ -37,12 +39,45 @@ class SecondReceiver {
   private _firstStorageInstance: Storage;
   @Inject(1)
   private _secondStorageInstance: Storage;
+  @Inject("a")
+  private _thirdStorageInstance: Storage;
 
   check() {
     expect(this._firstStorageInstance.prop).toBe("fr");
     expect(this._secondStorageInstance.prop).toBe("sr");
+    expect(this._thirdStorageInstance.prop).toBe("tr");
   }
 }
+
+@Service()
+class ArrayReceiver {
+  @Inject()
+  private _firstStorageInstance: Storage;
+  @Inject(Storage, 1, "a")
+  private _storageInstances: Storage[];
+
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._storageInstances.map(i => i.prop)).toEqual(["sr", "tr"]);
+  }
+}
+
+@Service()
+class SingleValueArrayReceiver {
+  @Inject()
+  private _firstStorageInstance: Storage;
+  @Inject(Storage, 1)
+  private _secondStorageInstance: Storage[];
+  @Inject(Storage, "a")
+  private _thirdStorageInstance: Storage[];
+
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._secondStorageInstance[0].prop).toBe("sr");
+    expect(this._thirdStorageInstance[0].prop).toBe("tr");
+  }
+}
+
 
 describe("DI", async () => {
   let api: AxiosInstance;
@@ -84,5 +119,13 @@ describe("DI", async () => {
   it("should inject service with the specified ID", async () => {
     MetadataStorage.getService(FirstReceiver).instance.check();
     MetadataStorage.getService(SecondReceiver).instance.check();
+  });
+
+  it("should inject services with the specified ID into an array", async () => {
+    MetadataStorage.getService(ArrayReceiver).instance.check();
+  });
+
+  it("should inject one service with the specified ID into an array", async () => {
+    MetadataStorage.getService(SingleValueArrayReceiver).instance.check();
   });
 });

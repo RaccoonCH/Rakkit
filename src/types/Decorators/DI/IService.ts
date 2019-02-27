@@ -1,4 +1,5 @@
-export interface IService<Instance> {
-  id?: string | number;
+import { IDiId } from "../..";
+
+export interface IService<Instance> extends IDiId {
   instance?: Instance;
 }

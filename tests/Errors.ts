@@ -1,4 +1,4 @@
-import { Rakkit, Router, Websocket, On, Service } from "../src";
+import { Rakkit, Router, Websocket, On, Service, Inject } from "../src";
 
 describe("Error", async () => {
   afterAll(async () => {
@@ -89,6 +89,44 @@ describe("Error", async () => {
         done();
       } catch (err) {
         done.fail(err);
+      } finally {
+        await Rakkit.stop();
+      }
+    });
+    it("should not throw inconsistency array error (Type isn't an array, but multiple values injection)", async (done) => {
+      try {
+        @Service(2, "1")
+        class ServiceA {
+        }
+        @Service()
+        class ReceiverA {
+          @Inject(ServiceA, 2, "1")
+          private _services: ServiceA; // Not declared as an Array
+        }
+        await Rakkit.start({
+        });
+        done.fail("Error not throwed");
+      } catch (err) {
+        done();
+      } finally {
+        await Rakkit.stop();
+      }
+    });
+    it("should not throw inconsistency array error (Type is an array, but it inject a simple value)", async (done) => {
+      try {
+        @Service(2, "1")
+        class ServiceA {
+        }
+        @Service()
+        class ReceiverA {
+          @Inject(2)
+          private _services: ServiceA[]; // Not declared as an Array
+        }
+        await Rakkit.start({
+        });
+        done.fail("Error not throwed");
+      } catch (err) {
+        done();
       } finally {
         await Rakkit.stop();
       }
