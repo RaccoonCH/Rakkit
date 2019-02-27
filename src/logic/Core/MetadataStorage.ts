@@ -20,9 +20,10 @@ import {
   IClassType,
   IWebsocket,
   IBaseMiddleware,
-  IType,
   InstanceOf,
-  IDiId
+  IDiId,
+  DiId,
+  ReturnedService
 } from "../../types";
 import { Middleware } from "koa";
 
@@ -122,11 +123,11 @@ export class MetadataStorage {
     };
   }
 
-  static getService(service: IDecorator<IDiId>): IService<any>;
+  static getService(service: IDecorator<IDiId>): ReturnedService<any>;
   static getService<ClassType>(
     classType: ClassType,
     id?: string | number
-  ) : IService< InstanceOf<ClassType> >;
+  ): ReturnedService<ClassType>;
   static getService<ClassType>(
     classtypeOrService: ClassType | IDecorator<IDiId>,
     id?: string | number
@@ -141,11 +142,41 @@ export class MetadataStorage {
       return service.params;
     }
   }
+
+
+  /**
+   * Declare a class as a service, you can inject items and use it as a service
+   * @param item
+   */
+  static addAsService(item: IDecorator<any>): ReturnedService<any>;
+  static addAsService<ClassType>(
+    classType: ClassType,
+    id: DiId
+  ): ReturnedService<ClassType>;
+  static addAsService<ClassType>(
+    itemOrClass: IDecorator<any> | ClassType,
+    id?: DiId
+  ) {
+    const isClass = typeof itemOrClass === "function";
+    const classFunc = isClass ? itemOrClass : (itemOrClass as IDecorator<any>).class;
+    const instance = new (classFunc as IClassType<ClassType>)();
+    const serviceParams = {
+      id,
+      instance
+    };
+    const service: IDecorator<IService<any>> = {
+      class: classFunc,
+      key: classFunc.constructor.name,
+      params: serviceParams
+    };
+    this.Instance.AddService(service);
+    return serviceParams;
+  }
   //#endregion
 
   //#region Add-ers
   AddWebsocket(item: IDecorator<IWebsocket>) {
-    this.addAsService(item);
+    MetadataStorage.addAsService(item);
     this._websockets.set(item.class, item);
   }
 
@@ -155,7 +186,7 @@ export class MetadataStorage {
     if (routerAlreadyExists) {
       throw new Error(`Multiple routers have the path: ${item.params.path}`);
     } else {
-      this.addAsService(item);
+      MetadataStorage.addAsService(item);
       this._routers.set(item.class, item);
     }
   }
@@ -163,7 +194,7 @@ export class MetadataStorage {
   AddMiddleware(item: IDecorator<IMiddleware>) {
     // If middleware is a class, instanciate it and use the "use" method as the middleware
     if (item.params.isClass) {
-      const instance = this.addAsService(item);
+      const instance = MetadataStorage.addAsService(item).instance;
       item.params.isClass = false;
       item.params.function = (instance as IBaseMiddleware).use.bind(instance);
     }
@@ -389,23 +420,6 @@ export class MetadataStorage {
       ...prev,
       ...curr.params.middlewares
     ], []);
-  }
-
-  /**
-   * Declare a class as a service, you can inject items and use it as a service
-   * @param item
-   */
-  private addAsService(item: IDecorator<any>) {
-    const instance = new (item.class as IClassType<any>)();
-    const service = {
-      ...item,
-      params: {
-        id: undefined,
-        instance
-      }
-    };
-    this.AddService(service);
-    return instance;
   }
 
   /**

@@ -4,7 +4,6 @@
     "target": "es2016",
     "noImplicitAny": false,
     "sourceMap": true,
-    "outDir": "build",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "declaration": true,
@@ -15,12 +14,5 @@
       "esnext.asynciterable"
     ],
     "moduleResolution": "node"
-  },
-  "exclude": [
-    "node_modules",
-    "scripts",
-    "examples",
-    "docs",
-    "tests"
-  ]
+  }
 }

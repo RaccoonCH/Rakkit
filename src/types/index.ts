@@ -7,6 +7,7 @@ export * from "./Decorators/DI/IInject";
 export * from "./Decorators/DI/IService";
 export * from "./Decorators/DI/DiId";
 export * from "./Decorators/DI/IDiId";
+export * from "./Decorators/DI/ReturnedService";
 export * from "./Decorators/Params/REST/IEndpointParams";
 export * from "./Decorators/Params/REST/IRouterParams";
 export * from "./Decorators/Params/REST/IMiddlewareParams";

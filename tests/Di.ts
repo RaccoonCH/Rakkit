@@ -128,4 +128,24 @@ describe("DI", async () => {
   it("should inject one service with the specified ID into an array", async () => {
     MetadataStorage.getService(SingleValueArrayReceiver).instance.check();
   });
+
+  it("should create a new service at runtime", async () => {
+    class NewService {
+      MyProp = "a";
+    }
+    const instanceByAdding = MetadataStorage.addAsService(NewService, 2).instance;
+    expect(instanceByAdding.MyProp).toBe("a");
+    instanceByAdding.MyProp = "b";
+    const instanceByGetting = MetadataStorage.getService(NewService, 2).instance;
+    expect(instanceByGetting.MyProp).toBe("b");
+  });
+
+  it("should throw error when adding a new service at runtime and it already exists", async (done) => {
+    try {
+      MetadataStorage.addAsService(Storage, 1);
+      done.fail("Error not throwed");
+    } catch (err) {
+      done();
+    }
+  });
 });

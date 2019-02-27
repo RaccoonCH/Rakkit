@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import * as BodyParser from "koa-bodyparser";
-import * as SocketIO from "socket.io";
+import * as SocketIo from "socket.io";
 import * as Static from "koa-static";
 import * as Router from "koa-router";
 import * as Cors from "@koa/cors";
@@ -21,7 +21,7 @@ export class Rakkit extends AppLoader {
   private _koaApp: Koa;
   private _mainRestRouter: Router;
   private _httpServer: Server;
-  private _socketio: SocketIO.Server;
+  private _socketio: SocketIo.Server;
   private _silent: boolean;
   private _config: IAppConfig;
 
@@ -35,6 +35,10 @@ export class Rakkit extends AppLoader {
 
   get Url() {
     return `http://${this._host}:${this._port}`;
+  }
+
+  get SocketIo() {
+    return this._socketio;
   }
 
   private constructor(config: IAppConfig) {
@@ -112,7 +116,7 @@ export class Rakkit extends AppLoader {
   }
 
   private async startWs() {
-    this._socketio = SocketIO(this._httpServer, {
+    this._socketio = SocketIo(this._httpServer, {
       path: this._wsEndpoint
     });
     this._socketio.on("connection", (socket) => {
