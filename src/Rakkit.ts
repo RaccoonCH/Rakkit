@@ -10,8 +10,6 @@ import { Color } from "./misc";
 export class Rakkit extends AppLoader {
   protected static _instance: Rakkit;
   private _koaApp: Koa;
-  private _mainRestRouter: Router;
-  private _mainRootRouter: Router;
   private _httpServer: Server;
   private _socketio: SocketIo.Server;
   private _config: IAppConfig;
@@ -30,6 +28,10 @@ export class Rakkit extends AppLoader {
 
   get SocketIo() {
     return this._socketio;
+  }
+
+  get KoaApp() {
+    return this._koaApp;
   }
 
   private constructor(config?: IAppConfig) {
@@ -115,7 +117,6 @@ export class Rakkit extends AppLoader {
     Array.from(MetadataStorage.Instance.Websockets.values()).map((ws) => {
       const nsp = this._socketio.of(ws.params.namespace);
       nsp.on("connection", (socket) => {
-        console.log(`Connected to room ${ws.params.namespace}`);
         ws.params.ons.map(({ params }) => {
           if (params.event !== "connection") {
             socket.on(params.event, (datas: any) => {
