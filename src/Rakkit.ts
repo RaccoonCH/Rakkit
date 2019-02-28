@@ -1,10 +1,9 @@
 import "reflect-metadata";
-import * as SocketIo from "socket.io";
-import * as Router from "koa-router";
-import * as Koa from "koa";
 import { createServer, Server } from "http";
+import * as SocketIo from "socket.io";
+import * as Koa from "koa";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig, MiddlewareExecutionTime } from "./types";
+import { IAppConfig } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {

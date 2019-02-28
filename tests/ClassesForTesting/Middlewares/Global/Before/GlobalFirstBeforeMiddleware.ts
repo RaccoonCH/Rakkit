@@ -13,6 +13,9 @@ export class GlobalFirstBeforeMiddleware implements IBaseMiddleware {
   private _testService: TestService;
 
   async use(context: Context, next: NextFunction) {
+    if (!context.request.body) {
+      throw new Error("BodyParser error");
+    }
     this._testService.TestValue.firstBeforeGlobal = true;
     context.body = "gb1;";
     next();

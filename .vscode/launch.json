@@ -31,15 +31,14 @@
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
-        "--inspect-brk",
         "--inspect=9228",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
+        "--no-cache",
         "--runInBand",
-        "--coverage",
-        "--verbose",
-        "--detectOpenHandles",
         "--config",
-        "${workspaceRoot}/jest.config.json"
+        "${workspaceRoot}/jest.config.json",
+        "--coverage",
+        "false"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",

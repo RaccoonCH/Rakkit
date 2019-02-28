@@ -1,0 +1,1 @@
+# Servir des fichiers statiques

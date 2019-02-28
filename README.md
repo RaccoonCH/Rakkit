@@ -82,6 +82,20 @@ class PeopleRouter {
 }
 ```
 
+### Parse body and use koa middleware
+You can parse the body of requests by using [koa-bodyparser](https://www.npmjs.com/package/koa-bodyparser) and just call his exported function in the `globalRestMiddleware` start option:
+```javascript
+import * as BodyParser from "koa-bodyparser";
+
+Rakkit.start({
+  globalRestMiddlewares: [
+    BodyParser(),
+    ...
+  ]
+});
+```
+You can install and use all koa plugins like this.  
+
 #### Middlewares
 In this example we have two middlewares, the @BeforeMiddleware use methods that are executed before the @Get("/") and for the @AfterMiddleware they are executed after it.  
 You have three levels of middleware, on the endpoint (@Get, @Post, @Put, @Delete), on the router (@Router) and globaly (All router of your application). In this example we illustrate each level.  
@@ -189,6 +203,24 @@ class PeopleRouter {
   }
 }
 ```
+
+### Serving static files
+If you want to serve static files, the best way is to use Apache2 or Nginx, but you can use [static-koa-router](https://www.npmjs.com/package/static-koa-router) like this:
+```javascript
+import { Rakkit, MetadataStorage } from "rakkit";
+import { Serve } from "static-koa-router"
+
+async function start() {
+  await Rakkit.start()
+  Serve(
+    `${__dirname}/public`,
+    MetadataStorage.Instance.MainRouter
+  )
+}
+
+start();
+```
+
 
 ## The project history  
 Initially this tool was made in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we choose to make it an independent tool to benefit the community and progress on a better basis.

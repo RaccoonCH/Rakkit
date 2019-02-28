@@ -18,7 +18,7 @@ describe("Websocket", async () => {
 
   describe("Without room", () => {
     it("should trigger the connection", async (done) => {
-      socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
+      socketConnection = SocketConnect("http://localhost:3000", { path: "/ws2" });
       socketConnection.on("connected", () => {
         done();
       });
@@ -46,7 +46,7 @@ describe("Websocket", async () => {
 
   describe("With room", () => {
     it("should trigger the connection", async (done) => {
-      roomSocketConnection = SocketConnect("http://localhost:3000/my-room", { path: "/ws" });
+      roomSocketConnection = SocketConnect("http://localhost:3000/my-room", { path: "/ws2" });
       roomSocketConnection.on("room-connected", () => {
         done();
       });

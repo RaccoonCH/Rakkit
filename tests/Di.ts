@@ -91,7 +91,7 @@ describe("DI", async () => {
         GlobalFirstBeforeMiddleware
       ]
     });
-    socketConnection = SocketConnect("http://localhost:3000", { path: "/ws" });
+    socketConnection = SocketConnect("http://localhost:3000", { path: "/ws2" });
     api = Axios.create({
       baseURL: "http://localhost:3000/rest/test-di"
     });

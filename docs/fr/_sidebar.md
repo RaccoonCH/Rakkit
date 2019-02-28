@@ -1,3 +1,13 @@
-- [Commencer](fr/GettingStarted.md)
-- [Routeur](fr/Router.md)
-- [Websocket](fr/Websocket.md)
+- **Commencer**
+  - [Commencer](fr/GettingStarted.md)
+  - [Démos](fr/Demos.md)
+- **Coder**
+  - [Routeur](fr/Router.md)
+  - [Websocket](fr/Websocket.md)
+  - [Middleware](fr/Middleware.md)
+  - [Services / Injection de dépendance](fr/DI.md)
+  - [L'objet Rakkit](fr/RakkitObject.md)
+  - [L'object MetadataStorage](fr/MetadataStorage.md)
+  - [Servir des fichiers statiques](fr/ServingStaticFiles.md)
+- **Contribution**
+  - [Contribution](fr/Contributing.md)
