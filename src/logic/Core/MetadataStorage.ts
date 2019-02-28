@@ -1,5 +1,4 @@
 import { Rakkit } from "../../Rakkit";
-import * as Router from "koa-router";
 import {
   AppLoader,
   HandlerFunctionHelper
@@ -20,10 +19,10 @@ import {
   IClassType,
   IWebsocket,
   IBaseMiddleware,
-  InstanceOf,
   IDiId,
   DiId,
-  ReturnedService
+  ReturnedService,
+  ApiRouter
 } from "../../types";
 import { Middleware } from "koa";
 
@@ -37,7 +36,7 @@ export class MetadataStorage {
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
   private _routers: Map<Object, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
-  private _compiledRouter: Router = new Router();
+  private _compiledRouter: ApiRouter = new ApiRouter();
   // DI
   private _services: IDecorator<IService<any>>[] = [];
   private _injections: IDecorator<IInject>[] = [];
@@ -55,7 +54,7 @@ export class MetadataStorage {
   }
 
   get MainRouter() {
-    return this._compiledRouter as Readonly<Router>;
+    return this._compiledRouter as Readonly<ApiRouter>;
   }
 
   get BeforeMiddlewares() {
@@ -293,6 +292,7 @@ export class MetadataStorage {
   }
 
   private async buildRouters() {
+    let restRouter = new ApiRouter({ prefix: Rakkit.Instance.Config.restEndpoint });
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
       // Look if the endpoint is already merged to another endpoinr
@@ -328,23 +328,24 @@ export class MetadataStorage {
       });
       item.params.middlewares = this.extractMiddlewares(mws);
       this.mountEndpointsToRouter(item);
-      this._compiledRouter.use(
+      restRouter.use(
         item.params.path,
         item.params.router.routes(),
         item.params.router.allowedMethods()
       );
     });
-    const globalMiddlewares = Rakkit.Instance.Config.globalMiddlewares;
-    if (globalMiddlewares &&  globalMiddlewares.length > 0) {
-      // Mount global middlewares to the main router
-      const globalBeforeMiddlewares = this.getBeforeMiddlewares(globalMiddlewares);
-      const globalAfterMiddlewares = this.getAfterMiddlewares(globalMiddlewares);
-      const router = this._compiledRouter;
-      this._compiledRouter = new Router();
-      this._compiledRouter.use(...globalBeforeMiddlewares);
-      this._compiledRouter.use(router.routes());
-      this._compiledRouter.use(...globalAfterMiddlewares);
-    }
+
+    const rootMiddlewares = Rakkit.Instance.Config.globalRootMiddlewares;
+    const restMiddlewares = Rakkit.Instance.Config.globalRestMiddlewares;
+    restRouter = this.mountMiddlewaresToRouter(
+      restMiddlewares,
+      restRouter
+    );
+    this._compiledRouter.use(restRouter.routes());
+    this._compiledRouter = this.mountMiddlewaresToRouter(
+      rootMiddlewares,
+      this._compiledRouter
+    );
   }
   //#endregion
 
@@ -356,6 +357,17 @@ export class MetadataStorage {
         endpoint.params.functions[0] === usedMw.params.applyOn
       );
     });
+  }
+
+  private mountMiddlewaresToRouter(middlewares: MiddlewareType[], router: ApiRouter) {
+    const tempRouter = new ApiRouter(router.opts);
+    const restBeforeMiddlewares = this.getBeforeMiddlewares(middlewares);
+    const restAfterMiddlewares = this.getAfterMiddlewares(middlewares);
+    tempRouter.use(...restBeforeMiddlewares);
+    tempRouter.use(router.prefix("/").routes());
+    tempRouter.use(...restAfterMiddlewares);
+
+    return tempRouter;
   }
 
   private getEndpointFunctions(endpoint: IDecorator<IEndpoint>) {
@@ -391,7 +403,18 @@ export class MetadataStorage {
 
   private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
     return middlewares.reduce<Middleware[]>((arr, item) => {
-      const foundMiddleware = this._middlewares.get(item);
+      let foundMiddleware = this._middlewares.get(item);
+      if (!foundMiddleware) {
+        foundMiddleware = {
+          class: item,
+          key: (item as HandlerFunction).name,
+          params: {
+            executionTime: "BEFORE",
+            function: (item as HandlerFunction),
+            isClass: false
+          }
+        };
+      }
       if (foundMiddleware.params.executionTime === beforeAfter) {
         return [
           ...arr,
@@ -411,7 +434,7 @@ export class MetadataStorage {
   }
 
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
-    router.params.router = new Router();
+    router.params.router = new ApiRouter();
     this.loadMiddlewares(router.params, this._beforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
       const method = endpoint.params.method.toLowerCase();

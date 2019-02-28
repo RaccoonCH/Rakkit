@@ -12,15 +12,12 @@ export * from "./Decorators/REST/IEndpoint";
 export * from "./Decorators/REST/IRouter";
 export * from "./Decorators/Routing/IMiddleware";
 export * from "./Decorators/Routing/IUsedMiddleware";
-export * from "./Decorators/Routing/MiddlewareExecutionTime";
 export * from "./Decorators/Routing/IClassPath";
 export * from "./Decorators/WS/IOn";
 export * from "./Decorators/WS/IWebsocket";
 export * from "./Decorators/IDecorator";
 
 export * from "./REST/HttpMethod";
-export * from "./REST/CorsOptions";
-export * from "./REST/PublicOptions";
 
 export * from "./Routing/IBaseMiddleware";
 export * from "./Routing/MiddlewareType";
@@ -28,6 +25,8 @@ export * from "./Routing/HandlerFunction";
 export * from "./Routing/Context";
 export * from "./Routing/NextFunction";
 export * from "./Routing/IMiddlewareClass";
+export * from "./Routing/MiddlewareExecutionTime";
+export * from "./Routing/ApiRouter";
 
 export * from "./WS/WsOptions";
 export * from "./WS/Socket";

@@ -1,5 +1,5 @@
 import { Rakkit } from "../../../src";
-import { join as Join } from "path";
+import * as BodyParser from "koa-bodyparser";
 
 export class App {
   private _websockets = [`${__dirname}/websockets/*`];
@@ -9,9 +9,9 @@ export class App {
     Rakkit.start({
       websockets: this._websockets,
       routers: this._routers,
-      public: {
-        path: Join(__dirname, "public")
-      }
+      globalRestMiddlewares: [
+        BodyParser()
+      ]
     });
   }
 }

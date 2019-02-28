@@ -1,4 +1,5 @@
 import Axios, { AxiosInstance } from "axios";
+import * as BodyParser from "koa-bodyparser";
 import { GlobalSecondBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalSecondBeforeMiddleware";
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { GlobalSecondAfterMiddleware } from "./ClassesForTesting/Middlewares/Global/After/GlobalSecondAfterMiddleware";
@@ -30,7 +31,8 @@ describe("REST Middlewares", async () => {
 
   beforeAll(async () => {
     await Start({
-      globalMiddlewares: [
+      globalRestMiddlewares: [
+        BodyParser(),
         GlobalFirstBeforeMiddleware,
         GlobalFirstAfterMiddleware,
         GlobalSecondBeforeMiddleware,

@@ -1,3 +1,5 @@
+import { GoodbyeMiddleware } from "../middlewares/GoodbyeMiddleware";
+import { HelloMiddleware } from "../middlewares/HelloMiddleware";
 import { ExampleService } from "../services/ExampleService";
 import {
   Router,
@@ -5,10 +7,9 @@ import {
   Inject,
   Context,
   NextFunction,
-  UseMiddleware
+  UseMiddleware,
+  Post
 } from "../../../../src";
-import { HelloMiddleware } from "../middlewares/HelloMiddleware";
-import { GoodbyeMiddleware } from "../middlewares/GoodbyeMiddleware";
 
 @Router("example")
 @UseMiddleware(HelloMiddleware)
@@ -24,10 +25,11 @@ export class ExampleRouter {
     next();
   }
 
-  @Get("/")
-  @UseMiddleware(GoodbyeMiddleware, HelloMiddleware)
-  get2(context: Context, next: NextFunction) {
+  @Post("/")
+  @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
+  post(context: Context, next: NextFunction) {
     console.log(this._routerService);
+    console.log(context.request.body);
     context.body = "Hello world";
     next();
   }

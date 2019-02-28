@@ -1,4 +1,5 @@
 import { connect as SocketConnect } from "socket.io-client";
+import * as BodyParser from "koa-bodyparser";
 import Axios, { AxiosInstance } from "axios";
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { Start } from "./Utils/Start";
@@ -85,7 +86,8 @@ describe("DI", async () => {
 
   beforeAll(async () => {
     await Start({
-      globalMiddlewares: [
+      globalRestMiddlewares: [
+        BodyParser(),
         GlobalFirstBeforeMiddleware
       ]
     });

@@ -1,3 +1,4 @@
+import * as BodyParser from "koa-bodyparser";
 import { Rakkit, IAppConfig } from "../../src";
 
 const getDirName = (path) => {
@@ -8,10 +9,13 @@ export const Start = async (config?: IAppConfig) => {
   const wsGlob = getDirName("*Ws.ts");
   const routerGlob = getDirName("*Router.ts");
   return Rakkit.start({
-    ...(config || {}),
     port: 3000,
     websockets: [wsGlob],
     routers: [routerGlob],
-    silent: false // False for codecov
+    globalRestMiddlewares: [
+      BodyParser()
+    ],
+    silent: false, // False for codecov
+    ...(config || {})
   });
 };
