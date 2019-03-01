@@ -1,5 +1,5 @@
 # Websocket
-Ils sont basés sur le même fonctionnement que ceux de [socket.io](https://socket.io)
+Ils sont basés sur le même fonctionnement que ceux de [socket.io](https://socket.io). Vous pouvez, donc, si besoin, vous referez à leur documentation.
 
 #### Notions de base
 **Websocket decorator**  

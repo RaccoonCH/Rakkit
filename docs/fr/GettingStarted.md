@@ -1,7 +1,5 @@
 <center>
   <img src="../assets/logo.png" width="220" alt="Nest Logo"/>
-  <br>
-  A simple backend library written in <b>TypeScript</b> that provides <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
   <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
@@ -24,7 +22,7 @@
 # Commencer
 
 ### Installation
-Vous pouvez simplement installer **Rakkit** avec `npm` ou `yarn`
+Vous pouvez simplement installer **Rakkit** avec `npm` ou `yarn`.
 ```
 npm i rakkit
 ```
@@ -33,7 +31,7 @@ yarn add rakkit
 ```
 
 ### Démarrer l'application
-Afin de démarrer l'application vous devrez utiliser la class `Rakkit` et acceder à la méthode static `start`.  
+Afin de démarrer l'application vous devrez utiliser la classe `Rakkit` et acceder à la méthode static `start` de celui-ci.  
 Voici un exemple:
 ```javascript
 import { Rakkit } from "rakkit";

@@ -1,2 +1,1 @@
-- Traductions
-  - [:us: Anglais](/)
+[:us: Anglais](/)

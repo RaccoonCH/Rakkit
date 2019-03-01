@@ -39,6 +39,10 @@ Cela donne comme ordre (symétrique / onion):
 - **After** <span style="color:dodgerblue">router</span> middleware
 - **After** <span style="color:seagreen">global</span> middleware
 
+### Avant tout, La fonction next
+- Fonctionne comme la fonction next de [Koa](https://koajs.com) (ou [Express](https://expressjs.com/fr/)).  
+- Il est **passé en deuxième paramètre (après le context) dans les méthode de classe**.  
+- Il **permet de passer à la route suivante**, si cette fonction n'est pas appelée il va donc se contenter de simplement renvoyer le réponse au client sans passer aux routes qui suivent.  
 
 #### Déclaration au niveau du endpoint
 ```javascript
