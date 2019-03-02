@@ -457,11 +457,12 @@ export class MetadataStorage {
     this.loadMiddlewares(router.params, this._beforeMiddlewares);
     router.params.endpoints.map((endpoint) => {
       const method = endpoint.params.method.toLowerCase();
+      const functions = endpoint.params.functions.map((fn) =>
+        HandlerFunctionHelper.getWrappedHandlerFunction(fn as HandlerFunction)
+      );
       router.params.router[method](
         `${endpoint.params.endpoint}`,
-        ...endpoint.params.functions.map((fn) => {
-          return HandlerFunctionHelper.getWrappedHandlerFunction(fn as HandlerFunction);
-        })
+        ...functions
       );
     });
     this.loadMiddlewares(router.params, this._afterMiddlewares);
