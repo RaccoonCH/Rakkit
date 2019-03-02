@@ -1,9 +1,7 @@
-import { Rakkit } from "../../Rakkit";
 import {
+  Rakkit,
   AppLoader,
-  HandlerFunctionHelper
-} from "..";
-import {
+  HandlerFunctionHelper,
   IDecorator,
   IRouter,
   IEndpoint,
@@ -22,26 +20,27 @@ import {
   IDiId,
   DiId,
   ReturnedService,
-  ApiRouter
-} from "../../types";
-import { Middleware } from "koa";
+  ApiRouter,
+  InstanceOf,
+  ArrayDiError
+} from "../..";
 
 export class MetadataStorage {
   //#region Declarations
   private static _instance: MetadataStorage;
   // REST
-  private _middlewares: Map<Object, IDecorator<IMiddleware>> = new Map();
-  private _beforeMiddlewares: Map<Object, HandlerFunction> = new Map();
-  private _afterMiddlewares: Map<Object, HandlerFunction> = new Map();
+  private _middlewares: Map<Function, IDecorator<IMiddleware>> = new Map();
+  private _beforeMiddlewares: Map<Function, HandlerFunction> = new Map();
+  private _afterMiddlewares: Map<Function, HandlerFunction> = new Map();
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
-  private _routers: Map<Object, IDecorator<IRouter>> = new Map();
+  private _routers: Map<Function, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
   private _compiledRouter: ApiRouter = new ApiRouter();
   // DI
   private _services: IDecorator<IService<any>>[] = [];
   private _injections: IDecorator<IInject>[] = [];
   // WS
-  private _websockets: Map<Object, IDecorator<IWebsocket>> = new Map();
+  private _websockets: Map<Function, IDecorator<IWebsocket>> = new Map();
   private _ons: IDecorator<IOn>[] = [];
   //#endregion
 
@@ -130,19 +129,22 @@ export class MetadataStorage {
   static getService<ClassType>(
     classType: ClassType,
     id?: string | number
-  ): ReturnedService<ClassType>;
+  ): InstanceOf<ClassType>;
   static getService<ClassType>(
     classtypeOrService: ClassType | IDecorator<IDiId>,
     id?: string | number
   ) {
     const isService = typeof classtypeOrService !== "function";
     const comparedClassType = isService ? (classtypeOrService as IDecorator<any>).class : classtypeOrService;
-    const comparedName = isService ? (classtypeOrService as IDecorator<IDiId>).params.id : id;
+    const comparedId = isService ? (classtypeOrService as IDecorator<IDiId>).params.id : id;
     const service = this.Instance._services.find((service) =>
-      service.class === comparedClassType && service.params.id === comparedName
+      service.class === comparedClassType && service.params.id === comparedId
     );
     if (service) {
-      return service;
+      if (isService) {
+        return service;
+      }
+      return service.params.instance;
     }
   }
 
@@ -152,33 +154,30 @@ export class MetadataStorage {
    * @param item
    */
   static addAsService(item: IDecorator<any>): ReturnedService<any>;
-  static addAsService<ClassType>(
+  static addAsService<ClassType extends Function>(
     classType: ClassType,
-    id: DiId
-  ): ReturnedService<ClassType>;
+    id?: DiId
+  ): InstanceOf<ClassType>;
   static addAsService<ClassType>(
     itemOrClass: IDecorator<any> | ClassType,
     id?: DiId
   ) {
     const isClass = typeof itemOrClass === "function";
-    const classFunc = isClass ? itemOrClass : (itemOrClass as IDecorator<any>).class;
-    const instance = MetadataStorage.Instance.initializeInstance({
-      class: classFunc,
+    const classFunc = isClass ? (itemOrClass as ClassType) : (itemOrClass as IDecorator<any>).class;
+    const params = {
+      class: (classFunc as Function),
       key: classFunc.constructor.name,
       params: {
         id
       }
-    });
-    const serviceParams = {
-      id,
-      instance
     };
-    const service: IDecorator<IService<any>> = {
-      class: classFunc,
-      key: classFunc.constructor.name,
-      params: serviceParams
-    };
+    const instance = MetadataStorage.Instance.initializeInstance(params);
+    const service: IDecorator<IService<any>> = params;
+    service.params.instance = instance;
     this.Instance.AddService(service);
+    if (isClass) {
+      return service.params.instance;
+    }
     return service;
   }
   //#endregion
@@ -276,11 +275,11 @@ export class MetadataStorage {
         );
         const type = item.params.injectionType();
         const services = item.params.ids.reduce((prev, id) => {
-          const service = MetadataStorage.getService(type, id);
-          if (service) {
+          const instance = MetadataStorage.getService(type, id);
+          if (instance) {
             return [
               ...prev,
-              service.params.instance
+              instance
             ];
           } else {
             throw new Error(`The service ${type.name} with the id ${id} doesn't exists`);
@@ -297,7 +296,7 @@ export class MetadataStorage {
     this._middlewares.forEach((item) => {
       // If middleware is a class, instanciate it and use the "use" method as the middleware
       if (item.params.isClass) {
-        const instance = MetadataStorage.getService((item.class as IBaseMiddleware)).params.instance;
+        const instance = MetadataStorage.getService(item.class);
         item.params.isClass = false;
         item.params.function = instance.use.bind(instance);
       }
@@ -422,7 +421,7 @@ export class MetadataStorage {
   }
 
   private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
-    return middlewares.reduce<Middleware[]>((arr, item) => {
+    return middlewares.reduce<HandlerFunction[]>((arr, item) => {
       let foundMiddleware = this._middlewares.get(item);
       if (!foundMiddleware) {
         foundMiddleware = {
@@ -500,50 +499,77 @@ export class MetadataStorage {
     );
   }
 
+  /**
+   * Initialize a service by his constructor and his params
+   * @param item The item to initialize
+   */
   private initializeInstance(item: IDecorator<IService>) {
-    if (!item.params.instance) {
-      const classType = item.class as IClassType<any>;
-      const initParams: Object[] = Reflect.getMetadata("design:paramtypes", item.class);
-      if (initParams) {
-        const instances = initParams.reduce<ReturnedService<any>[]>((prev, param, index) => {
-         let value = undefined;
-          if (param) {
-            const service = MetadataStorage.getService(param);
-            value = service ? service.params.instance : undefined;
-          }
-          const injection = this._injections.find((injection) => {
-            return (
-              injection.class === item.class &&
-              injection.params.paramIndex === index
-            );
-          }
-          );
-          if (injection) {
-            const services = injection.params.ids.map((id) => {
-              const service = MetadataStorage.getService(
-                injection.params.injectionType() || param,
-                id
+    if (item) {
+      if (!item.params.instance) {
+        const classType = item.class as IClassType<any>;
+        // Get the constructor params of the class
+        const initParams: Function[] = Reflect.getMetadata("design:paramtypes", item.class);
+        if (initParams) {
+          const instances = initParams.reduce<ReturnedService<any>[]>((prev, param, index) => {
+            let value = undefined;
+
+            // Get the injections of the class that is in the constructor
+            // at the same index
+            const injection = this._injections.find((injection) => {
+              return (
+                injection.class === item.class &&
+                injection.params.paramIndex === index
               );
-              return this.initializeInstance(service);
             });
-            if (services.length === 1) {
-              value = services[0];
+            if (injection) {
+              // For each injection get the services with the specified ids
+              // constructor(@Inject(type => MyService, 1, 2) private _myService: MyService[])
+              const instances = injection.params.ids.map((id) => {
+                const serviceItem: IDecorator<IDiId> = {
+                  class: injection.params.injectionType() || param,
+                  key: undefined,
+                  params: {
+                    id
+                  }
+                };
+                const service = MetadataStorage.getService(serviceItem);
+
+                // Initialize the instance of the service that is passed into parameters
+                return this.initializeInstance(service);
+              });
+              // TODO: Verify array
+              const isArray = Array.isArray(param.prototype);
+              if (isArray && !injection.params.injectionType()) {
+                throw new ArrayDiError(item.class, ` On constructor at index: ${index}`);
+              }
+              const isServicesAnArray = instances.length > 1;
+              value = isServicesAnArray ? instances : instances[0];
+            } else {
+              // If the constructor injection is not decorated but the type is a service
+              // constructor(private _service: MyService)
+              const serviceItem: IDecorator<IDiId> = {
+                class: param,
+                key: undefined,
+                params: {
+                  id: undefined
+                }
+              };
+              const service = MetadataStorage.getService(serviceItem);
+              value = this.initializeInstance(service);
             }
-            if (services.length > 1) {
-              value = services;
-            }
-          }
-          return [
-            ...prev,
-            value
-          ];
-        }, []);
-        item.params.instance = new classType(...instances);
-      } else {
-        item.params.instance = new classType();
+            return [
+              ...prev,
+              value
+            ];
+          }, []);
+          item.params.instance = new classType(...instances);
+        } else {
+          item.params.instance = new classType();
+        }
       }
+      return item.params.instance;
     }
-    return item.params.instance;
+    return undefined;
   }
   //#endregion
 }

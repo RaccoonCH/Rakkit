@@ -1,5 +1,9 @@
-import { MetadataStorage } from "../../logic";
-import { DiId, TypeFn } from "../..";
+import {
+  MetadataStorage,
+  DiId,
+  TypeFn,
+  ArrayDiError
+} from "../..";
 
 /**
  * Use it to inject a service instance (singleton), to the variable.
@@ -16,7 +20,10 @@ export function Inject(typeOrId?: Function | DiId, ...ids: (DiId[] | undefined))
     const serviceType = isTypeAtFirstParam ? (typeOrId as Function) : () => type;
     const isIdsAnArray = ids.length > 1 && isTypeAtFirstParam;
     if (isArrayAtDefinition && !isTypeAtFirstParam) {
-      throw new Error(`You must declare the type of your injection array on ${target.constructor.name} at ${key}`);
+      throw new ArrayDiError(
+        target.constructor,
+        key
+      );
     }
     if (
       (isIdsAnArray && isArrayAtDefinition) ||
@@ -26,7 +33,7 @@ export function Inject(typeOrId?: Function | DiId, ...ids: (DiId[] | undefined))
     ) {
       const finalIds = isTypeAtFirstParam ? ids : [ (typeOrId as DiId) || undefined ];
       MetadataStorage.Instance.AddInjection({
-        class: index !== undefined ? target : target.constructor,
+        class: index !== undefined ? (target as Function) : target.constructor,
         key,
         params: {
           paramIndex: index,
@@ -36,10 +43,11 @@ export function Inject(typeOrId?: Function | DiId, ...ids: (DiId[] | undefined))
         }
       });
     } else {
-      throw new Error(`
-      Injection inconsistency type, declare the type as an array if you want to inject multiple values
-      on ${index !== undefined ? (target as Function).name : target.constructor.name} at the property ${index ? key : "constructor"}
-      `);
+      const isOnConstructor = index !== undefined;
+      throw new ArrayDiError(
+        isOnConstructor ? target as Function : target.constructor,
+        isOnConstructor ? "constructor" : key
+      );
     }
   };
 }

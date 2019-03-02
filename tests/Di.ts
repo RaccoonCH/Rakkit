@@ -155,26 +155,26 @@ describe("DI", async () => {
   });
 
   it("should inject service with the specified ID", async () => {
-    MetadataStorage.getService(FirstReceiver).params.instance.check();
-    MetadataStorage.getService(SecondReceiver).params.instance.check();
+    MetadataStorage.getService(FirstReceiver).check();
+    MetadataStorage.getService(SecondReceiver).check();
   });
 
   it("should inject services with the specified ID into an array", async () => {
-    MetadataStorage.getService(ArrayReceiver).params.instance.check();
+    MetadataStorage.getService(ArrayReceiver).check();
   });
 
   it("should inject one service with the specified ID into an array", async () => {
-    MetadataStorage.getService(SingleValueArrayReceiver).params.instance.check();
+    MetadataStorage.getService(SingleValueArrayReceiver).check();
   });
 
   it("should create a new service at runtime", async () => {
     class NewService {
       MyProp = "a";
     }
-    const instanceByAdding = MetadataStorage.addAsService(NewService, 2).params.instance;
+    const instanceByAdding = MetadataStorage.addAsService(NewService, 2);
     expect(instanceByAdding.MyProp).toBe("a");
     instanceByAdding.MyProp = "b";
-    const instanceByGetting = MetadataStorage.getService(NewService, 2).params.instance;
+    const instanceByGetting = MetadataStorage.getService(NewService, 2);
     expect(instanceByGetting.MyProp).toBe("b");
   });
 
@@ -188,20 +188,20 @@ describe("DI", async () => {
   });
 
   it("should inject circular", async () => {
-    MetadataStorage.getService(Circular1).params.instance.check();
-    MetadataStorage.getService(Circular2).params.instance.check();
+    MetadataStorage.getService(Circular1).check();
+    MetadataStorage.getService(Circular2).check();
   });
 
   it("should inject to constructor", async () => {
-    MetadataStorage.getService(ConstructorInjection).params.instance.check();
+    MetadataStorage.getService(ConstructorInjection).check();
   });
 
   it("should inject to constructor with arrays", async () => {
-    MetadataStorage.getService(ConstructorArrayInjection).params.instance.check();
+    MetadataStorage.getService(ConstructorArrayInjection).check();
   });
 
-  it("should inject to constructor with circular", async () => {
-    MetadataStorage.getService(CircularConstructorDi1Service, 1).params.instance.check();
-    MetadataStorage.getService(CircularConstructorDi2Service, 1).params.instance.check();
+  it("should inject to constructor with semi circular", async () => {
+    MetadataStorage.getService(CircularConstructorDi1Service, 1).check();
+    MetadataStorage.getService(CircularConstructorDi2Service, 1).check();
   });
 });

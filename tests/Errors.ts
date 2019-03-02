@@ -1,4 +1,4 @@
-import { Rakkit, Router, Websocket, On, Service, Inject } from "../src";
+import { Rakkit, Router, Websocket, On, Service, Inject, ArrayDiError } from "../src";
 
 describe("Error", async () => {
   afterAll(async () => {
@@ -32,7 +32,8 @@ describe("Error", async () => {
       }
       await Rakkit.stop();
     });
-    it("should not throw inconsistency array error (Type isn't an array, but multiple values injection)", async (done) => {
+    it("should throw inconsistency array error (Type isn't an array, but multiple values injection)", async (done) => {
+      // ERROR THROWED A ADDING DECORATOR, CANNOT TEST, TEST => BUILDING METADATA
       try {
         @Service(2, "1")
         class ServiceA {
@@ -49,7 +50,8 @@ describe("Error", async () => {
       }
       await Rakkit.stop();
     });
-    it("should not throw inconsistency array error (Type is an array, but it inject a simple value)", async (done) => {
+    it("should throw inconsistency array error (Type is an array, but it inject a simple value)", async (done) => {
+      // ERROR THROWED A ADDING DECORATOR, CANNOT TEST, TEST => BUILDING METADATA
       try {
         @Service(2, "1")
         class ServiceB {
@@ -57,7 +59,7 @@ describe("Error", async () => {
         @Service()
         class ReceiverB {
           @Inject(2)
-          private _services: ServiceB[]; // Not declared as an Array
+          private _services: ServiceB[];
         }
         await Rakkit.start();
         done.fail("Error not throwed");
@@ -66,45 +68,18 @@ describe("Error", async () => {
       }
       await Rakkit.stop();
     });
-  });
-
-  describe("On", () => {
-    it("should not throw @On() same message error if they have same event but different namespace", async (done) => {
-      try {
-        @Websocket()
-        class WsA {
-          @On("a")
-          wsaA() {}
-        }
-        @Websocket("nsp")
-        class WsB {
-          @On("a")
-          wsbA() {}
-        }
-        await Rakkit.start();
-        done();
-      } catch (err) {
-        done.fail(err);
+    it("should throw inconsistency array error on constructor (Type is an array, but it inject a simple value)", async () => {
+      @Service(2, "1")
+      class ServiceB {
       }
-      await Rakkit.stop();
-    });
-    it("should throw @On() same message error if they have the same event and the same namespace", async (done) => {
-      try {
-        @Websocket()
-        class WsA {
-          @On("a")
-          wsaA() {}
-        }
-        @Websocket()
-        class WsB {
-          @On("a")
-          wsbA() {}
-        }
-        await Rakkit.start();
-        done.fail("Error not throwed");
-      } catch (err) {
-        done();
+      @Service()
+      class ReceiverB {
+        constructor(
+          @Inject(2)
+          private _services: ServiceB[]
+        ) {}
       }
+      expect(Rakkit.start()).rejects.toThrowError(ArrayDiError);
       await Rakkit.stop();
     });
   });
@@ -120,6 +95,28 @@ describe("Error", async () => {
         }
         await Rakkit.start();
         done.fail();
+      } catch (err) {
+        done();
+      }
+      await Rakkit.stop();
+    });
+  });
+
+  describe("On", () => {
+    it("should throw @On() same message error if they have the same event and the same namespace", async (done) => {
+      try {
+        @Websocket()
+        class WsA {
+          @On("a")
+          wsaA() {}
+        }
+        @Websocket()
+        class WsB {
+          @On("a")
+          wsbA() {}
+        }
+        await Rakkit.start();
+        done.fail("Error not throwed");
       } catch (err) {
         done();
       }
