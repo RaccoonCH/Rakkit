@@ -16,6 +16,9 @@ export class GlobalFirstBeforeMiddleware implements IBaseMiddleware {
     if (!context.request.body) {
       throw new Error("BodyParser error");
     }
+    if (!this) {
+      throw new Error("Context not binded");
+    }
     this._testService.TestValue.firstBeforeGlobal = true;
     context.body = "gb1;";
     next();

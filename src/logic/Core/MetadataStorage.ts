@@ -142,7 +142,7 @@ export class MetadataStorage {
       service.class === comparedClassType && service.params.id === comparedName
     );
     if (service) {
-      return service.params;
+      return service;
     }
   }
 
@@ -162,7 +162,13 @@ export class MetadataStorage {
   ) {
     const isClass = typeof itemOrClass === "function";
     const classFunc = isClass ? itemOrClass : (itemOrClass as IDecorator<any>).class;
-    const instance = new (classFunc as IClassType<ClassType>)();
+    const instance = MetadataStorage.Instance.initializeInstance({
+      class: classFunc,
+      key: classFunc.constructor.name,
+      params: {
+        id
+      }
+    });
     const serviceParams = {
       id,
       instance
@@ -173,7 +179,7 @@ export class MetadataStorage {
       params: serviceParams
     };
     this.Instance.AddService(service);
-    return serviceParams;
+    return service;
   }
   //#endregion
 
@@ -196,20 +202,7 @@ export class MetadataStorage {
   }
 
   AddMiddleware(item: IDecorator<IMiddleware>) {
-    // If middleware is a class, instanciate it and use the "use" method as the middleware
-    if (item.params.isClass) {
-      const instance = MetadataStorage.addAsService(item).instance;
-      item.params.isClass = false;
-      item.params.function = (instance as IBaseMiddleware).use.bind(instance);
-    }
-    switch (item.params.executionTime) {
-      case "AFTER":
-        this._afterMiddlewares.set(item.class, item.params.function);
-      break;
-      case "BEFORE":
-        this._beforeMiddlewares.set(item.class, item.params.function);
-      break;
-    }
+    MetadataStorage.addAsService(item);
     this._middlewares.set(item.class, item);
   }
 
@@ -217,7 +210,7 @@ export class MetadataStorage {
     const serviceAlreadyExists = MetadataStorage.getService(item);
     if (serviceAlreadyExists) {
       throw new Error(`
-        ${(serviceAlreadyExists.instance as Object).constructor.name} with the id "${serviceAlreadyExists.id}"
+        ${(serviceAlreadyExists.params.instance as Object).constructor.name} with the id "${serviceAlreadyExists.params.id}"
         is already declared as a service don't decorate it twice.
         @Websocket, @Router, @AfterMiddleware, @BeforeMiddleware is implicitly decorated by @Service
       `);
@@ -240,6 +233,9 @@ export class MetadataStorage {
   }
 
   AddInjection(item: IDecorator<IInject>) {
+    if (item.params.ids.length < 1) {
+      item.params.ids = [ undefined ];
+    }
     this._injections.push(item);
   }
   //#endregion
@@ -270,29 +266,53 @@ export class MetadataStorage {
   }
 
   private buildInjections() {
+    this._services.map((item) => {
+      this.initializeInstance(item);
+    });
     this._injections.map((item) => {
-      const destinationService = MetadataStorage.getService(item.class, undefined);
-      if (destinationService) {
+      if (item.key) {
+        const destinationServices = this._services.filter((service) =>
+          service.class === item.class
+        );
+        const type = item.params.injectionType();
         const services = item.params.ids.reduce((prev, id) => {
-          const service = MetadataStorage.getService(item.params.injectionType, id);
+          const service = MetadataStorage.getService(type, id);
           if (service) {
             return [
               ...prev,
-              service.instance
+              service.params.instance
             ];
           } else {
-            throw new Error(`The service ${item.params.injectionType.name} with the id ${id} doesn't exists`);
+            throw new Error(`The service ${type.name} with the id ${id} doesn't exists`);
           }
         }, []);
-        destinationService.instance[item.key] = item.params.isArray ? services : services[0];
-      } else {
-        throw new Error(`The class ${item.class.constructor.name} should be declared as a service`);
+        destinationServices.map((service) =>
+          service.params.instance[item.key] = item.params.isArray ? services : services[0]
+        );
       }
     });
   }
 
   private async buildRouters() {
-    let restRouter = new ApiRouter({ prefix: Rakkit.Instance.Config.restEndpoint });
+    this._middlewares.forEach((item) => {
+      // If middleware is a class, instanciate it and use the "use" method as the middleware
+      if (item.params.isClass) {
+        const instance = MetadataStorage.getService((item.class as IBaseMiddleware)).params.instance;
+        item.params.isClass = false;
+        item.params.function = instance.use.bind(instance);
+      }
+      switch (item.params.executionTime) {
+        case "AFTER":
+          this._afterMiddlewares.set(item.class, item.params.function);
+        break;
+        case "BEFORE":
+          this._beforeMiddlewares.set(item.class, item.params.function);
+        break;
+      }
+    });
+    let restRouter = new ApiRouter({
+      prefix: Rakkit.Instance.Config.restEndpoint
+    });
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
       // Look if the endpoint is already merged to another endpoinr
@@ -392,7 +412,7 @@ export class MetadataStorage {
   private bindContext(context: IDecorator<any>, fn: Function): Function;
   private bindContext(context: IDecorator<any>, fns: Function[]): Function[];
   private bindContext(context: IDecorator<any>, fnsOrFn: Function[] | Function) : Function[] | Function {
-    const instance = MetadataStorage.getService(context).instance;
+    const instance = MetadataStorage.getService(context).params.instance;
     if (Array.isArray(fnsOrFn)) {
       return fnsOrFn.map(
         (fn) => fn.bind(instance)
@@ -440,7 +460,9 @@ export class MetadataStorage {
       const method = endpoint.params.method.toLowerCase();
       router.params.router[method](
         `${endpoint.params.endpoint}`,
-        ...endpoint.params.functions.map(HandlerFunctionHelper.getWrappedHandlerFunction)
+        ...endpoint.params.functions.map((fn) => {
+          return HandlerFunctionHelper.getWrappedHandlerFunction(fn as HandlerFunction);
+        })
       );
     });
     this.loadMiddlewares(router.params, this._afterMiddlewares);
@@ -476,6 +498,52 @@ export class MetadataStorage {
     return Array.from(this._routers.values()).filter((router) =>
       router.params.path === path
     );
+  }
+
+  private initializeInstance(item: IDecorator<IService>) {
+    if (!item.params.instance) {
+      const classType = item.class as IClassType<any>;
+      const initParams: Object[] = Reflect.getMetadata("design:paramtypes", item.class);
+      if (initParams) {
+        const instances = initParams.reduce<ReturnedService<any>[]>((prev, param, index) => {
+         let value = undefined;
+          if (param) {
+            const service = MetadataStorage.getService(param);
+            value = service ? service.params.instance : undefined;
+          }
+          const injection = this._injections.find((injection) => {
+            return (
+              injection.class === item.class &&
+              injection.params.paramIndex === index
+            );
+          }
+          );
+          if (injection) {
+            const services = injection.params.ids.map((id) => {
+              const service = MetadataStorage.getService(
+                injection.params.injectionType() || param,
+                id
+              );
+              return this.initializeInstance(service);
+            });
+            if (services.length === 1) {
+              value = services[0];
+            }
+            if (services.length > 1) {
+              value = services;
+            }
+          }
+          return [
+            ...prev,
+            value
+          ];
+        }, []);
+        item.params.instance = new classType(...instances);
+      } else {
+        item.params.instance = new classType();
+      }
+    }
+    return item.params.instance;
   }
   //#endregion
 }

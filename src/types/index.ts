@@ -1,5 +1,4 @@
 export * from "./Core/IAppConfig";
-export * from "./Core/IType";
 export * from "./Core/IClassType";
 export * from "./Core/InstanceOf";
 
@@ -7,6 +6,7 @@ export * from "./Decorators/DI/IInject";
 export * from "./Decorators/DI/IService";
 export * from "./Decorators/DI/DiId";
 export * from "./Decorators/DI/IDiId";
+export * from "./Decorators/DI/TypeFn";
 export * from "./Decorators/DI/ReturnedService";
 export * from "./Decorators/REST/IEndpoint";
 export * from "./Decorators/REST/IRouter";

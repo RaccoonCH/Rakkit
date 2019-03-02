@@ -39,7 +39,7 @@ describe("Error", async () => {
         }
         @Service()
         class ReceiverA {
-          @Inject(ServiceA, 2, "1")
+          @Inject(type => ServiceA, 2, "1")
           private _services: ServiceA; // Not declared as an Array
         }
         await Rakkit.start();

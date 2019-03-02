@@ -1,10 +1,12 @@
 import { MetadataStorage } from "../../logic";
-import { IClassType, DiId } from "../../types";
+import { DiId } from "../../types";
 
 /**
  * Declare a service that is a singleton, an instance is initialized and
  * you can access to it by the @Inject middleware in a class or a another service.
  */
+export function Service();
+export function Service(...ids: DiId[]);
 export function Service(...ids: DiId[]): Function {
   return (target: Function): void => {
     const finalIds = ids.length <= 0 || !ids ? [ undefined ] : ids;
@@ -13,8 +15,7 @@ export function Service(...ids: DiId[]): Function {
         class: target,
         key: target.name,
         params: {
-          id,
-          instance: new (target as IClassType<any>)()
+          id
         }
       });
     });

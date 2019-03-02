@@ -3,7 +3,11 @@ import * as BodyParser from "koa-bodyparser";
 import Axios, { AxiosInstance } from "axios";
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { Start } from "./Utils/Start";
-import { Rakkit, Service, Inject, MetadataStorage, Websocket } from "../src";
+import { Rakkit, Service, Inject, MetadataStorage } from "../src";
+import { Circular1 } from "./ClassesForTesting/CircularDi1Service";
+import { Circular2 } from "./ClassesForTesting/CircularDi2Service";
+import { CircularConstructorDi1Service } from "./ClassesForTesting/CircularConstructorDi1Service";
+import { CircularConstructorDi2Service } from "./ClassesForTesting/CircularConstructorDi2Service";
 
 const basicReturnedObject = {
   testDi: true,
@@ -54,7 +58,7 @@ class SecondReceiver {
 class ArrayReceiver {
   @Inject()
   private _firstStorageInstance: Storage;
-  @Inject(Storage, 1, "a")
+  @Inject(type => Storage, 1, "a")
   private _storageInstances: Storage[];
 
   check() {
@@ -67,9 +71,9 @@ class ArrayReceiver {
 class SingleValueArrayReceiver {
   @Inject()
   private _firstStorageInstance: Storage;
-  @Inject(Storage, 1)
+  @Inject(type => Storage, 1)
   private _secondStorageInstance: Storage[];
-  @Inject(Storage, "a")
+  @Inject(type => Storage, "a")
   private _thirdStorageInstance: Storage[];
 
   check() {
@@ -79,6 +83,38 @@ class SingleValueArrayReceiver {
   }
 }
 
+@Service()
+class ConstructorInjection {
+  constructor(
+    private _firstStorageInstance: Storage,
+    @Inject(1)
+    private _secondStorageInstance: Storage,
+    s: string,
+    @Inject("a")
+    private _thirdStorageInstance: Storage
+  ) {
+  }
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._secondStorageInstance.prop).toBe("sr");
+    expect(this._thirdStorageInstance.prop).toBe("tr");
+  }
+}
+
+@Service()
+class ConstructorArrayInjection {
+  constructor(
+    private _firstStorageInstance: Storage,
+    @Inject(type => Storage, 1, "a")
+    private _storageInstances: Storage[],
+    s: string
+  ) {
+  }
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._storageInstances.map(i => i.prop)).toEqual(["sr", "tr"]);
+  }
+}
 
 describe("DI", async () => {
   let api: AxiosInstance;
@@ -119,26 +155,26 @@ describe("DI", async () => {
   });
 
   it("should inject service with the specified ID", async () => {
-    MetadataStorage.getService(FirstReceiver).instance.check();
-    MetadataStorage.getService(SecondReceiver).instance.check();
+    MetadataStorage.getService(FirstReceiver).params.instance.check();
+    MetadataStorage.getService(SecondReceiver).params.instance.check();
   });
 
   it("should inject services with the specified ID into an array", async () => {
-    MetadataStorage.getService(ArrayReceiver).instance.check();
+    MetadataStorage.getService(ArrayReceiver).params.instance.check();
   });
 
   it("should inject one service with the specified ID into an array", async () => {
-    MetadataStorage.getService(SingleValueArrayReceiver).instance.check();
+    MetadataStorage.getService(SingleValueArrayReceiver).params.instance.check();
   });
 
   it("should create a new service at runtime", async () => {
     class NewService {
       MyProp = "a";
     }
-    const instanceByAdding = MetadataStorage.addAsService(NewService, 2).instance;
+    const instanceByAdding = MetadataStorage.addAsService(NewService, 2).params.instance;
     expect(instanceByAdding.MyProp).toBe("a");
     instanceByAdding.MyProp = "b";
-    const instanceByGetting = MetadataStorage.getService(NewService, 2).instance;
+    const instanceByGetting = MetadataStorage.getService(NewService, 2).params.instance;
     expect(instanceByGetting.MyProp).toBe("b");
   });
 
@@ -149,5 +185,23 @@ describe("DI", async () => {
     } catch (err) {
       done();
     }
+  });
+
+  it("should inject circular", async () => {
+    MetadataStorage.getService(Circular1).params.instance.check();
+    MetadataStorage.getService(Circular2).params.instance.check();
+  });
+
+  it("should inject to constructor", async () => {
+    MetadataStorage.getService(ConstructorInjection).params.instance.check();
+  });
+
+  it("should inject to constructor with arrays", async () => {
+    MetadataStorage.getService(ConstructorArrayInjection).params.instance.check();
+  });
+
+  it("should inject to constructor with circular", async () => {
+    MetadataStorage.getService(CircularConstructorDi1Service, 1).params.instance.check();
+    MetadataStorage.getService(CircularConstructorDi2Service, 1).params.instance.check();
   });
 });

@@ -1,7 +1,8 @@
-import { DiId } from "../..";
+import { DiId, TypeFn } from "../..";
 
 export interface IInject {
+  paramIndex?: number;
+  isArray?: boolean;
   ids: DiId[];
-  isArray: boolean;
   injectionType: Function;
 }
