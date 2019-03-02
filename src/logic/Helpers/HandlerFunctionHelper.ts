@@ -3,8 +3,8 @@ import { HandlerFunction, Context, NextFunction } from "../../types";
 
 export class HandlerFunctionHelper {
   static getWrappedHandlerFunction(handler: HandlerFunction): Middleware {
-    return (context: Context, next: NextFunction) => {
-      handler(context, next);
+    return async (context: Context, next: NextFunction) => {
+      await handler(context, next);
     };
   }
 }

@@ -15,6 +15,6 @@ export class HelloMiddleware implements IBaseMiddleware {
   async use (context: Context, next: NextFunction) {
     this._exampleService.MyServiceValue = "I've passed to HelloMiddleware :)";
     console.log("Hello");
-    next();
+    await next();
   }
 }

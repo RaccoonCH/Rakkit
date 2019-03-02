@@ -33,4 +33,13 @@ export class ExampleRouter {
     context.body = "Hello world";
     next();
   }
+
+  @Get("/s")
+  @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
+  async asyncJob(context: Context, next: NextFunction) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 5000);
+    });
+    context.body = "And voilà !";
+  }
 }
