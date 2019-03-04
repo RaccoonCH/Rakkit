@@ -9,6 +9,6 @@ import {
 export class GlobalFirstAfterMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
     context.body += "ga1;";
-    next();
+    await next();
   }
 }

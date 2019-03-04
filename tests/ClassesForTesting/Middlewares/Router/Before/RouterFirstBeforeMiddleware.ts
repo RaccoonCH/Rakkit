@@ -15,6 +15,6 @@ export class RouterFirstBeforeMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
     this._testService.TestValue.firstBeforeRouter = true;
     context.body += "rb1;";
-    next();
+    await next();
   }
 }

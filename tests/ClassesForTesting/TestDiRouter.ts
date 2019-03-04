@@ -12,9 +12,9 @@ export class TestDiRouter {
 
   @Get("/")
   @UseMiddleware(EndpointFirstBeforeMiddleware)
-  get(context: Context, next: NextFunction) {
+  async get(context: Context, next: NextFunction) {
     this._testService.TestValue.testDi = true;
     context.body = this._testService.TestValue;
-    next();
+    await next();
   }
 }

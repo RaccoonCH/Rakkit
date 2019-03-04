@@ -30,18 +30,18 @@ export class MergeMw2 {
   @UseMiddleware(
     GlobalFirstBeforeMiddleware
   )
-  get1(context: Context, next: NextFunction) {
+  async get1(context: Context, next: NextFunction) {
     context.body += "1;";
-    next();
+    await next();
   }
   @Get("/")
   @UseMiddleware(
     GlobalSecondBeforeMiddleware,
     GlobalFirstAfterMiddleware
   )
-  get2(context: Context, next: NextFunction) {
+  async get2(context: Context, next: NextFunction) {
     context.body += "2;";
-    next();
+    await next();
   }
 }
 

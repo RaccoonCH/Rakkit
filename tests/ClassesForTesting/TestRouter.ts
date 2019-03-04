@@ -8,6 +8,7 @@ import {
   Inject
 } from "../../src";
 import { TestService } from "./TestService";
+import { wait } from "../Utils/Waiter";
 
 @Router("test")
 export class TestMiddlewareRouter {
@@ -17,38 +18,46 @@ export class TestMiddlewareRouter {
   _b: TestService;
 
   @Get()
-  get(context: Context) {
+  async get(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
   @Get("/:param")
-  getParam(context: Context) {
+  async getParam(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Post("/")
-  post(context: Context) {
+  async post(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
   @Post("/:param")
-  postParam(context: Context) {
+  async postParam(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Put("/")
-  put(context: Context) {
+  async put(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
   @Put("/:param")
-  putParam(context: Context) {
+  async putParam(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Delete()
-  delete(context: Context) {
+  async delete(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
   @Delete("/:param")
-  deleteParam(context: Context) {
+  async deleteParam(context: Context) {
+    await wait();
     context.body = this.getReturnedBody(context);
   }
 

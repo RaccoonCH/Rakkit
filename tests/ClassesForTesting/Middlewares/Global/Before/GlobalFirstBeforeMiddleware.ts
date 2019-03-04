@@ -13,6 +13,7 @@ export class GlobalFirstBeforeMiddleware implements IBaseMiddleware {
   private _testService: TestService;
 
   async use(context: Context, next: NextFunction) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (!context.request.body) {
       throw new Error("BodyParser error");
     }
@@ -21,6 +22,6 @@ export class GlobalFirstBeforeMiddleware implements IBaseMiddleware {
     }
     this._testService.TestValue.firstBeforeGlobal = true;
     context.body = "gb1;";
-    next();
+    await next();
   }
 }

@@ -9,6 +9,6 @@ import {
 export class EndpointSecondBeforeMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
     context.body += "eb2;";
-    next();
+    await next();
   }
 }

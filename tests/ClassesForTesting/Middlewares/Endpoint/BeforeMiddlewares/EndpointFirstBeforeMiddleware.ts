@@ -15,6 +15,6 @@ export class EndpointFirstBeforeMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
     this._testService.TestValue.firstBeforeEndpoint = true;
     context.body += "eb1;";
-    next();
+    await next();
   }
 }

@@ -9,6 +9,6 @@ import {
 export class RouterSecondBeforeMiddleware implements IBaseMiddleware {
   async use(context: Context, next: NextFunction) {
     context.body += "rb2;";
-    next();
+    await next();
   }
 }

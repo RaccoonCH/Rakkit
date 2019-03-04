@@ -19,27 +19,28 @@ export class ExampleRouter {
 
   @Get("/")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
-  get(context: Context, next: NextFunction) {
+  async get(context: Context, next: NextFunction) {
     console.log(this._routerService);
     context.body = "Hello world";
-    next();
+    await next();
   }
 
   @Post("/")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
-  post(context: Context, next: NextFunction) {
+  async post(context: Context, next: NextFunction) {
     console.log(this._routerService);
     console.log(context.request.body);
     context.body = "Hello world";
-    next();
+    await next();
   }
 
-  @Get("/s")
+  @Get("/async")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async asyncJob(context: Context, next: NextFunction) {
     await new Promise((resolve) => {
       setTimeout(resolve, 5000);
     });
     context.body = "And voilà !";
+    await next();
   }
 }

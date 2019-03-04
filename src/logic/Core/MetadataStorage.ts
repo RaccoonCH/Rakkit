@@ -16,7 +16,6 @@ import {
   IInject,
   IClassType,
   IWebsocket,
-  IBaseMiddleware,
   IDiId,
   DiId,
   ReturnedService,
