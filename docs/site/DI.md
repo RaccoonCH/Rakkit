@@ -129,11 +129,11 @@ class B {
 
 ### Get and add at runtime
 You can retrieve and add class instances on the fly by the object [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) using static methods:  
-_Ajout_
+_Get_
 ```javascript
 MetadataStorage.getService<ClassType>(classType: ClassType, id?: string | number);
 ```
-_Suppression_
+_Add_
 ```javascript
 MetadataStorage.addAsService<ClassType>(classType: ClassType, id?: string | number);
 ```
