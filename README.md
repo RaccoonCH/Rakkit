@@ -1,7 +1,7 @@
 <p align="center">
   <img src="docs/assets/logo.png" width="220" alt="Rakkit logo"/>
   <br>
-  A backend library written in <b>TypeScript</b> that provides <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
+  A library written in <b>TypeScript</b> that provides <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
   <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
