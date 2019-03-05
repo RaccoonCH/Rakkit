@@ -43,6 +43,7 @@ Cela donne comme ordre (symétrique / onion):
 - Fonctionne comme la fonction next de [Koa](https://koajs.com) (ou [Express](https://expressjs.com/fr/)).  
 - Il est **passé en deuxième paramètre (après le context) dans les méthode de classe**.  
 - Il **permet de passer à la route suivante**, si cette fonction n'est pas appelée il va donc se contenter de simplement renvoyer le réponse au client sans passer aux routes qui suivent.  
+- Si une fonction est asynchrone dans la liste des méthodes appelées il est nécessaire d'executer **next avec un await**, car le middleware attends l'execution de la méthode suivante qui attend celle de la suivant et ainsi de suite et quand tout à été executé il envoie la réponse au client.
 
 #### Déclaration au niveau du endpoint
 ```javascript
@@ -54,7 +55,7 @@ import {
 class MyBeforeMiddleware implements IBaseMiddleware {
   async use(ctx: Context, next: NextFunction) {
     ctx.body = "-2;";
-    next(); // Pour passer à l'éxecution suivante
+    await next(); // Pour passer à l'éxecution suivante
   }
 }
 
@@ -62,7 +63,7 @@ class MyBeforeMiddleware implements IBaseMiddleware {
 class MySecondBeforeMiddleware implements IBaseMiddleware {
   async use(ctx: Context, next: NextFunction) {
     ctx.body = "-1;";
-    next(); // Pour passer à l'éxecution suivante
+    await next(); // Pour passer à l'éxecution suivante
   }
 }
 
@@ -83,9 +84,13 @@ export class MiddlewareOnEndpoint {
     MySecondBeforeMiddleware,
     MyAfterMiddleware
   )
-  get(context: Context, next: NextFunction) {
+  async get(context: Context, next: NextFunction) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     context.body += "0;";
-    next(); // En appellant next je passe au middleware MyAfterMiddleware
+    // En appellant next je passe au middleware MyAfterMiddleware
+    // Pas besoin d'appeler next car la méthode suivante n'inclue pas de tâches asynchrone,
+    // mais vous pouvez quand même le mettre
+    next();
   }
 }
 ```
@@ -145,7 +150,7 @@ Rakkit.start({
 ```
 
 ### Cas particulier: Fusion de endpoint et middleware
-Comme expliqué dans la partie [routeur](/#/fr/router) on peut fusionner des endpoints, vous pouvez aussi utiliser les middlewares en utilisant cette notion.
+Comme expliqué dans la partie [routeur](/#/fr/router) on peut fusionner des endpoints, vous pouvez aussi utiliser les middlewares en avec cette notion.
 
 ```javascript
 @Router("example")

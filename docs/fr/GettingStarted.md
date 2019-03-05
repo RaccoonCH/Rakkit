@@ -30,10 +30,44 @@ npm i rakkit
 yarn add rakkit
 ```
 
+### reflect-metadata et décorateur
+Pour utiliser Rakkit, et également pour toute les application en TS utilisant les décorateur vous devrez installer reflect-metadata et l'inclure dans le fichier de démarrage de votre application.
+```
+npm i reflect-metadata
+```
+```
+yarn add reflect-metadata
+```
+
+Il faut également que déclariez dans le fichier tsconfig.json que vous utilisez les décorateurs:  
+```javascript
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true, // <-
+    "experimentalDecorators": true, // <-
+    "module": "commonjs",
+    "target": "es2016",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "build",
+    "declaration": true,
+    "importHelpers": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "es2016",
+      "esnext.asynciterable"
+    ],
+    "moduleResolution": "node"
+  }
+}
+
+```
+
 ### Démarrer l'application
 Afin de démarrer l'application vous devrez utiliser la classe `Rakkit` et acceder à la méthode static `start` de celui-ci.  
 Voici un exemple:
 ```javascript
+import "reflect-metdata";
 import { Rakkit } from "rakkit";
 
 Rakkit.start();

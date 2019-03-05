@@ -1,13 +1,17 @@
 - **Commencer**
   - [Commencer](fr/GettingStarted.md)
   - [Démos](fr/Demos.md)
-- **Coder**
+- **REST**
   - [Routeur](fr/Router.md)
-  - [Websocket](fr/Websocket.md)
   - [Middleware](fr/Middleware.md)
-  - [Services / Injection de dépendance](fr/DI.md)
-  - [L'objet Rakkit](fr/RakkitObject.md)
-  - [L'object MetadataStorage](fr/MetadataStorage.md)
+  - [Librairie externe pour Koa](fr/MiddlewaresKoa.md)
   - [Servir des fichiers statiques](fr/ServingStaticFiles.md)
+- **Websocket**
+  - [Websocket](fr/Websocket.md)
+- **DI**
+  - [Services / Injection de dépendance](fr/DI.md)
+- **Utiles**
+  - [L'object MetadataStorage](fr/MetadataStorage.md)
+  - [L'objet Rakkit](fr/RakkitObject.md)
 - **Contribution**
   - [Contribution](fr/Contributing.md)

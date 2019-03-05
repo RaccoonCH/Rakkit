@@ -70,7 +70,7 @@ export class ExampleRouter {
 }
 ```
 
-**Précision sur la fonction next**  
+**Précision sur la fonction [next](http://localhost:3000/#/fr/Middleware?id=avant-tout-la-fonction-next)**  
 Comment on peut l'observer, on a **juste eu besoin d'appeller la fonction next à la première méthode** (`first`) car on veut **passer à la seconde** `second` .  
 Dans cette exemple si le client accède à la route `http://localhost:4000/example`, il recevra la réponse: `hello world`.  
 Main si la fonction next n'avait pas été appelée, le client aurait juste reçu `hello `.
