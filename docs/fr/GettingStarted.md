@@ -83,7 +83,7 @@ Vous pouvez passer plusieurs paramètres lors du démarrage de l'application dan
 | port | `number?` | `4000` | Le numero du port
 | restEndpoint | `string?` | `"/rest"` | Le chemin d'accès de l'api REST
 | socketioOptions | `WsOptions?` | `path: "/ws"` | Paramètrage de Socket.io (socket.io)
-| routers | `ClassOrString[]?` | `undefined` | Une liste chemins représentants les fichiers de routers ([glob](https://github.com/isaacs/node-glob)) ou une liste de class de routers
-| websockets | `ClassOrString[]?` | `undefined` | Une liste chemins représentants les fichiers de websockets ([glob](https://github.com/isaacs/node-glob)) ou une liste de class de websockets
-| globalRestMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux pour l'api REST (class ou fonctions)
-| globalRootMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux de l'application à la racine (`"/"`) (class ou fonctions)
+| routers | `ClassOrString[]?` | `undefined` | Une liste chemins représentants les fichiers de routers ([glob](https://github.com/isaacs/node-glob)) ou une liste de classes de routers
+| websockets | `ClassOrString[]?` | `undefined` | Une liste chemins représentants les fichiers de websockets ([glob](https://github.com/isaacs/node-glob)) ou une liste de classes de websockets
+| globalRestMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux pour l'api REST (classes ou fonctions)
+| globalRootMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux pour le router principal (`"/"`) (classes ou fonctions)

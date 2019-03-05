@@ -3,7 +3,7 @@ Tout comme l'objet Rakkit c'est un singleton, vous pouvez donc acceder à son in
 Il fournit diverses propriétés qui vous seront peut-être utile comme par exemple: les services, les injections, les routers, les endoints, les websocket, etc....  
 Vous devez simplement retenir que c'est lui qui gère les décorateurs, c'est vous pouvez donc acceder aux informations les concernant par cet instance d'objet.
 
-Voici les propriétés disponibles et leurs descriptions via `MetadataStorage.Instance`, (Elle sont toute en readonly):
+Voici les propriétés disponibles et leurs descriptions via `MetadataStorage.Instance`, (Elle sont toutes en readonly):
 
 | Proptiété | Type | Description |
 | --- | --- | --- |

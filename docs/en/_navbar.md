@@ -1,2 +1,1 @@
-- Translations
-  - [:fr: Français](/fr/)
+[:fr: Français](/fr/GettingStarted)

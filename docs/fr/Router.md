@@ -50,7 +50,7 @@ export class ExampleRouter {
 #### Fusion de route
 Vous pouvez avoir deux **méthodes de classe** qui ont la même **méthode http** ainsi que le même **endpoint** afin de chainer les executions qui se font **dans l'orde de déclaration des méthodes dans la classe**.  
 _Surtout utile quand elle est couplée à l'utilisation des [middlewares](http://localhost:3000/#/fr/Middleware)_  
-Pour pouvoir utiliser cette fonctionnalité vous devrez comprendre le fonctionnement de la fonction [next](http://localhost:3000/#/fr/Middleware?id=avant-tout-la-fonction-next)
+Pour pouvoir utiliser cette fonctionnalité vous devrez comprendre le fonctionnement de la fonction [next](http://localhost:3000/#/fr/Middleware?id=avant-tout-la-fonction-next).
 
 On peut fusionner des routes de cette façon:
 ```javascript

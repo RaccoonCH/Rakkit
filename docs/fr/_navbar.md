@@ -1,1 +1,1 @@
-[:us: Anglais](/)
+[:us: English](/en/GettingStarted)

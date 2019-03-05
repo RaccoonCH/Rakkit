@@ -24,12 +24,6 @@ Il est important de savoir de savoir comment les middleware sont englobé par le
 - Les middlewares router englobe les middlewares endpoint
 - Les middlewares globaux englobe les middlewares router
 
-Ce qui veut dire:
-**BeforeMiddleware**
-Les middlewares globaux sont executés avant les middlewares de routeur qui sont executés avant les middlewares de endpoint.
-**AfterMiddleware**
-Les middleware de endpoint sont executées avant les middlewares de router qui sont executés avant les middlewares globaux.
-
 Cela donne comme ordre (symétrique / onion):
 - **Before** <span style="color:seagreen">global</span> middleware
 - **Before** <span style="color:dodgerblue">router</span> middleware
@@ -104,7 +98,7 @@ En accedant à la route `http://localhost:4000/example` on va donc recevoir comm
 #### Déclaration au niveau du router
 En utilisant les middlewares au niveau du routeur, les middlewares seront appliqués à tous les enpoints de celui-ci.
 ```javascript
-// Middleware sur les endpoint
+// Middleware sur les endpoints
 @Router("example")
 @UseMiddleware(
   MyBeforeMiddleware,
@@ -132,7 +126,7 @@ Dans cet exemple on a donc cet ordre d'éxecution:
 Dans cet exemple, en accedant à n'importe quel endpoint de ce routeur: `http://localhost:4000/example/*` (`/` ou `/foo`) on va recevoir comme réponse `-2;-1;0;1;`
 
 #### Déclaration au niveau global
-Vous pouvez **appliquer des middlewares à tout les routeurs de votre application (donc a tous les endpoints)** en passant en paramètres la liste de ceux-ci dans la proptiété `globalRestMiddlewares` (`/`) ou `globalRootMiddlewares` (`/rest` par défaut) de `Rakkit`.  
+Vous pouvez **appliquer des middlewares à tout les routeurs de votre application (donc a tous les endpoints)** en passant en paramètres la liste de ceux-ci dans la proptiété `globalRestMiddlewares` (`/rest` par défaut) ou `globalRootMiddlewares` (`/` root) de `Rakkit`.  
 Vous pouvez aussi utiliser cette fonctionnalité afin **d'attacher des "plugins" Koa**, comme par exemple [koa-bodyparser](https://github.com/koajs/bodyparser) qui permet de "parser" le body des requêtes entrantes.
 ```javascript
 import * as BodyParser from "koa-bodyparser";

@@ -13,5 +13,6 @@
 - **Utiles**
   - [L'object MetadataStorage](fr/MetadataStorage.md)
   - [L'objet Rakkit](fr/RakkitObject.md)
-- **Contribution**
+- **Développement**
   - [Contribution](fr/Contributing.md)
+  - [Changelog](fr/Changelog.md)
