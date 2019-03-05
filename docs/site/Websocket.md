@@ -1,7 +1,7 @@
 # Websocket
 They are based on the same operation as those of [socket.io](https://socket.io). You can, therefore, if necessary, refer to their documentation.
 
-#### Notions de base
+#### Basic notions
 **Websocket decorator**  
 **`@Websocket(namespace?: string)`**  
 - It **decorates a class**.  

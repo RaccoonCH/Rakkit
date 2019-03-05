@@ -1,7 +1,7 @@
-# Servir des fichiers statiques
+# Serving static files
 We recommend serving static files with Apache or Nginx but you can do it with your application using the library that has been developed by us and available on npm: **[koa-router-static](https://www.npmjs.com/package/static-koa-router)**.  
 To use it you will need the instance of the main router available via the `MetadataStorage` object in order to serve the files via your application root (`/`).  
-**Exemple**
+**Example**
 ```javascript
 import { Serve } from "static-koa-router";
 
