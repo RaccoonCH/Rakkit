@@ -75,7 +75,7 @@ class C {
 }
 ```
 
-#### Injection dans un tableau
+#### Array injection
 By repeating the previous example, we can also inject several services into the same variable, which will give an instance array of the injected class.  
 In this case we are forced to **declare explicitly the type in the injection** in the first parameter because TypeScript (reflect-metadata) does not allow me to know the type of a table.
 ```javascript
@@ -105,7 +105,7 @@ class C {
 }
 ```
 
-#### Injection par constructeur
+#### Constructor injection
 Another way to inject a dependency, which is by the constructor, can be used.  
 It works the same way, but with this notation you don't have to decorate the injection if it is simple ( simple = @Inject() ).  
 However, you will not be able to **do circular injection** with this method unlike with property injection, this is explained in [below](http://localhost:3000/#/fr/DI?id=circular-dependencies) and that is why we recommend property injection.
@@ -127,7 +127,7 @@ class B {
 }
 ```
 
-### Récupération et ajout à la volée
+### Get and add at runtime
 You can retrieve and add class instances on the fly by the object [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) using static methods:  
 _Ajout_
 ```javascript

@@ -15,7 +15,7 @@ The `endpoint` parameter that you enter when "decorating" is mounted after the r
 Providing the value `"/"` or not specifying a value mounts the endpoint to the root of the router path, which gives: `http://HOST:PORT/REST_ENDPOINT/ROUTER_PATH`  
 _All capitalized values vary according to your configuration_
 
-**Le Context**  
+**The Context**  
 - The decorated class methods of **@Get**, **@Post**, **@Put** or **@Delete** receive in **first parameter** a `Context` which is equivalent to a `Context` of [koa](https://koajs.com/) and works in the same way, so you can refer to their [documentation](https://koajs.com/) to know how to use and handle it.
 
 #### Basic router
@@ -49,7 +49,7 @@ export class ExampleRouter {
 
 #### Route merging
 You can have two **class methods** that have the same **http method** as well as the same **endpoint** in order to chain the executions that are done **in the order of declaration of methods in the class**.  
-Especially useful when coupled with the use of [middlewares](http://localhost:3000/#/fr/Middleware)_  
+_Especially useful when coupled with the use of [middlewares](http://localhost:3000/#/fr/Middleware)_  
 To be able to use this feature you will need to understand how the [next](http://localhost:3000/#/fr/Middleware?id=before-all-function-next) function works.  
 
 Roads can be merged this way:
