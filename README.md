@@ -24,7 +24,7 @@
   </p>
 </p>
 
-## Getting started  
+## 🚀 Getting started  
 ```
 npm i rakkit
 ```
@@ -32,25 +32,25 @@ npm i rakkit
 yarn add rakkit
 ```
 
-## Documentation
+## 📜 Documentation
 The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 
-## Features (Fully typed, Class based & Decorators)  
+## 🔨 Features (Fully typed, Class based & Decorators)  
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/))
 - Websocket app creation ([socket.io](https://socket.io/))
-## The next step
+## 🔮 The next step
 We want to integrate the use of GraphQL in a near future, like [type-graphql](https://github.com/19majkel94/type-graphql) does.
 
-## Chat with us
+## 📠 Chat with us
 - [Discord](https://discord.gg/szRhf3C)
 - [Gitter](https://gitter.im/_rakkit_/community)
 
-## The project history  
+## 📔 The project history  
 Initially this tool was made in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a standalone library, so we choose to make it an independent tool to benefit the community and progress on a better basis.
 
-## Philosophy  
+## 🧠 Philosophy  
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
 
-## Contributing  
+## 💪 Contributing  
 All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).
