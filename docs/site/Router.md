@@ -1,7 +1,7 @@
-# Routeur
+# Router
 They are based on the same operation as those of [koa](https://koajs.com/). You can, therefore, if necessary, refer to their documentation.
 
-### Notions de base
+### Basic notions
 **Router decorator**  
 **`@Router(path: string)`**  
 - He decorates a **class**.  
