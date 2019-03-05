@@ -1,5 +1,5 @@
 <center>
-  <img src="../assets/logo.png" width="220" alt="Nest Logo"/>
+  <img src="./assets/logo.png" width="220" alt="Rakkit logo"/>
   <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
