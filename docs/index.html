@@ -21,11 +21,14 @@
       maxLevel: 4,
       subMaxLevel: 2,
       name: 'rakkit',
-      nameLink: {
-        '/fr/': '/fr/'
-      },
+      logo: './assets/logo.png',
       repo: 'https://github.com/raccoonch/rakkit',
       ga: 'UA-128796921-2',
+      basePath: "/site/",
+      alias: {
+        '/fr/(.*)': '/langs/fr/$1'
+      },
+      homepage: "GettingStarted.md",
       externalLinkTarget: '_blank',
       tabs: {
         theme: 'material'
@@ -45,7 +48,7 @@
       plugins: [
         function (hook, vm) {
           hook.beforeEach(function (html) {
-            const lang = vm.route.file.split('/')[0];
+            var lang = vm.route.file.split('/')[1];
             if (/githubusercontent\.com/.test(vm.route.file)) {
               url = vm.route.file
                 .replace('raw.githubusercontent.com', 'github.com')

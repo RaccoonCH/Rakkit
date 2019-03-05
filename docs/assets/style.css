@@ -3,6 +3,11 @@
   --docsifytabs-tab-highlight-color: #56c88f;
 }
 
+.app-name {
+  width: 10%;
+  min-width: 60px;
+}
+
 * {
   outline: none;
 }
