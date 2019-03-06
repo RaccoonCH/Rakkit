@@ -1,3 +1,3 @@
 # Changelog
 
-Rien, pour le moment...
+Disponible uniquement en anglais [ici](/Changelog)

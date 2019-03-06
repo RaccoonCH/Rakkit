@@ -1,5 +1,5 @@
 - **Getting started**
-  - [Getting started](GettingStarted.md)
+  - [Getting started](/GettingStarted)
   - [Demos](Demos.md)
 - **REST**
   - [Router](Router.md)

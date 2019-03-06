@@ -14,6 +14,7 @@
 <body>
   <div id="app"></div>
   <script>
+    const basePath = '/Rakkit/site/'
     window.$docsify = {
       auto2top: true,
       executeScript: true,
@@ -21,16 +22,16 @@
       loadSidebar: true,
       mergeNavbar: true,
       maxLevel: 4,
-      subMaxLevel: 2,
+      subMaxLevel: 3,
       name: 'rakkit',
       logo: './assets/logo.png',
       repo: 'https://github.com/raccoonch/rakkit',
       ga: 'UA-128796921-2',
-      basePath: "/Rakkit/site/",
+      basePath,
       alias: {
-        '/fr/(.*)': '/langs/fr/$1'
+        '/fr/(.*)': '/langs/fr/$1',
+        '/': '/GettingStarted'
       },
-      homepage: "GettingStarted.md",
       externalLinkTarget: '_blank',
       tabs: {
         theme: 'material'
@@ -50,15 +51,23 @@
       plugins: [
         function (hook, vm) {
           hook.beforeEach(function (html) {
+            if (vm.route.path === '/') {
+              document.location.replace(`${basePath}/#/GettingStarted`)
+            }
             var lang = vm.route.file.split('/')[1];
             if (/githubusercontent\.com/.test(vm.route.file)) {
               url = vm.route.file
                 .replace('raw.githubusercontent.com', 'github.com')
                 .replace(/\/master/, '/blob/master')
             } else {
-              url = 'https://github.com/RaccoonCH/Rakkit/blob/master/docs/' + vm.route.file
+              url = `https://github.com/RaccoonCH/Rakkit/blob/master/docs/site/${vm.route.file}` 
             }
-            var editHtml = `[:memo: ${lang === 'fr' ? 'Editer ce document' : 'Edit this document'}](${url})\n`
+            let editText = 'Edit this document'
+            switch(lang) {
+              case 'fr':
+                editText = 'Editer ce document'
+            }
+            const editHtml = `[:memo: ${editText}](${url})\n`
             return editHtml + html
           })
         }

@@ -1,7 +1,7 @@
 # Websocket
 Ils sont basés sur le même fonctionnement que ceux de [socket.io](https://socket.io). Vous pouvez, donc, si besoin, vous referez à leur documentation.
 
-#### Notions de base
+### Notions de base
 **Websocket decorator**  
 **`@Websocket(namespace?: string)`**  
 - Il **décore une classe**.  
@@ -16,7 +16,7 @@ Ils sont basés sur le même fonctionnement que ceux de [socket.io](https://sock
 - Même objet que celui de socket.io, vous avez donc la [documentation](https://socket.io/docs/server-api#Socket) de celui-ci qui est fournit [ici](https://socket.io/docs/server-api#Socket).
 Les méthode de classe décorées de `@On`, reçoivent en premier paramètre le `Socket` qui a appelé l'évenement et en second paramètre, les données envoyées par celui-ci (excepté pour l'évement `"connection"` qui ne reçoit aucune données).
 
-#### Classe websocket basique
+### Classe websocket basique
 ```javascript
 import { Websocket, On, Socket } from "rakkit";
 
@@ -35,7 +35,7 @@ export class ExampleWs {
 ```
 Dans cet exemple, en appellant l'évenement `hello` depuis un client socket.io, le serveur va appeler l'évenement `world` du client et lui renvoyer les données reçues.
 
-#### Classe websocket avec namespace
+### Classe websocket avec namespace
 
 ##### Server-side
 _ExampleWs.ts_

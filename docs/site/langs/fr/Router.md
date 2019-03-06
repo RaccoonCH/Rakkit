@@ -18,7 +18,7 @@ _Toutes les valeurs en majuscule varient selon votre configuration_
 **Le Context**  
 - Les méthode de classe décorées de **@Get**, **@Post**, **@Put** ou **@Delete** reçoivent en **premier paramètre** un `Context` qui équivaut à un `Context` de [koa](https://koajs.com/) et fonctionne de la même façon, vous pouvez donc vous référez à leur [documentation](https://koajs.com/) afin de savoir comment l'utiliser et le manipuler.
 
-#### Routeur basique
+### Routeur basique
 Voici un exemple simple de routeur avec Rakkit.
 ```javascript
 import { Router, Get, Post, Put, Delete, Context } from "rakkit";
@@ -47,7 +47,7 @@ export class ExampleRouter {
 }
 ```
 
-#### Fusion de route
+### Fusion de route
 Vous pouvez avoir deux **méthodes de classe** qui ont la même **méthode http** ainsi que le même **endpoint** afin de chainer les executions qui se font **dans l'orde de déclaration des méthodes dans la classe**.  
 _Surtout utile quand elle est couplée à l'utilisation des [middlewares](http://localhost:3000/#/fr/Middleware)_  
 Pour pouvoir utiliser cette fonctionnalité vous devrez comprendre le fonctionnement de la fonction [next](http://localhost:3000/#/fr/Middleware?id=avant-tout-la-fonction-next).
