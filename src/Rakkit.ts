@@ -99,7 +99,7 @@ export class Rakkit extends AppLoader {
       this.startMessage("WS    ", this._config.socketioOptions.path);
     }
     if (startRest && !this._config.silent) {
-      const routers = Array.from(MetadataStorage.Instance.Routers.values());
+      const routers = Array.from(MetadataStorage.Instance.Rest.Routers.values());
       if (routers.length > 0) {
         console.log(
           Color("\nRouters:", "cmd.underscore")
@@ -113,7 +113,7 @@ export class Rakkit extends AppLoader {
 
   private async startWs() {
     this._socketio = SocketIo(this._httpServer, this._config.socketioOptions);
-    Array.from(MetadataStorage.Instance.Websockets.values()).map((ws) => {
+    Array.from(MetadataStorage.Instance.Ws.Websockets.values()).map((ws) => {
       const nsp = this._socketio.of(ws.params.namespace);
       nsp.on("connection", (socket) => {
         ws.params.ons.map(({ params }) => {
@@ -131,7 +131,7 @@ export class Rakkit extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
-      this._koaApp.use(MetadataStorage.Instance.MainRouter.routes());
+      this._koaApp.use(MetadataStorage.Instance.Rest.MainRouter.routes());
       resolve();
     });
   }

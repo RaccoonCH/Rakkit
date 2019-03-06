@@ -32,9 +32,10 @@ export function Inject(typeOrId?: Function | DiId, ...ids: (DiId[] | undefined))
       index
     ) {
       const finalIds = isTypeAtFirstParam ? ids : [ (typeOrId as DiId) || undefined ];
-      MetadataStorage.Instance.AddInjection({
+      MetadataStorage.Instance.Di.AddInjection({
         class: index !== undefined ? (target as Function) : target.constructor,
         key,
+        category: "di",
         params: {
           paramIndex: index,
           ids: finalIds,

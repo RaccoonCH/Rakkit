@@ -11,9 +11,10 @@ export function Service(...ids: DiId[]): Function {
   return (target: Function): void => {
     const finalIds = ids.length <= 0 || !ids ? [ undefined ] : ids;
     finalIds.map((id) => {
-      MetadataStorage.Instance.AddService({
+      MetadataStorage.Instance.Di.AddService({
         class: target,
         key: target.name,
+        category: "di",
         params: {
           id
         }

@@ -16,6 +16,7 @@ export * from "./Decorators/Routing/IClassPath";
 export * from "./Decorators/WS/IOn";
 export * from "./Decorators/WS/IWebsocket";
 export * from "./Decorators/IDecorator";
+export * from "./Decorators/DecoratorCategory";
 
 export * from "./REST/HttpMethod";
 

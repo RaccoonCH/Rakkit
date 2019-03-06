@@ -6,9 +6,10 @@ import { MetadataStorage } from "../../logic";
  */
 export function Router(path: string): Function {
   return (target: Function): void => {
-    MetadataStorage.Instance.AddRouter({
+    MetadataStorage.Instance.Rest.AddRouter({
       class: target,
       key: target.name,
+      category: "rest",
       params: {
         path: path.replace(/^\/|\/$/g, ""), // Remove first and last "/"
         endpoints: []

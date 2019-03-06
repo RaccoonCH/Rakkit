@@ -87,10 +87,10 @@ class SingleValueArrayReceiver {
 class ConstructorInjection {
   constructor(
     protected _firstStorageInstance: Storage,
-    @Inject(1)
+    @Inject(type => Storage, 1)
     protected _secondStorageInstance: Storage,
     s: string,
-    @Inject("a")
+    @Inject(type => Storage, "a")
     protected _thirdStorageInstance: Storage
   ) {
   }
@@ -191,32 +191,32 @@ describe("DI", async () => {
   });
 
   it("should inject service with the specified ID", async () => {
-    MetadataStorage.getService(FirstReceiver).check();
-    MetadataStorage.getService(SecondReceiver).check();
+    MetadataStorage.Instance.Di.GetService(FirstReceiver).check();
+    MetadataStorage.Instance.Di.GetService(SecondReceiver).check();
   });
 
   it("should inject services with the specified ID into an array", async () => {
-    MetadataStorage.getService(ArrayReceiver).check();
+    MetadataStorage.Instance.Di.GetService(ArrayReceiver).check();
   });
 
   it("should inject one service with the specified ID into an array", async () => {
-    MetadataStorage.getService(SingleValueArrayReceiver).check();
+    MetadataStorage.Instance.Di.GetService(SingleValueArrayReceiver).check();
   });
 
   it("should create a new service at runtime", async () => {
     class NewService {
       MyProp = "a";
     }
-    const instanceByAdding = MetadataStorage.addAsService(NewService, 2);
+    const instanceByAdding = MetadataStorage.Instance.Di.AddService(NewService, 2);
     expect(instanceByAdding.MyProp).toBe("a");
     instanceByAdding.MyProp = "b";
-    const instanceByGetting = MetadataStorage.getService(NewService, 2);
+    const instanceByGetting = MetadataStorage.Instance.Di.GetService(NewService, 2);
     expect(instanceByGetting.MyProp).toBe("b");
   });
 
   it("should throw error when adding a new service at runtime and it already exists", async (done) => {
     try {
-      MetadataStorage.addAsService(Storage, 1);
+      MetadataStorage.Instance.Di.AddService(Storage, 1);
       done.fail("Error not throwed");
     } catch (err) {
       done();
@@ -224,37 +224,37 @@ describe("DI", async () => {
   });
 
   it("should inject circular", async () => {
-    MetadataStorage.getService(Circular1).check();
-    MetadataStorage.getService(Circular2).check();
+    MetadataStorage.Instance.Di.GetService(Circular1).check();
+    MetadataStorage.Instance.Di.GetService(Circular2).check();
   });
 
   it("should inject to constructor", async () => {
-    MetadataStorage.getService(ConstructorInjection).check();
+    MetadataStorage.Instance.Di.GetService(ConstructorInjection).check();
   });
 
   it("should inject to constructor with arrays", async () => {
-    MetadataStorage.getService(ConstructorArrayInjection).check();
+    MetadataStorage.Instance.Di.GetService(ConstructorArrayInjection).check();
   });
 
   it("should inject to constructor with semi circular", async () => {
-    MetadataStorage.getService(CircularConstructorDi1Service, 1).check();
-    MetadataStorage.getService(CircularConstructorDi2Service, 1).check();
+    MetadataStorage.Instance.Di.GetService(CircularConstructorDi1Service, 1).check();
+    MetadataStorage.Instance.Di.GetService(CircularConstructorDi2Service, 1).check();
   });
 
   it("should inject to constructor with semi circular", async () => {
-    MetadataStorage.getService(CircularConstructorDi1Service, 1).check();
-    MetadataStorage.getService(CircularConstructorDi2Service, 1).check();
+    MetadataStorage.Instance.Di.GetService(CircularConstructorDi1Service, 1).check();
+    MetadataStorage.Instance.Di.GetService(CircularConstructorDi2Service, 1).check();
   });
 
   it("should inject extends with constructor", async () => {
-    MetadataStorage.getService(ExtendingServiceConstructor).check();
+    MetadataStorage.Instance.Di.GetService(ExtendingServiceConstructor).check();
   });
 
   it("should inject extends with property", async () => {
-    MetadataStorage.getService(ExtendingService).check();
+    MetadataStorage.Instance.Di.GetService(ExtendingService).check();
   });
 
   it("should inject extends with deep injection", async () => {
-    MetadataStorage.getService(DeepExtending).check();
+    MetadataStorage.Instance.Di.GetService(DeepExtending).check();
   });
 });

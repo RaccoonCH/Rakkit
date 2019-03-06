@@ -6,9 +6,10 @@ import { MetadataStorage } from "../../logic";
  */
 export function Websocket(namespace?: string): Function {
   return (target: Function): void => {
-    MetadataStorage.Instance.AddWebsocket({
+    MetadataStorage.Instance.Ws.AddWebsocket({
       class: target,
       key: target.name,
+      category: "ws",
       params: {
         namespace,
         ons: []
