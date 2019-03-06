@@ -127,6 +127,25 @@ class B {
 }
 ```
 
+### Héritage
+Vous pouvez hériter vos services de d'autres services ainsi que de classe abstraite (ou class normale) utilisant l'injection afin que votre classe hérite de celle-ci:
+```javascript
+@Service()
+class MyService {
+  MyServiceValue = "Hello";
+}
+
+abstract class ToExtends {
+  @Inject()
+  protected _myService: MyService;
+}
+
+@Service()
+class ExampleService extends ToExtends {
+}
+```
+Dans cet exemple `ExampleService` aura accès à la propriété `MyService` hérités de `ToExtends`.
+
 ### Récupération et ajout à la volée
 Vous pouvez récupérer et ajouter des instances de classe à la volée par l'objet [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) en utilisant les méthodes statiques:  
 _Récupération_

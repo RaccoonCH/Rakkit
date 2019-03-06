@@ -127,6 +127,25 @@ class B {
 }
 ```
 
+### Inheritance
+You can inherit your services from other services as well as from abstract class (or normal class) using injection so that your class inherits it:
+```javascript
+@Service()
+class MyService {
+  MyServiceValue = "Hello";
+}
+
+abstract class ToExtends {
+  @Inject()
+  protected _myService: MyService;
+}
+
+@Service()
+class ExampleService extends ToExtends {
+}
+```
+In this example `ExampleService` will have access to the `MyService` property inherited from `ToExtends`.
+
 ### Get and add at runtime
 You can retrieve and add class instances on the fly by the object [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) using static methods:  
 _Get_
