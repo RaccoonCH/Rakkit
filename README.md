@@ -43,7 +43,7 @@ The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 We want to integrate the use of GraphQL in a near future, like [type-graphql](https://github.com/19majkel94/type-graphql) does.
 
 ## 📠 Chat with us
-- [Discord](https://discord.gg/szRhf3C)
+- [Discord](https://discord.gg/McygUJb)
 - [Gitter](https://gitter.im/_rakkit_/community)
 
 ## 📔 The project history  
