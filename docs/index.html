@@ -14,7 +14,7 @@
 <body>
   <div id="app"></div>
   <script>
-    const basePath = '/Rakkit/site/'
+    const baseLink = '/Rakkit/'
     window.$docsify = {
       auto2top: true,
       executeScript: true,
@@ -27,7 +27,7 @@
       logo: './assets/logo.png',
       repo: 'https://github.com/raccoonch/rakkit',
       ga: 'UA-128796921-2',
-      basePath,
+      basePath: `${baseLink}site/`,
       alias: {
         '/fr/(.*)': '/langs/fr/$1',
         '/': '/GettingStarted'
@@ -52,7 +52,7 @@
         function (hook, vm) {
           hook.beforeEach(function (html) {
             if (vm.route.path === '/') {
-              document.location.replace(`${basePath}/#/GettingStarted`)
+              document.location.replace(`${baseLink}#/GettingStarted`)
             }
             var lang = vm.route.file.split('/')[1];
             if (/githubusercontent\.com/.test(vm.route.file)) {
