@@ -70,11 +70,11 @@ class ArrayReceiver {
 @Service()
 class SingleValueArrayReceiver {
   @Inject()
-  private _firstStorageInstance: Storage;
+  protected _firstStorageInstance: Storage;
   @Inject(type => Storage, 1)
-  private _secondStorageInstance: Storage[];
+  protected _secondStorageInstance: Storage[];
   @Inject(type => Storage, "a")
-  private _thirdStorageInstance: Storage[];
+  protected _thirdStorageInstance: Storage[];
 
   check() {
     expect(this._firstStorageInstance.prop).toBe("fr");
@@ -86,18 +86,54 @@ class SingleValueArrayReceiver {
 @Service()
 class ConstructorInjection {
   constructor(
-    private _firstStorageInstance: Storage,
+    protected _firstStorageInstance: Storage,
     @Inject(1)
-    private _secondStorageInstance: Storage,
+    protected _secondStorageInstance: Storage,
     s: string,
     @Inject("a")
-    private _thirdStorageInstance: Storage
+    protected _thirdStorageInstance: Storage
   ) {
   }
   check() {
     expect(this._firstStorageInstance.prop).toBe("fr");
     expect(this._secondStorageInstance.prop).toBe("sr");
     expect(this._thirdStorageInstance.prop).toBe("tr");
+  }
+}
+
+@Service()
+class ExtendingServiceConstructor extends ConstructorInjection {
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._secondStorageInstance.prop).toBe("sr");
+    expect(this._thirdStorageInstance.prop).toBe("tr");
+  }
+}
+
+@Service()
+class ExtendingService extends SingleValueArrayReceiver {
+  check() {
+    expect(this._firstStorageInstance.prop).toBe("fr");
+    expect(this._secondStorageInstance[0].prop).toBe("sr");
+    expect(this._thirdStorageInstance[0].prop).toBe("tr");
+  }
+}
+
+abstract class ToExtends1 {
+  @Inject()
+  protected _contructorInjection: ConstructorInjection;
+}
+
+abstract class ToExtends2 extends ToExtends1 {
+  @Inject()
+  protected _singleValueArrayReceiver: SingleValueArrayReceiver;
+}
+
+@Service()
+class DeepExtending extends ToExtends2 {
+  check() {
+    this._contructorInjection.check();
+    this._singleValueArrayReceiver.check();
   }
 }
 
@@ -203,5 +239,22 @@ describe("DI", async () => {
   it("should inject to constructor with semi circular", async () => {
     MetadataStorage.getService(CircularConstructorDi1Service, 1).check();
     MetadataStorage.getService(CircularConstructorDi2Service, 1).check();
+  });
+
+  it("should inject to constructor with semi circular", async () => {
+    MetadataStorage.getService(CircularConstructorDi1Service, 1).check();
+    MetadataStorage.getService(CircularConstructorDi2Service, 1).check();
+  });
+
+  it("should inject extends with constructor", async () => {
+    MetadataStorage.getService(ExtendingServiceConstructor).check();
+  });
+
+  it("should inject extends with property", async () => {
+    MetadataStorage.getService(ExtendingService).check();
+  });
+
+  it("should inject extends with deep injection", async () => {
+    MetadataStorage.getService(DeepExtending).check();
   });
 });

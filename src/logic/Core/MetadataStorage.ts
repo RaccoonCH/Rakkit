@@ -265,6 +265,7 @@ export class MetadataStorage {
 
   private buildInjections() {
     this._services.map((item) => {
+      this.extendsSuperclass(item.class);
       this.initializeInstance(item);
     });
     this._injections.map((item) => {
@@ -497,6 +498,24 @@ export class MetadataStorage {
     return Array.from(this._routers.values()).filter((router) =>
       router.params.path === path
     );
+  }
+
+  private extendsSuperclass(classType: Function) {
+    const superClass = Object.getPrototypeOf(classType);
+    if (superClass) {
+      this.extendsSuperclass(superClass);
+      const classInjections = this._injections.filter((injection) =>
+        injection.class === (superClass as Function)
+      );
+      const newInjections = classInjections.map<IDecorator<IInject>>((injection) => {
+        return {
+          class: classType,
+          key: injection.key,
+          params: injection.params
+        };
+      });
+      this._injections = this._injections.concat(newInjections);
+    }
   }
 
   /**
