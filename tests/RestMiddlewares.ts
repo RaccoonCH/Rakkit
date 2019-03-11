@@ -3,6 +3,10 @@ import { GlobalSecondBeforeMiddleware } from "./ClassesForTesting/Middlewares/Gl
 import { GlobalFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { GlobalSecondAfterMiddleware } from "./ClassesForTesting/Middlewares/Global/After/GlobalSecondAfterMiddleware";
 import { GlobalFirstAfterMiddleware } from "./ClassesForTesting/Middlewares/Global/After/GlobalFirstAfterMiddleware";
+import { AppSecondBeforeMiddleware } from "./ClassesForTesting/Middlewares/App/Before/AppSecondBeforeMiddleware";
+import { AppFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/App/Before/AppFirstBeforeMiddleware";
+import { AppSecondAfterMiddleware } from "./ClassesForTesting/Middlewares/App/After/AppSecondAfterMiddleware";
+import { AppFirstAfterMiddleware } from "./ClassesForTesting/Middlewares/App/After/AppFirstAfterMiddleware";
 import { Start } from "./Utils/Start";
 import { Rakkit, Router, UseMiddleware, Get, NextFunction, Context } from "../src";
 
@@ -12,6 +16,8 @@ const getMergedMiddlewareString = (...mwStrings: string[]) => {
 
 const getGenericMiddlewareString = (...mwStrings: string[]) => {
   return getMergedMiddlewareString(
+    "ab1",
+    "ab2",
     "gb1",
     "gb2",
     "rb1",
@@ -20,7 +26,9 @@ const getGenericMiddlewareString = (...mwStrings: string[]) => {
     "ra1",
     "ra2",
     "ga1",
-    "ga2"
+    "ga2",
+    "aa1",
+    "aa2"
   );
 };
 
@@ -50,6 +58,12 @@ describe("REST Middlewares", async () => {
 
   beforeAll(async () => {
     await Start({
+      appMiddlewares: [
+        AppFirstBeforeMiddleware,
+        AppSecondBeforeMiddleware,
+        AppFirstAfterMiddleware,
+        AppSecondAfterMiddleware
+      ],
       globalRestMiddlewares: [
         GlobalFirstBeforeMiddleware,
         GlobalFirstAfterMiddleware,
@@ -101,11 +115,24 @@ describe("REST Middlewares", async () => {
     );
   });
 
-  it("should merge 3 endpoints if it has the same endpoint and method and use middlewares with params", async () => {
+  it("should merge 2 endpoints that use different middlewares (different router)", async () => {
     const res = (await api.get("/merge-mw-2")).data;
     expect(res).toBe(
-      // Reseted at gb1 => real gb1;gb1;gb1
-      getMergedMiddlewareString("gb1", "1", "gb2", "2", "ga1", "ga1", "ga2")
+      getMergedMiddlewareString(
+        "ab1",
+        "ab2",
+        "gb1",
+        "gb2",
+        "gb1",
+        "1",
+        "gb2",
+        "2",
+        "ga1",
+        "ga1",
+        "ga2",
+        "aa1",
+        "aa2"
+      )
     );
   });
 });

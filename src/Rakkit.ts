@@ -3,7 +3,7 @@ import { createServer, Server } from "http";
 import * as SocketIo from "socket.io";
 import * as Koa from "koa";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig } from "./types";
+import { IAppConfig, MiddlewareType, MiddlewareExecutionTime } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
@@ -39,6 +39,7 @@ export class Rakkit extends AppLoader {
     this._config = {
       globalRestMiddlewares: this._config.globalRestMiddlewares || [],
       globalRootMiddlewares: this._config.globalRootMiddlewares || [],
+      appMiddlewares: this._config.appMiddlewares || [],
       host: this._config.host || "localhost",
       port: this._config.port || 4000,
       restEndpoint: this._config.restEndpoint === undefined ? "/rest" : config.restEndpoint,
@@ -131,9 +132,29 @@ export class Rakkit extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
+      this.loadAppMiddlewares(this._config.appMiddlewares);
       this._koaApp.use(MetadataStorage.Instance.Rest.MainRouter.routes());
+      this.loadAppMiddlewares(this._config.appMiddlewares, "AFTER");
       resolve();
     });
+  }
+
+  private loadAppMiddlewares(middlewares: MiddlewareType[], executionTime: MiddlewareExecutionTime = "BEFORE") {
+    const rest = MetadataStorage.Instance.Rest;
+    let allMiddlewares;
+    switch (executionTime) {
+      case "BEFORE":
+        allMiddlewares = rest.BeforeMiddlewares;
+        break;
+      case "AFTER":
+        allMiddlewares = rest.AfterMiddlewares;
+        break;
+    }
+    Rakkit.loadMiddlewares(
+      middlewares,
+      this._koaApp,
+      allMiddlewares
+    );
   }
 
   private startMessage(type: string, suffix: string) {

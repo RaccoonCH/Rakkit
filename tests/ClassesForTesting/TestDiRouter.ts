@@ -1,4 +1,4 @@
-import { EndpointFirstBeforeMiddleware } from "./Middlewares/Endpoint/BeforeMiddlewares/EndpointFirstBeforeMiddleware";
+import { EndpointFirstBeforeMiddleware } from "./Middlewares/Endpoint/Before/EndpointFirstBeforeMiddleware";
 import { RouterFirstBeforeMiddleware } from "./Middlewares/Router/Before/RouterFirstBeforeMiddleware";
 import { Router, Get, Inject, Context, UseMiddleware, NextFunction } from "../../src";
 import { TestService } from "./TestService";

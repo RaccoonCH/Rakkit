@@ -1,3 +1,5 @@
+import * as Koa from "koa";
+import * as KoaCompose from "koa-compose";
 import * as Router from "koa-router";
 import { sync as GlobSync } from "glob";
 import { HandlerFunctionHelper } from "../../logic";
@@ -11,11 +13,11 @@ import {
 export class AppLoader {
   static loadMiddlewares(
     middlewaresToLoad: MiddlewareType[],
-    router: Router,
+    router: Router | Koa,
     middlewares: ReadonlyMap<Object, HandlerFunction>
   ) {
     if (middlewaresToLoad) {
-      const mws = middlewaresToLoad.reduce((prev, curr) => {
+      const mws: HandlerFunction[] = middlewaresToLoad.reduce((prev, curr) => {
         const middleware = middlewares.get(curr);
         if (middleware) {
           return [
@@ -25,7 +27,7 @@ export class AppLoader {
         }
         return prev;
       }, []);
-      router.use(mws);
+      router.use(KoaCompose(mws));
     }
   }
 

@@ -1,7 +1,7 @@
-import { EndpointSecondBeforeMiddleware } from "./Middlewares/Endpoint/BeforeMiddlewares/EndpointSecondBeforeMiddleware";
-import { EndpointFirstBeforeMiddleware } from "./Middlewares/Endpoint/BeforeMiddlewares/EndpointFirstBeforeMiddleware";
-import { EndpointSecondAfterMiddleware } from "./Middlewares/Endpoint/AfterMiddlewares/EndpointSecondAfterMiddleware";
-import { EndpointFirstAfterMiddleware } from "./Middlewares/Endpoint/AfterMiddlewares/EndpointFirstAfterMiddleware";
+import { EndpointSecondBeforeMiddleware } from "./Middlewares/Endpoint/Before/EndpointSecondBeforeMiddleware";
+import { EndpointFirstBeforeMiddleware } from "./Middlewares/Endpoint/Before/EndpointFirstBeforeMiddleware";
+import { EndpointSecondAfterMiddleware } from "./Middlewares/Endpoint/After/EndpointSecondAfterMiddleware";
+import { EndpointFirstAfterMiddleware } from "./Middlewares/Endpoint/After/EndpointFirstAfterMiddleware";
 import { RouterSecondBeforeMiddleware } from "./Middlewares/Router/Before/RouterSecondBeforeMiddleware";
 import { RouterFirstBeforeMiddleware } from "./Middlewares/Router/Before/RouterFirstBeforeMiddleware";
 import { RouterSecondAfterMiddleware } from "./Middlewares/Router/After/RouterSecondAfterMiddleware";

@@ -15,4 +15,5 @@ export interface IAppConfig {
   websockets?: ClassOrString[];
   globalRestMiddlewares?: MiddlewareType[];
   globalRootMiddlewares?: MiddlewareType[];
+  appMiddlewares?: MiddlewareType[];
 }

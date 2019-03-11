@@ -22,7 +22,8 @@ export class RestBuilder extends MetadataBuilder {
   private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
   private _routers: Map<Function, IDecorator<IRouter>> = new Map();
   private _endpoints: IDecorator<IEndpoint>[] = [];
-  private _compiledRouter: ApiRouter = new ApiRouter();
+  private _mainRouter: ApiRouter = new ApiRouter();
+  private _restRouter: ApiRouter = new ApiRouter();
 
   get Middlewares() {
     return this._middlewares as ReadonlyMap<Object, IDecorator<IMiddleware>>;
@@ -37,7 +38,11 @@ export class RestBuilder extends MetadataBuilder {
   }
 
   get MainRouter() {
-    return this._compiledRouter as Readonly<ApiRouter>;
+    return this._mainRouter as Readonly<ApiRouter>;
+  }
+
+  get RestRouter() {
+    return this._restRouter as Readonly<ApiRouter>;
   }
 
   get Routers() {
@@ -65,7 +70,7 @@ export class RestBuilder extends MetadataBuilder {
         break;
       }
     });
-    let restRouter = new ApiRouter({
+    this._restRouter = new ApiRouter({
       prefix: Rakkit.Instance.Config.restEndpoint
     });
     this._endpoints.map((item) => {
@@ -103,7 +108,7 @@ export class RestBuilder extends MetadataBuilder {
       });
       item.params.middlewares = this.extractMiddlewares(mws);
       this.mountEndpointsToRouter(item);
-      restRouter.use(
+      this._restRouter.use(
         item.params.path,
         item.params.router.routes(),
         item.params.router.allowedMethods()
@@ -112,14 +117,14 @@ export class RestBuilder extends MetadataBuilder {
 
     const rootMiddlewares = Rakkit.Instance.Config.globalRootMiddlewares;
     const restMiddlewares = Rakkit.Instance.Config.globalRestMiddlewares;
-    restRouter = this.mountMiddlewaresToRouter(
+    this._restRouter = this.mountMiddlewaresToRouter(
       restMiddlewares,
-      restRouter
+      this._restRouter
     );
-    this._compiledRouter.use(restRouter.routes());
-    this._compiledRouter = this.mountMiddlewaresToRouter(
+    this._mainRouter.use(this._restRouter.routes());
+    this._mainRouter = this.mountMiddlewaresToRouter(
       rootMiddlewares,
-      this._compiledRouter
+      this._mainRouter
     );
   }
 
@@ -148,6 +153,14 @@ export class RestBuilder extends MetadataBuilder {
     this._endpoints.push(item);
   }
 
+  GetBeforeMiddlewares(middlewares: MiddlewareType[]) {
+    return this.getBeforeAfterMiddlewares(middlewares, "BEFORE");
+  }
+
+  GetAfterMiddlewares(middlewares: MiddlewareType[]) {
+    return this.getBeforeAfterMiddlewares(middlewares, "AFTER");
+  }
+
   private getUsedMiddlewares(endpoint: IDecorator<IEndpoint>) {
     return this._usedMiddlewares.filter((usedMw) => {
       return (
@@ -159,8 +172,8 @@ export class RestBuilder extends MetadataBuilder {
 
   private mountMiddlewaresToRouter(middlewares: MiddlewareType[], router: ApiRouter) {
     const tempRouter = new ApiRouter(router.opts);
-    const restBeforeMiddlewares = this.getBeforeMiddlewares(middlewares);
-    const restAfterMiddlewares = this.getAfterMiddlewares(middlewares);
+    const restBeforeMiddlewares = this.GetBeforeMiddlewares(middlewares);
+    const restAfterMiddlewares = this.GetAfterMiddlewares(middlewares);
     tempRouter.use(...restBeforeMiddlewares);
     tempRouter.use(router.prefix("/").routes());
     tempRouter.use(...restAfterMiddlewares);
@@ -169,36 +182,31 @@ export class RestBuilder extends MetadataBuilder {
   }
 
   private getBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
-    return middlewares.reduce<HandlerFunction[]>((arr, item) => {
-      let foundMiddleware = this._middlewares.get(item);
-      if (!foundMiddleware) {
-        foundMiddleware = {
-          class: item,
-          key: (item as HandlerFunction).name,
-          category: "rest",
-          params: {
-            executionTime: "BEFORE",
-            function: (item as HandlerFunction),
-            isClass: false
-          }
-        };
-      }
-      if (foundMiddleware.params.executionTime === beforeAfter) {
-        return [
-          ...arr,
-          foundMiddleware.params.function
-        ];
-      }
-      return arr;
-    }, []);
-  }
-
-  private getBeforeMiddlewares(middlewares: MiddlewareType[]) {
-    return this.getBeforeAfterMiddlewares(middlewares, "BEFORE");
-  }
-
-  private getAfterMiddlewares(middlewares: MiddlewareType[]) {
-    return this.getBeforeAfterMiddlewares(middlewares, "AFTER");
+    if (middlewares) {
+      return middlewares.reduce<HandlerFunction[]>((arr, item) => {
+        let foundMiddleware = this._middlewares.get(item);
+        if (!foundMiddleware) {
+          foundMiddleware = {
+            class: item,
+            key: (item as HandlerFunction).name,
+            category: "rest",
+            params: {
+              executionTime: "BEFORE",
+              function: (item as HandlerFunction),
+              isClass: false
+            }
+          };
+        }
+        if (foundMiddleware.params.executionTime === beforeAfter) {
+          return [
+            ...arr,
+            foundMiddleware.params.function
+          ];
+        }
+        return arr;
+      }, []);
+    }
+    return [];
   }
 
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
@@ -221,9 +229,9 @@ export class RestBuilder extends MetadataBuilder {
     const endpointUsedMiddlewares = this.getUsedMiddlewares(endpoint);
     const endpointMiddlewares = this.extractMiddlewares(endpointUsedMiddlewares);
     const compiledMergedEnpoint: Function[] = [
-      ...this.getBeforeMiddlewares(endpointMiddlewares),
+      ...this.GetBeforeMiddlewares(endpointMiddlewares),
       ...this.bindContext(endpoint, endpoint.params.functions),
-      ...this.getAfterMiddlewares(endpointMiddlewares)
+      ...this.GetAfterMiddlewares(endpointMiddlewares)
     ];
     return compiledMergedEnpoint;
   }
