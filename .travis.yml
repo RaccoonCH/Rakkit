@@ -3,7 +3,7 @@ jobs:
     - stage: test
       language: node_js
       node_js:
-        - 11
+        - 11.10.1
         - 10
       before_install:
         - npm i -g codecov
