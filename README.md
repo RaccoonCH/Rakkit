@@ -39,6 +39,7 @@ The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/))
 - Websocket app creation ([socket.io](https://socket.io/))
+
 ## 🔮 The next step
 We want to integrate the use of GraphQL in a near future, like [type-graphql](https://github.com/19majkel94/type-graphql) does.
 
