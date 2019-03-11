@@ -2,7 +2,7 @@ import { connect as SocketConnect } from "socket.io-client";
 import { Start } from "./Utils/Start";
 import { Rakkit } from "../src";
 
-describe("Websocket", async () => {
+describe("Websocket", () => {
   let socketConnection: SocketIOClient.Socket;
   let roomSocketConnection: SocketIOClient.Socket;
 

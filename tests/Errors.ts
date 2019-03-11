@@ -1,6 +1,6 @@
 import { Rakkit, Router, Websocket, On, Service, Inject, ArrayDiError } from "../src";
 
-describe("Error", async () => {
+describe("Error", () => {
   afterAll(async () => {
     await Rakkit.stop();
   });

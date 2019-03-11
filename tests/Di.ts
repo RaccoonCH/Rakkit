@@ -152,7 +152,7 @@ class ConstructorArrayInjection {
   }
 }
 
-describe("DI", async () => {
+describe("DI", () => {
   let api: AxiosInstance;
   let socketConnection: SocketIOClient.Socket;
 

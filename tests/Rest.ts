@@ -16,7 +16,7 @@ const getBody = (method: HttpMethod, param?: string, body?: boolean) => {
   };
 };
 
-describe("REST", async () => {
+describe("REST", () => {
   let api: AxiosInstance;
 
   beforeAll(async () => {

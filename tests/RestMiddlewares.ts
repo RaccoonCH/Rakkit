@@ -53,7 +53,7 @@ export class MergeMw2 {
   }
 }
 
-describe("REST Middlewares", async () => {
+describe("REST Middlewares", () => {
   let api: AxiosInstance;
 
   beforeAll(async () => {
