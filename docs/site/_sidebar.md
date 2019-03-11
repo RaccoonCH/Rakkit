@@ -4,7 +4,7 @@
 - **REST**
   - [Router](Router.md)
   - [Middleware](Middleware.md)
-  - [External Koa libs](MiddlewaresKoa.md)
+  - [External Koa modules](MiddlewaresKoa.md)
   - [Serving static files](ServingStaticFiles.md)
 - **Websocket**
   - [Websocket](Websocket.md)

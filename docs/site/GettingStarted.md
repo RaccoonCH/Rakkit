@@ -87,3 +87,4 @@ You can pass several parameters when starting the application in the `start` met
 | websockets | `ClassOrString[]?` | `undefined` | A list of paths representing the websockets files ([glob](https://github.com/isaacs/node-glob)) or a list of websockets classes |
 | globalRestMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware for l'api REST (class or functions) |
 | globalRootMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware for the root router (`"/"`) (class or functions) |
+| appMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware on the Koa application |

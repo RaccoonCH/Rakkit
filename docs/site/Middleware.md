@@ -6,10 +6,11 @@ This is **a function that is executed before another**, usually to modify the re
 - Middleware router
 - Global middleware at the REST `/rest` router level
 - Global middleware at the root router level `/`
+- App middleware (mostly used for koa modules)
 
 There are also **two modes of execution:**
-- Before the road
-- After the road
+- Before the route
+- After the route
 
 There are **two reporting modes**:
 - Based on a class (preferred)
@@ -23,8 +24,10 @@ It is important to know how middleware is encompassed by their parents:
 - Endpoint middleware wrapps endpoint
 - The middlewares router wrapps the endpoint middlewares
 - Global middleware wrapps router middleware
+- App middleware wrapps global middlewares
 
-This gives as an order (symmetrical / onion)::
+This gives as an order (symmetrical / onion):
+- **Before** <span style="color:violet">app</span> middleware
 - **Before** <span style="color:seagreen">global</span> middleware
 - **Before** <span style="color:dodgerblue">router</span> middleware
 - **Before** <span style="color:red">endpoint</span> middleware
@@ -32,6 +35,7 @@ This gives as an order (symmetrical / onion)::
 - **After** <span style="color:red">endpoint</span> middleware
 - **After** <span style="color:dodgerblue">router</span> middleware
 - **After** <span style="color:seagreen">global</span> middleware
+- **After** <span style="color:violet">app</span> middleware
 
 ### First of all, the next function
 - Works as the next function of [Koa](https://koajs.com) (or [Express](https://expressjs.com/fr/)).  
@@ -139,6 +143,20 @@ Rakkit.start({
     MyBeforeMiddleware,
     MySecondBeforeMiddleware,
     MyAfterMiddleware
+  ]
+});
+```
+
+#### AppMiddlewares
+It defines middleware directly on the instance of the Koa application and not on Koa-Router, this allows you for example to attach Koa modules.
+```javascript
+import * as Cors from "@koa/cors";
+import * as BodyParser from "koa-bodyparser";
+
+Rakkit.start({
+  appMiddlewares: [
+    Cors(),
+    BodyParser()
   ]
 });
 ```

@@ -147,14 +147,14 @@ class ExampleService extends ToExtends {
 In this example `ExampleService` will have access to the `MyService` property inherited from `ToExtends`.
 
 ### Get and add at runtime
-You can retrieve and add class instances on the fly by the object [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) using static methods:  
+You can retrieve and add class instances on the fly by the object [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) using methods:  
 _Get_
 ```javascript
-MetadataStorage.getService<ClassType>(classType: ClassType, id?: string | number);
+MetadataStorage.Instance.Di.getService<ClassType>(classType: ClassType, id?: string | number);
 ```
 _Add_
 ```javascript
-MetadataStorage.addAsService<ClassType>(classType: ClassType, id?: string | number);
+MetadataStorage.Instance.Di.addService<ClassType>(classType: ClassType, id?: string | number);
 ```
 
 ### Limitations

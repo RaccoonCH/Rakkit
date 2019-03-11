@@ -5,14 +5,16 @@ Vous devez simplement retenir que c'est lui qui gère les décorateurs, c'est vo
 
 Voici les propriétés disponibles et leurs descriptions via `MetadataStorage.Instance`, (Elle sont toutes en readonly):
 
-| Proptiété | Type | Description |
-| --- | --- | --- |
-| MainRouter | `ApiRouter` | Le routeur principale de l'application `/` |
-| BeforeMiddlewares | `Map<Object, HandlerFunction>` | Tous les `@BeforeMiddleware` |
-| AfterMiddlewares | `Map<Object, HandlerFunction>` | Tous les `@AfterMiddleware` |
-| Middlewares | `Map<Object, IDecorator<IMiddleware>>` | Tous les middlewares (`@AfterMiddleware` et `@BeforeMiddleware`) |
-| Routers | `ReadonlyMap<Object, IDecorator<IRouter>>` | Tous les `@Router` |
-| Endpoints | `Array<IDecorator<IEndpoint>>` | Tous les `@Endpoint` |
-| Ons | `Array<IDecorator<IOn>>` | Tous les `@On` |
-| Websockets | `Map<Object, IDecorator<IWebsocket>>` | Tous les `@Websocket` |
-| Services | `Array<IDecorator<IService<any>>>` | Tous les `@Service` |
+| Instance sujet | Proptiété | Type | Description |
+| --- | --- | --- | --- |
+| Rest | MainRouter | `ApiRouter` | Le routeur principale de l'application `/` |
+| Rest | RestRouter | `ApiRouter` | Le routeur de rest `/rest` par défaut |
+| Rest | BeforeMiddlewares | `Map<Object, HandlerFunction>` | Tous les `@BeforeMiddleware` |
+| Rest | AfterMiddlewares | `Map<Object, HandlerFunction>` | Tous les `@AfterMiddleware` |
+| Rest | Middlewares | `Map<Object, IDecorator<IMiddleware>>` | Tous les middlewares (`@AfterMiddleware` et `@BeforeMiddleware`) |
+| Rest | Routers | `ReadonlyMap<Object, IDecorator<IRouter>>` | Tous les `@Router` |
+| Rest | Endpoints | `Array<IDecorator<IEndpoint>>` | Tous les `@Endpoint` |
+| Ws | Ons | `Array<IDecorator<IOn>>` | Tous les `@On` |
+| Ws | Websockets | `Array<IDecorator<IWebsocket>>` | Tous les `@Websocket` |
+| Di | Services | `Array<IDecorator<IService<any>>>` | Tous les `@Service` |
+| Di | Injections | `Map<Object, IDecorator<IInject>>` | Tous les `@Inject` |

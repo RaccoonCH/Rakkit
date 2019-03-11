@@ -87,3 +87,4 @@ Vous pouvez passer plusieurs paramètres lors du démarrage de l'application dan
 | websockets | `ClassOrString[]?` | `undefined` | Une liste chemins représentants les fichiers de websockets ([glob](https://github.com/isaacs/node-glob)) ou une liste de classes de websockets
 | globalRestMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux pour l'api REST (classes ou fonctions)
 | globalRootMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux pour le router principal (`"/"`) (classes ou fonctions)
+| appMiddlewares | `MiddlewareType[]?` | `undefined` | Une liste de middlewares globaux sur l'application Koa

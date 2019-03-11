@@ -10,7 +10,8 @@ Decriptif des fichiers et de l'architecture:
 
 | Fichier / Dossier | Description |
 | --- | --- |
-| MetadataStorage.ts | Gère toute la logique des décorateurs et construit les objets à partir de leurs informations |
+| MetadataStorage.ts | Englobe tout les MetdataBuilders |
+| Builders | Gère toute la logique des décorateurs et construit les objets à partir de leurs informations |
 | Rakkit.ts | Initialise les serveurs et les dépendance externes (Koa, Socket.io) |
 | AppLoader | Tout ce qui conserne un chargement en mémoire ou de fichiers |
 | types | Contient tous les types / interfaces / classes abstraites / classes sans logiques particulières (Qui définissent un type) utilisées par Rakkit |

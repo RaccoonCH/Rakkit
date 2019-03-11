@@ -6,6 +6,7 @@ C'est **une fonction qui est executer avant une autre**, en général pour modif
 - Router middleware
 - Middleware global au niveau du router REST `/rest`
 - Middleware global au niveau du router racine `/`
+- App middleware (Plutôt utilisé pour les modules Koa)
 
 Il y'a également **deux modes d'execution**:
 - Avant la route
@@ -23,8 +24,10 @@ Il est important de savoir de savoir comment les middleware sont englobé par le
 - Les middlewares endpoint englobe le endpoint
 - Les middlewares router englobe les middlewares endpoint
 - Les middlewares globaux englobe les middlewares router
+- Les middlewares d'application englobe les middlewares globaux
 
 Cela donne comme ordre (symétrique / onion):
+- **Before** <span style="color:violet">app</span> middleware
 - **Before** <span style="color:seagreen">global</span> middleware
 - **Before** <span style="color:dodgerblue">router</span> middleware
 - **Before** <span style="color:red">endpoint</span> middleware
@@ -32,6 +35,7 @@ Cela donne comme ordre (symétrique / onion):
 - **After** <span style="color:red">endpoint</span> middleware
 - **After** <span style="color:dodgerblue">router</span> middleware
 - **After** <span style="color:seagreen">global</span> middleware
+- **After** <span style="color:violet">app</span> middleware
 
 ### Avant tout, La fonction next
 - Fonctionne comme la fonction next de [Koa](https://koajs.com) (ou [Express](https://expressjs.com/fr/)).  
@@ -139,6 +143,20 @@ Rakkit.start({
     MyBeforeMiddleware,
     MySecondBeforeMiddleware,
     MyAfterMiddleware
+  ]
+});
+```
+
+#### AppMiddlewares
+Il définit les middlewares directement sur l'instance de l'application Koa et non sur Koa-Router, cela vous permet, par exemple d'attacher des modules Koa.
+```javascript
+import * as Cors from "@koa/cors";
+import * as BodyParser from "koa-bodyparser";
+
+Rakkit.start({
+  appMiddlewares: [
+    Cors(),
+    BodyParser()
   ]
 });
 ```

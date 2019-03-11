@@ -10,7 +10,8 @@ Declarative of files and architecture:
 
 | File / Folder | Description |
 | --- | --- |
-| MetadataStorage.ts | Manages all the logic of decorators and builds objects from their information |
+| MetadataStorage.ts | Wrapps all MetadataBuilders |
+| Builders (MetatadataStorage) | Manages all the logic of decorators and builds objects from their information |
 | Rakkit.ts | Initializes servers and external dependencies (Koa, Socket.io) |
 | AppLoader.ts | Anything that involves loading into memory or files |
 | types | Contains all types / interfaces / abstract classes / classes without particular logic (which define a type) used by Rakkit |

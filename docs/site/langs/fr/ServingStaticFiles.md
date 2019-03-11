@@ -5,7 +5,7 @@ Pour l'utiliser vous aurez besoin de l'instance du router principale disponible 
 ```javascript
 import { Serve } from "static-koa-router";
 
-Serve(`${__dirname}/public`, MetadataStorage.Instance.MainRouter)
+Serve(`${__dirname}/public`, MetadataStorage.Instance.Rest.MainRouter)
 ```
 
 Vous pouvez également le monter sur un routeur que créer par vous même grâce à la librairie `koa-router`. Mais faite attention de ne pas empiter sur un router que vous auriez déclarer avec la même route.

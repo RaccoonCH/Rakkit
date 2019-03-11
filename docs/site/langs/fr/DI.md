@@ -147,14 +147,14 @@ class ExampleService extends ToExtends {
 Dans cet exemple `ExampleService` aura accès à la propriété `MyService` hérités de `ToExtends`.
 
 ### Récupération et ajout à la volée
-Vous pouvez récupérer et ajouter des instances de classe à la volée par l'objet [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) en utilisant les méthodes statiques:  
+Vous pouvez récupérer et ajouter des instances de classe à la volée par l'objet [MetadataStorage](http://localhost:3000/#/fr/MetadataStorage) en utilisant les méthodes:  
 _Récupération_
 ```javascript
-MetadataStorage.getService<ClassType>(classType: ClassType, id?: string | number);
+MetadataStorage.Instance.Di.getService<ClassType>(classType: ClassType, id?: string | number);
 ```
 _Ajout_
 ```javascript
-MetadataStorage.addAsService<ClassType>(classType: ClassType, id?: string | number);
+MetadataStorage.Instance.Di.addService<ClassType>(classType: ClassType, id?: string | number);
 ```
 
 ### Limitations

@@ -4,7 +4,7 @@
 - **REST**
   - [Routeur](fr/Router.md)
   - [Middleware](fr/Middleware.md)
-  - [Librairie externe pour Koa](fr/MiddlewaresKoa.md)
+  - [Modules externe pour Koa](fr/MiddlewaresKoa.md)
   - [Servir des fichiers statiques](fr/ServingStaticFiles.md)
 - **Websocket**
   - [Websocket](fr/Websocket.md)
