@@ -1,5 +1,6 @@
-import { MetadataStorage } from "../../logic";
+import { DecoratorHelper } from "../../logic";
+
 /**
  * Declare a middleware that execute the function before the endpoint method
  */
-export const BeforeMiddleware = MetadataStorage.getAddMiddlewareDecorator("BEFORE");
+export const BeforeMiddleware = DecoratorHelper.getAddMiddlewareDecorator("BEFORE");

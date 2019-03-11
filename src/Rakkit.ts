@@ -3,7 +3,7 @@ import { createServer, Server } from "http";
 import * as SocketIo from "socket.io";
 import * as Koa from "koa";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig, MiddlewareType, MiddlewareExecutionTime, HandlerFunction } from "./types";
+import { IAppConfig, MiddlewareType, MiddlewareExecutionTime } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {

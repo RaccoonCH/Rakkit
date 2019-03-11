@@ -1,6 +1,6 @@
-import { MetadataStorage } from "../../logic";
+import { DecoratorHelper } from "../../logic";
 
 /**
- * Declare a GET endpoint
+ * Declare a Get endpoint
  */
-export const Get = MetadataStorage.getAddEndpointDecorator("GET");
+export const Get = DecoratorHelper.getAddEndpointDecorator("GET");

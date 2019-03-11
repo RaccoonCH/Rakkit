@@ -1,6 +1,6 @@
-import { MetadataStorage } from "../../logic";
+import { DecoratorHelper } from "../../logic";
 
 /**
- * Declare a PUT endpoint
+ * Declare a Put endpoint
  */
-export const Put = MetadataStorage.getAddEndpointDecorator("PUT");
+export const Put = DecoratorHelper.getAddEndpointDecorator("PUT");
