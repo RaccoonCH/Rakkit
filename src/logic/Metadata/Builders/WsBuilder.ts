@@ -15,7 +15,7 @@ export class WsBuilder extends MetadataBuilder {
   }
 
   get Websockets() {
-    return this._websockets as ReadonlyMap<Object, IDecorator<IWebsocket>>;
+    return this._websockets as ReadonlyMap<Function, IDecorator<IWebsocket>>;
   }
 
   AddWebsocket(item: IDecorator<IWebsocket>) {

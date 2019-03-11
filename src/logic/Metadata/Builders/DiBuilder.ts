@@ -15,6 +15,14 @@ export class DiBuilder extends MetadataBuilder {
   private _services: IDecorator<IService<any>>[] = [];
   private _injections: IDecorator<IInject>[] = [];
 
+  get Services() {
+    return this._services as ReadonlyArray<IDecorator<IService<any>>>;
+  }
+
+  get Injections() {
+    return this._injections as ReadonlyArray<IDecorator<IInject>>;
+  }
+
   Build() {
     this._services.map((item) => {
       this.extendsSuperclass(item.class);

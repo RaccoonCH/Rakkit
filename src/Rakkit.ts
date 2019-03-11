@@ -3,7 +3,7 @@ import { createServer, Server } from "http";
 import * as SocketIo from "socket.io";
 import * as Koa from "koa";
 import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig, MiddlewareType, MiddlewareExecutionTime } from "./types";
+import { IAppConfig, MiddlewareType, MiddlewareExecutionTime, HandlerFunction } from "./types";
 import { Color } from "./misc";
 
 export class Rakkit extends AppLoader {
@@ -56,33 +56,40 @@ export class Rakkit extends AppLoader {
     this._httpServer = createServer(this._koaApp.callback());
   }
 
-  /**
-   * Start the application (Express, GraphQL, ...)
-   */
-  static async start(config?: IAppConfig): Promise<Rakkit> {
-    if (!this.Instance || config) {
+  static async start(config?: IAppConfig) {
+    if (!this._instance || config) {
       this._instance = new Rakkit(config);
     }
-
-    this.Instance.LoadControllers(this.Instance._config);
-    await MetadataStorage.Instance.BuildAll();
-
-    this.Instance.startAllServices();
-    return this.Instance;
+    return this._instance.start();
   }
 
   static async stop() {
-    if (this.Instance) {
-      if (this.Instance._socketio) {
-        await new Promise((resolve) => {
-          this.Instance._socketio.close(resolve);
-        });
-      }
+    if (this._instance) {
+      return this._instance.stop();
+    }
+  }
+
+  private async start() {
+    this.LoadControllers(this._config);
+    const rest = MetadataStorage.Instance.Rest;
+    rest.LoadAnonymousMiddlewares(this._config.globalRestMiddlewares);
+    rest.LoadAnonymousMiddlewares(this._config.globalRootMiddlewares);
+    rest.LoadAnonymousMiddlewares(this._config.appMiddlewares);
+    await MetadataStorage.Instance.BuildAll();
+    this.startAllServices();
+    return this;
+  }
+
+  private async stop() {
+    if (this._socketio) {
       await new Promise((resolve) => {
-        this.Instance._httpServer.close(resolve);
+        this._socketio.close(resolve);
       });
     }
-    return this._instance;
+    await new Promise((resolve) => {
+      this._httpServer.close(resolve);
+    });
+    return this;
   }
 
   private async startAllServices() {
