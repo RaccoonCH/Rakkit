@@ -36,6 +36,7 @@ yarn add rakkit
 The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 
 ## 🔨 Features (Fully typed, Class based & Decorators)  
+- **WIP**: GraphQL API creation
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/))
 - Websocket app creation ([socket.io](https://socket.io/))
@@ -54,4 +55,7 @@ Initially this tool was made in order to create a homemade Headless CMS. But as 
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
 
 ## 💪 Contributing  
-All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).
+All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).  
+
+Actual contributors:
+- Owen Calvin

@@ -24,6 +24,10 @@ export class MetadataStorage {
     return this._diMetadata;
   }
 
+  get Gql() {
+    return this._gqlMetadata;
+  }
+
   static get Instance() {
     if (!this._instance) {
       this._instance = new MetadataStorage();

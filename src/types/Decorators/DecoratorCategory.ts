@@ -1,1 +1,1 @@
-export type DecoratorCategory = "di" | "rest" | "ws";
+export type DecoratorCategory = "di" | "rest" | "ws" | "gql";

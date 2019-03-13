@@ -13,3 +13,10 @@ export * from "./Routing/UseMiddleware";
 
 export * from "./WS/On";
 export * from "./WS/Websocket";
+
+export * from "./Gql/ObjectType";
+export * from "./Gql/InputType";
+export * from "./Gql/ArgsType";
+export * from "./Gql/Resolver";
+export * from "./Gql/Query";
+export * from "./Gql/Field";

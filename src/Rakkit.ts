@@ -45,6 +45,7 @@ export class Rakkit extends AppLoader {
       restEndpoint: this._config.restEndpoint === undefined ? "/rest" : config.restEndpoint,
       routers: this._config.routers || [],
       websockets: this._config.websockets || [],
+      resolvers: this._config.resolvers || [],
       silent: this._config.silent || false,
       socketioOptions: this._config.socketioOptions || {}
     };

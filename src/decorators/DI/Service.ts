@@ -1,5 +1,7 @@
-import { MetadataStorage } from "../../logic";
-import { DiId } from "../../types";
+import {
+  MetadataStorage,
+  DiId
+} from "../..";
 
 /**
  * Declare a service that is a singleton, an instance is initialized and

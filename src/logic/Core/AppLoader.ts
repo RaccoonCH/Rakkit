@@ -34,6 +34,7 @@ export class AppLoader {
   LoadControllers(options: IAppConfig) {
     this.load(options.routers);
     this.load(options.websockets);
+    this.load(options.resolvers);
   }
 
   private load(items: ClassOrString[]) {

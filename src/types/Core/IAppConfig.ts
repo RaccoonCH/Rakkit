@@ -13,6 +13,7 @@ export interface IAppConfig {
   socketioOptions?: WsOptions;
   routers?: ClassOrString[];
   websockets?: ClassOrString[];
+  resolvers?: ClassOrString[];
   globalRestMiddlewares?: MiddlewareType[];
   globalRootMiddlewares?: MiddlewareType[];
   appMiddlewares?: MiddlewareType[];
