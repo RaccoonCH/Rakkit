@@ -7,7 +7,7 @@ export function ArgsType(): Function {
       key: target.name,
       category: "gql",
       params: {
-        type: "ArgsType"
+        gqlTypeName: "ArgsType"
       }
     });
   };

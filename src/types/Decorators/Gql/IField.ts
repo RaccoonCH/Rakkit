@@ -1,5 +1,5 @@
 export interface IField {
-  isArray: boolean;
   type: Function;
+  isArray: boolean;
   nullable: boolean;
 }

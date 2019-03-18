@@ -1,1 +1,6 @@
-export type GqlType = "ArgsType" | "InputType" | "ObjectType";
+export type GqlType =
+  "ArgsType" |
+  "InputType" |
+  "ObjectType" |
+  "Query" |
+  "Mutation";

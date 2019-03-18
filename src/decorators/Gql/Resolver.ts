@@ -7,6 +7,7 @@ export function Resolver(): Function {
       key: target.name,
       category: "gql",
       params: {
+        gqlTypeName: "Query"
       }
     });
   };

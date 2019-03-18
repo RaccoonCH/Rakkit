@@ -6,6 +6,10 @@ import {
 export abstract class MetadataBuilder {
   abstract Build(): void;
 
+  protected extractParams<DecoratorType = any>(items: IDecorator<DecoratorType>[]) {
+    return items.map((item) => item.params);
+  }
+
   protected bindContext(context: IDecorator<any>, fn: Function): Function;
   protected bindContext(context: IDecorator<any>, fns: Function[]): Function[];
   protected bindContext(context: IDecorator<any>, fnsOrFn: Function[] | Function) : Function[] | Function {

@@ -3,5 +3,5 @@ import {
 } from "../..";
 
 export interface IGqlType {
-  type: GqlType;
+  gqlTypeName: GqlType;
 }

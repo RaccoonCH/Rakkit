@@ -7,7 +7,7 @@ export function ObjectType(): Function {
       key: target.name,
       category: "gql",
       params: {
-        type: "ObjectType"
+        gqlTypeName: "ObjectType"
       }
     });
   };

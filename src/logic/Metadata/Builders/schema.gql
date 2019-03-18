@@ -1,0 +1,15 @@
+input ExampleInputType {
+  hello3: String
+}
+
+type ExampleObjectType {
+  hello: String
+}
+
+type ExampleObjectType2 {
+  hello2: String
+}
+
+type Query {
+  helloWorld: String
+}

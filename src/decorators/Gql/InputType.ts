@@ -7,7 +7,7 @@ export function InputType(): Function {
       key: target.name,
       category: "gql",
       params: {
-        type: "InputType"
+        gqlTypeName: "InputType"
       }
     });
   };
