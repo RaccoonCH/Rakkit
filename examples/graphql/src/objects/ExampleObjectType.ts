@@ -46,6 +46,23 @@ export class ExampleObjectType2<Type> extends ExampleObjectType0 implements Exam
   date: Date;
 }
 
+@GenericType()
+@ObjectType()
+export class Generic2<Type> {
+  @GenericField()
+  @Nullable()
+  @Deprecated("dasd")
+  field: Type[];
+
+  @GenericField()
+  field2: Type[];
+
+  @GenericField()
+  field3: Type[];
+}
+
+// const dsdf: Generic2<ExampleObjectType2<any>>;
+
 @InputType()
 export class ExampleInputType {
   @Field()

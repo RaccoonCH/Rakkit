@@ -28,9 +28,13 @@ import {
 } from "../../..";
 import { writeFile } from "fs";
 
+type Combination = {
+  objectType: IDecorator<IGqlType>;
+  field: IDecorator<IField>;
+};
+
 export class GqlBuilder extends MetadataBuilder {
   private _objectTypes: Map<Function | string, IDecorator<IGqlType>> = new Map();
-  private _generics: Map<string, IDecorator<IGqlType>> = new Map();
   private _fields: IDecorator<IField>[] = [];
   private _fieldSetters: IDecorator<Object>[] = [];
   private _objectTypeSetters: IDecorator<Object>[] = [];
@@ -91,41 +95,8 @@ export class GqlBuilder extends MetadataBuilder {
     this.writeSchemaFile();
   }
 
-  private getGenericName(ownerObjectType: IDecorator<IGqlType>, ...suffix: string[]) {
-    return [ownerObjectType.key, ...suffix].join("_");
-  }
-
-  private applyGenerics() {
-    this._fields.map((field) => {
-      if (field.params.generic) {
-        const ownerObjectType = this._objectTypes.get(field.class);
-        Array.from(this._objectTypes.values()).map((objectType) => {
-          if (
-            objectType.params.gqlTypeName === ownerObjectType.params.gqlTypeName &&
-            objectType.class !== ownerObjectType.class
-          ) {
-            const genericName = this.getGenericName(ownerObjectType, field.key, objectType.key);
-            const newGenericClass = {
-              ...ownerObjectType,
-              key: genericName,
-              params: {
-                ...ownerObjectType.params,
-                generic: false
-              }
-            };
-            this._objectTypes.set(genericName, newGenericClass);
-            this._fields.push({
-              ...field,
-              params: {
-                ...field.params,
-                generic: false,
-                type: () => genericName
-              }
-            });
-          }
-        });
-      }
-    });
+  private getGenericName(...strings: string[]) {
+    return strings.join("_");
   }
 
   private applyObjectTypeSetters() {
@@ -184,6 +155,56 @@ export class GqlBuilder extends MetadataBuilder {
       }
     });
     return [];
+  }
+
+  private permute(inputArray: any[]) {
+    const results = [];
+    const permuteFn = (arr: any[], m: any[] = []) => {
+      if (arr.length === 0) {
+        results.push(m);
+      } else {
+        for (let i = 0; i < arr.length; i++) {
+          const curr = arr.slice();
+          const next = curr.splice(i, 1);
+          permuteFn(curr.slice(), m.concat(next));
+        }
+      }
+    };
+    permuteFn(inputArray);
+    return results;
+  }
+
+  // TODO: GENERIC FUNC
+  private getAllFieldArrangements(fields: IDecorator<IField>[], objectTypes: IDecorator<IGqlType>[]) {
+    const allCombinations = fields.reduce((prev, field) => {
+      const combinations = objectTypes.map((objectType) => {
+        return [ objectType, field ];
+      });
+      return [
+        ...prev,
+        ...combinations
+      ];
+    }, []);
+    return allCombinations;
+  }
+
+  private applyGenerics() {
+    Array.from(this._objectTypes.values()).map((objectType, index) => {
+      if (objectType.params.generic) {
+        const genericObjectTypes = Array.from(this._objectTypes.values()).filter((genericObjectType) =>
+          genericObjectType.class !== objectType.class &&
+          genericObjectType.params.gqlTypeName === objectType.params.gqlTypeName
+        );
+        const genericFields = this._fields.filter((field) =>
+          field.params.generic && field.class === objectType.class
+        );
+        const arrangements = this.getAllFieldArrangements(
+          genericFields,
+          genericObjectTypes
+        );
+        console.log(arrangements);
+      }
+    });
   }
 
   private buildObjectTypes<GqlObjectType = GraphQLObjectType>(
@@ -274,15 +295,11 @@ export class GqlBuilder extends MetadataBuilder {
   ) {
     return () => {
       return this._fields.reduce((prev, field) => {
-        const genericTypeName = field.params.type();
-        const isGenericOkay = typeof genericTypeName === "string" ? objectType.key === genericTypeName : true;
+        const implementsField = interfaces.find((interfaceType) => interfaceType.class === field.class);
         if (
           !field.params.generic &&
-          isGenericOkay &&
-          (
-            field.class === objectType.class ||
-            interfaces.find((interfaceType) => interfaceType.class === field.class)
-          )
+          this.isObjectTypeParentOfField(objectType, field) ||
+          implementsField
         ) {
           const gqlField: GraphQLFieldConfig<any, any> = {
             type: this.parseTypeToGql(field),
@@ -336,6 +353,15 @@ export class GqlBuilder extends MetadataBuilder {
       finalType = GraphQLList(finalType);
     }
     return finalType;
+  }
+
+  private isObjectTypeParentOfField(objectType: IDecorator<IGqlType>, field: IDecorator<IField>) {
+    const fieldType = field.params.type();
+    const isStringType = typeof fieldType === "string";
+    if (isStringType) {
+      return objectType.key === fieldType;
+    }
+    return objectType.class === field.class;
   }
 
   private async writeSchemaFile() {
