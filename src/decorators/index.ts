@@ -20,3 +20,8 @@ export * from "./Gql/ArgsType";
 export * from "./Gql/Resolver";
 export * from "./Gql/Query";
 export * from "./Gql/Field";
+export * from "./Gql/Nullable";
+export * from "./Gql/Deprecated";
+export * from "./Gql/InterfaceType";
+export * from "./Gql/GenericType";
+export * from "./Gql/GenericField";

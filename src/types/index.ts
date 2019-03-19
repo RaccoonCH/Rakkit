@@ -19,6 +19,9 @@ export * from "./Decorators/Gql/IField";
 export * from "./Decorators/Gql/IGqlType";
 export * from "./Decorators/Gql/IQuery";
 export * from "./Decorators/Gql/IResolver";
+export * from "./Decorators/Gql/IDeprecation";
+export * from "./Decorators/Gql/INullable";
+export * from "./Decorators/Gql/IGeneric";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
 

@@ -9,3 +9,6 @@ export * from "./Metadata/Builders/GqlBuilder";
 
 export * from "./Helpers/HandlerFunctionHelper";
 export * from "./Helpers/DecoratorHelper";
+
+export * from "./Gql/Scalars/IsoDateTime";
+export * from "./Gql/Scalars/TimeStamp";

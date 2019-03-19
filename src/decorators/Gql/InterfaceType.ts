@@ -1,14 +1,13 @@
 import { MetadataStorage } from "../..";
 
-export function ObjectType(...interfaces: Function[]): Function {
+export function InterfaceType(): Function {
   return (target: Function): void => {
     MetadataStorage.Instance.Gql.AddType({
       class: target,
       key: target.name,
       category: "gql",
       params: {
-        gqlTypeName: "ObjectType",
-        interfaces: interfaces || [],
+        gqlTypeName: "InterfaceType",
         generic: false
       }
     });

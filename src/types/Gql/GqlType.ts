@@ -3,4 +3,5 @@ export type GqlType =
   "InputType" |
   "ObjectType" |
   "Query" |
-  "Mutation";
+  "Mutation" |
+  "InterfaceType";
