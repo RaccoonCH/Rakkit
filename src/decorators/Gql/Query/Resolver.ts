@@ -1,4 +1,4 @@
-import { MetadataStorage } from "../..";
+import { MetadataStorage } from "../../..";
 
 export function Resolver(): Function {
   return (target: Function): void => {
@@ -7,8 +7,8 @@ export function Resolver(): Function {
       key: target.name,
       category: "gql",
       params: {
-        generic: false,
-        gqlTypeName: "Query"
+        gqlTypeName: "Query",
+        name: "Query"
       }
     });
   };

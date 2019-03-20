@@ -1,9 +1,10 @@
 import {
   MetadataStorage,
   TypeFn
-} from "../..";
+} from "../../..";
 
 export function Field();
+export function Field(type: TypeFn);
 export function Field(description: string);
 export function Field(type: TypeFn, description: string);
 export function Field(typeOrDescription?: string | TypeFn, description?: string) {
@@ -19,12 +20,12 @@ export function Field(typeOrDescription?: string | TypeFn, description?: string)
       key,
       category: "gql",
       params: {
+        partial: false,
         type: finalType,
         description: definedDescription,
         deprecationReason: undefined,
         nullable: false,
-        isArray,
-        generic: false
+        isArray
       }
     });
   };

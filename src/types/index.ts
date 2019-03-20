@@ -21,7 +21,9 @@ export * from "./Decorators/Gql/IQuery";
 export * from "./Decorators/Gql/IResolver";
 export * from "./Decorators/Gql/IDeprecation";
 export * from "./Decorators/Gql/INullable";
-export * from "./Decorators/Gql/IGeneric";
+export * from "./Decorators/Gql/INotGenerated";
+export * from "./Decorators/Gql/INamed";
+export * from "./Decorators/Gql/IPartial";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
 

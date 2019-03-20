@@ -5,10 +5,10 @@ import {
 } from "graphql";
 import {
   GqlType,
-  IGeneric
+  INamed
 } from "../..";
 
-export interface IGqlType extends IGeneric {
+export interface IGqlType extends INamed {
   gqlTypeName: GqlType;
   compiled?: GraphQLInputType | GraphQLInputObjectType | GraphQLObjectType | {};
   interfaces?: Function[];

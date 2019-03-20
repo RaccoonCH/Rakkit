@@ -25,7 +25,7 @@ type ExampleObjectType0 {
   hello0: String!
 }
 
-type ExampleObjectType2_generic_ExampleResolver implements ExampleInterfaceType & ExampleInterfaceType2 {
+type ExampleObjectType2 implements ExampleInterfaceType & ExampleInterfaceType2 {
   hello3: String!
   hello4: String!
 
@@ -35,10 +35,18 @@ type ExampleObjectType2_generic_ExampleResolver implements ExampleInterfaceType 
   hello0: String!
 }
 
-type Generic2_field3_ExampleResolver_field2_ExampleResolver_field_ExampleResolver {
-
+type PartialExampleObjectType {
+  hello: String
 }
 
 type Query {
   helloWorld: String!
+  helloWorlsd: String!
+}
+
+type ResponseExampleObjectTypeExampleObjectType0 implements ExampleInterfaceType & ExampleInterfaceType2 {
+  hello3: String!
+  hello4: String!
+  items: [PartialExampleObjectType]
+  items2: ExampleObjectType0!
 }

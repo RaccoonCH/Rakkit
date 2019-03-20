@@ -1,4 +1,4 @@
-import { MetadataStorage } from "../..";
+import { MetadataStorage } from "../../..";
 
 export function Query() {
   return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
@@ -8,7 +8,7 @@ export function Query() {
       key,
       category: "gql",
       params: {
-        generic: false,
+        partial: false,
         function: descriptor.value,
         deprecationReason: undefined,
         type: baseType,

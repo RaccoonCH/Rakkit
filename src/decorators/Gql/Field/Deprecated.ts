@@ -1,7 +1,7 @@
 import {
   MetadataStorage,
   IDeprecation
-} from "../..";
+} from "../../..";
 
 export function Deprecated(reason?: string) {
   return (target: Object, key: string): void => {

@@ -1,16 +1,16 @@
 import {
   MetadataStorage,
-  INullable
-} from "../..";
+  IPartial
+} from "../../..";
 
-export function Nullable() {
+export function Partial() {
   return (target: Object, key: string): void => {
-    MetadataStorage.Instance.Gql.AddFieldSetter<INullable>({
+    MetadataStorage.Instance.Gql.AddFieldSetter<IPartial>({
       class: target.constructor,
       key,
       category: "gql",
       params: {
-        nullable: true
+        partial: true
       }
     });
   };
