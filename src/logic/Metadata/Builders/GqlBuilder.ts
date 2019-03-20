@@ -96,7 +96,7 @@ export class GqlBuilder extends MetadataBuilder {
   }
 
   private getGenericName(...strings: string[]) {
-    return strings.join("_");
+    return strings.filter((str) => str !== "").join("_");
   }
 
   private applyObjectTypeSetters() {
@@ -157,23 +157,6 @@ export class GqlBuilder extends MetadataBuilder {
     return [];
   }
 
-  private permute(inputArray: any[]) {
-    const results = [];
-    const permuteFn = (arr: any[], m: any[] = []) => {
-      if (arr.length === 0) {
-        results.push(m);
-      } else {
-        for (let i = 0; i < arr.length; i++) {
-          const curr = arr.slice();
-          const next = curr.splice(i, 1);
-          permuteFn(curr.slice(), m.concat(next));
-        }
-      }
-    };
-    permuteFn(inputArray);
-    return results;
-  }
-
   // TODO: GENERIC FUNC
   private getAllFieldArrangements(fields: IDecorator<IField>[], objectTypes: IDecorator<IGqlType>[]) {
     const allCombinations = fields.reduce((prev, field) => {
@@ -189,21 +172,60 @@ export class GqlBuilder extends MetadataBuilder {
   }
 
   private applyGenerics() {
-    Array.from(this._objectTypes.values()).map((objectType, index) => {
+    const arrange = (objectType: IDecorator<IGqlType>, fields: IDecorator<IField>[]) => {
+      const result: any[][][] = [];
+      const depth = fields.length;
+      const arrangeFn = (actualDepth: number, lastCombinations: any[][] = []) => {
+        fields.map((field) => {
+          Array.from(this._objectTypes.values()).map((genericObjectType) => {
+            const fieldExistsInCombinations = lastCombinations.find((combination) => combination.includes(field));
+            if (
+              objectType !== genericObjectType &&
+              genericObjectType.params.gqlTypeName !== objectType.params.gqlTypeName &&
+              !fieldExistsInCombinations
+            ) {
+              const newCombinations: any[][] = [...lastCombinations, [
+                genericObjectType,
+                field
+              ]];
+              if (actualDepth > 1) {
+                arrangeFn(actualDepth - 1, newCombinations);
+              } else {
+                result.push(newCombinations);
+              }
+            }
+          });
+        });
+      };
+      arrangeFn(depth, []);
+      return result;
+    };
+
+    const objectTypeWithGenericFields: Map<IDecorator<IGqlType>, IDecorator<IField>[]> = new Map();
+    Array.from(this._objectTypes.values()).map((objectType) => {
       if (objectType.params.generic) {
-        const genericObjectTypes = Array.from(this._objectTypes.values()).filter((genericObjectType) =>
-          genericObjectType.class !== objectType.class &&
-          genericObjectType.params.gqlTypeName === objectType.params.gqlTypeName
-        );
         const genericFields = this._fields.filter((field) =>
-          field.params.generic && field.class === objectType.class
+          field.class === objectType.class &&
+          field.params.generic
         );
-        const arrangements = this.getAllFieldArrangements(
-          genericFields,
-          genericObjectTypes
-        );
-        console.log(arrangements);
+        objectTypeWithGenericFields.set(objectType, genericFields);
       }
+    });
+    Array.from(objectTypeWithGenericFields).map(([objectType, fields]) => {
+      const allArrangements = arrange(objectType, fields);
+      allArrangements.map((fieldTypeArrangements) => {
+        const pathName = fieldTypeArrangements.reduce((prev, fieldWithType) => {
+          const fieldType: IDecorator<IGqlType> = fieldWithType[0];
+          const field: IDecorator<IField> = fieldWithType[1];
+          return this.getGenericName(prev, field.key, fieldType.key);
+        }, "");
+        const objectTypePathName = this.getGenericName(objectType.key, pathName);
+        objectTypePathName;
+        const newObjectType = { ...objectType };
+        newObjectType.key = objectTypePathName;
+        newObjectType.params.generic = false;
+        this._objectTypes.set(objectType.class, newObjectType);
+      });
     });
   }
 
