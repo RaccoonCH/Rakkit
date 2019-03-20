@@ -7,15 +7,15 @@ import {
 
 export class DecoratorHelper {
   static getAddTypeDecorator(gqlTypeName: GqlType) {
-    return () => {
+    return (name?: string) => {
       return (target: Function): void => {
-        this.getAddTypeFunction(target, gqlTypeName);
+        this.getAddTypeFunction(target, gqlTypeName, name);
       };
     };
   }
 
-  static getAddTypeFunction(target: Function, gqlTypeName: GqlType, interfaces: Function[] = []) {
-    const name = target.name;
+  static getAddTypeFunction(target: Function, gqlTypeName: GqlType, name?: string, interfaces: Function[] = []) {
+    const definedName = name || target.name;
     MetadataStorage.Instance.Gql.AddType({
       class: target,
       key: name,
@@ -23,7 +23,7 @@ export class DecoratorHelper {
       params: {
         interfaces,
         gqlTypeName,
-        name
+        name: definedName
       }
     });
   }

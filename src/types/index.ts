@@ -24,8 +24,14 @@ export * from "./Decorators/Gql/INullable";
 export * from "./Decorators/Gql/INotGenerated";
 export * from "./Decorators/Gql/INamed";
 export * from "./Decorators/Gql/IPartial";
+export * from "./Decorators/Gql/IInterface";
+export * from "./Decorators/Gql/IRequired";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
+
+export * from "./DecoratorsParams/Gql/IFieldParams";
+export * from "./DecoratorsParams/Gql/IGqlTypeParams";
+export * from "./DecoratorsParams/Gql/IObjectTypeParams";
 
 export * from "./REST/HttpMethod";
 

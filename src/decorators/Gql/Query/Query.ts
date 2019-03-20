@@ -9,6 +9,7 @@ export function Query() {
       category: "gql",
       params: {
         partial: false,
+        required: false,
         function: descriptor.value,
         deprecationReason: undefined,
         type: baseType,

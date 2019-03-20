@@ -1,10 +1,11 @@
 import {
   INullable,
   IDeprecation,
-  IPartial
+  IPartial,
+  IRequired
 } from "../..";
 
-export interface IField extends INullable, IDeprecation, IPartial {
+export interface IField extends INullable, IDeprecation, IPartial, IRequired {
   type: Function;
   isArray?: boolean;
   description?: string;

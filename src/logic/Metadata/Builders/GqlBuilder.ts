@@ -31,13 +31,20 @@ import {
 export class GqlBuilder extends MetadataBuilder {
   private _objectTypes: Map<Function, IDecorator<IGqlType>> = new Map();
   private _fields: IDecorator<IField>[] = [];
-  private _fieldSetters: IDecorator<Object>[] = [];
-  private _objectTypeSetters: IDecorator<Object>[] = [];
-
+  private _fieldSetters: IDecorator<Object | Function>[] = [];
+  private _objectTypeSetters: IDecorator<Object | Function>[] = [];
   private _schema: GraphQLSchema;
 
   get Schema() {
     return this._schema;
+  }
+
+  get ObjectTypes() {
+    return this._objectTypes as ReadonlyMap<Function, IDecorator<IGqlType>>;
+  }
+
+  get Fields() {
+    return this._fields as ReadonlyArray<IDecorator<IField>>;
   }
 
   AddType(item: IDecorator<IGqlType>) {
@@ -70,13 +77,16 @@ export class GqlBuilder extends MetadataBuilder {
     this.applyObjectTypeSetters();
     this.applyFieldSetters();
     this.applyPartials();
+    this.applyRequired();
     this.applyIhneritance();
+
     const interfaceTypes = this.buildObjectTypes<GraphQLInterfaceType>("InterfaceType");
     const inputTypes = this.buildObjectTypes<GraphQLInputObjectType>("InputType");
     const objectTypes = this.buildObjectTypes("ObjectType");
-    // const argsTypes = this.buildObjectTypes("ArgsType", true);
+    // const argsTypes = this.buildObjectTypes("ArgsType");
     const mutation = this.buildObjectTypes("Mutation")[0];
     const query = this.buildObjectTypes("Query")[0];
+
     const types = [
       ...interfaceTypes,
       ...inputTypes,
@@ -119,9 +129,10 @@ export class GqlBuilder extends MetadataBuilder {
     this._objectTypeSetters.map((setter) => {
       const objectType = this._objectTypes.get(setter.class);
       if (objectType) {
+        const params = this.getSetterParams(setter, objectType);
         objectType.params = {
           ...objectType.params,
-          ...setter.params
+          ...params
         };
       }
     });
@@ -136,60 +147,12 @@ export class GqlBuilder extends MetadataBuilder {
         );
       });
       if (field) {
+        const params = this.getSetterParams(setter, field);
         field.params = {
           ...field.params,
-          ...setter.params
+          ...params
         };
       }
-    });
-  }
-
-  private applyPartials() {
-    const getPartialName = (name: string) => {
-      return `Partial${name}`;
-    };
-    const partialClasses: Map<string, Function> = new Map();
-    const partialTypes = this._fields.reduce<IDecorator<IGqlType>[]>((prev, field) => {
-      if (field.params.partial) {
-        const fieldType: Function = field.params.type();
-        const fieldObjectType = this._objectTypes.get(fieldType);
-        if (fieldObjectType && !prev.includes(fieldObjectType)) {
-          const partialName = getPartialName(fieldType.name);
-          const partialClass = () => partialName;
-          partialClasses.set(partialName, partialClass);
-          field.params.type = () => partialClass;
-          prev.push(fieldObjectType);
-        }
-      }
-      return prev;
-    }, []);
-    partialTypes.map((partial) => {
-      const partialName = getPartialName(partial.params.name);
-      const partialClass = partialClasses.get(partialName);
-      const newPartial: IDecorator<IGqlType> = {
-        ...partial,
-        class: partialClass,
-        key: partialName,
-        params: {
-          ...partial.params,
-          name: partialName
-        }
-      };
-      this._objectTypes.set(partialClass, newPartial);
-      this._fields.map((field) => {
-        if (field.class === partial.class) {
-          const partialField: IDecorator<IField> = {
-            ...field,
-            class: partialClass,
-            params: {
-              ...field.params,
-              partial: false,
-              nullable: true
-            }
-          };
-          this._fields.push(partialField);
-        }
-      });
     });
   }
 
@@ -220,6 +183,66 @@ export class GqlBuilder extends MetadataBuilder {
       }
     });
     return [];
+  }
+
+  private applyPartials() {
+    this.applyChildFieldsTransformation("partial", {
+      partial: false,
+      nullable: true
+    });
+  }
+
+  private applyRequired() {
+    this.applyChildFieldsTransformation("required", {
+      required: false,
+      nullable: false
+    });
+  }
+
+  private applyChildFieldsTransformation(transformKey: keyof IField, transformation: Partial<IField>) {
+    const prefix = transformKey.charAt(0).toUpperCase() + transformKey.slice(1);
+    const classes: Map<string, Function> = new Map();
+    const types = this._fields.reduce<IDecorator<IGqlType>[]>((prev, field) => {
+      if (field.params[transformKey]) {
+        const fieldType: Function = field.params.type();
+        const fieldObjectType = this._objectTypes.get(fieldType);
+        if (fieldObjectType && !prev.includes(fieldObjectType)) {
+          const name = this.prefix(prefix, fieldObjectType.params.name);
+          const classType = () => name;
+          classes.set(name, classType);
+          field.params.type = () => classType;
+          prev.push(fieldObjectType);
+        }
+      }
+      return prev;
+    }, []);
+    types.map((type) => {
+      const name = this.prefix(prefix, type.params.name);
+      const classType = classes.get(name);
+      const newType: IDecorator<IGqlType> = {
+        ...type,
+        class: classType,
+        key: name,
+        params: {
+          ...type.params,
+          name
+        }
+      };
+      this._objectTypes.set(classType, newType);
+      this._fields.map((field) => {
+        if (field.class === type.class) {
+          const newField: IDecorator<IField> = {
+            ...field,
+            class: classType,
+            params: {
+              ...field.params,
+              ...transformation
+            }
+          };
+          this._fields.push(newField);
+        }
+      });
+    });
   }
 
   private buildObjectTypes<GqlObjectType = GraphQLObjectType>(
@@ -365,5 +388,17 @@ export class GqlBuilder extends MetadataBuilder {
         }
       });
     });
+  }
+
+  private prefix(prefix: string, suffix: string) {
+    return prefix + suffix;
+  }
+
+  private getSetterParams(setter: IDecorator<Object | Function>, current: IDecorator<any>) {
+    let params = setter.params;
+    if (typeof params === "function") {
+      params = (setter.params as Function)(current);
+    }
+    return params;
   }
 }
