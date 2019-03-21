@@ -1,15 +1,18 @@
+import { GraphQLFieldConfig } from "graphql";
 import {
-  INullable,
   IDeprecation,
   IPartial,
   IRequired,
-  IQuery
+  IQuery,
+  IHasType
 } from "../..";
-import { GraphQLFieldConfig } from 'graphql';
 
-export interface IField extends INullable, IDeprecation, IPartial, IRequired, IQuery {
-  type: Function;
-  isArray?: boolean;
+export interface IField extends
+  IHasType,
+  IDeprecation,
+  IPartial,
+  IRequired,
+  IQuery {
   description?: string;
   compiled?: GraphQLFieldConfig<any, any>;
 }

@@ -8,8 +8,7 @@ export function Query() {
       key,
       category: "gql",
       params: {
-        flatArgs: false,
-        args: () => Reflect.getMetadata("design:paramtypes", target, key)[0],
+        args: [],
         partial: false,
         required: false,
         function: descriptor.value,

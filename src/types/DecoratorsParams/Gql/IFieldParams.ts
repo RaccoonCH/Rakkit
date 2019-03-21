@@ -9,5 +9,4 @@ export interface IFieldParams extends
   Partial<INullable>,
   Partial<IDeprecation>,
   Partial<IRequired>,
-  Partial<IPartial>
-{}
+  Partial<IPartial> {}

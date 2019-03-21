@@ -26,7 +26,8 @@ import {
   MetadataStorage,
   GqlType,
   GraphQLISODateTime,
-  IParam
+  IParam,
+  IHasType
 } from "../../..";
 
 export class GqlBuilder extends MetadataBuilder {
@@ -37,7 +38,7 @@ export class GqlBuilder extends MetadataBuilder {
   private _objectTypeSetters: IDecorator<Object | Function>[] = [];
   private _schema: GraphQLSchema;
 
-  get _objectTypesList() {
+  private get _objectTypesList() {
     return Array.from(this._objectTypes.values());
   }
 
@@ -352,7 +353,7 @@ export class GqlBuilder extends MetadataBuilder {
           implementsField
         ) {
           const gqlField: GraphQLFieldConfig<any, any> = {
-            type: this.parseTypeToGql(field),
+            type: this.parseTypeToGql(field.params),
             deprecationReason: field.params.deprecationReason,
             description: field.params.description
           };
@@ -370,9 +371,9 @@ export class GqlBuilder extends MetadataBuilder {
    * Get the type of a field based on his defined app type
    * @param field The field to get the type
    */
-  private parseTypeToGql(field: IDecorator<IField>): GraphQLOutputType {
+  private parseTypeToGql(typed: IHasType): GraphQLOutputType {
     let finalType: GraphQLOutputType = undefined;
-    const baseType = field.params.type();
+    const baseType = typed.type();
     const relation = this._objectTypes.get(baseType);
     if (relation) {
       finalType = relation.params.compiled as GraphQLOutputType;
@@ -391,10 +392,10 @@ export class GqlBuilder extends MetadataBuilder {
         finalType = GraphQLISODateTime;
         break;
     }
-    if (!field.params.nullable) {
+    if (!typed.nullable) {
       finalType = GraphQLNonNull(finalType);
     }
-    if (field.params.isArray) {
+    if (typed.isArray) {
       finalType = GraphQLList(finalType);
     }
     return finalType;
@@ -410,29 +411,25 @@ export class GqlBuilder extends MetadataBuilder {
   ) {
     if (field.params.function) {
       if (field.params.args) {
-        const argsType = field.params.args();
-        if (!field.params.flatArgs) {
-          const objectType = this._objectTypes.get(argsType);
-          if (objectType) {
-            const args: GraphQLFieldConfigArgumentMap = {
-              [objectType.params.name]: {
-                type: objectType.params.compiled as GraphQLInputType
+        const argMap = field.params.args.reduce<GraphQLFieldConfigArgumentMap>((prev, arg) => {
+          const argType = arg.type();
+          const objectType = this._objectTypes.get(argType);
+          if (arg.flat || (objectType && objectType.params.gqlTypeName === "ObjectType")) {
+            this._fields.map((field) => {
+              if (field.class === objectType.class) {
+                prev[field.key] = {
+                  type: this.parseTypeToGql(field.params) as GraphQLInputType
+                };
               }
+            });
+          } else {
+            prev[arg.name] = {
+              type: this.parseTypeToGql(arg) as GraphQLInputType
             };
-            gqlField.args = args;
           }
-        } else {
-          const fieldType = field.params.type();
-          const argMap = this._fields.reduce<GraphQLFieldConfigArgumentMap>((prev, argField) => {
-            if (fieldType === argField.class) {
-              prev[argField.key] = {
-                type: this.parseTypeToGql(argField) as GraphQLInputType
-              };
-            }
-            return prev;
-          }, {});
-          gqlField.args = argMap;
-        }
+          return prev;
+        }, {});
+        gqlField.args = argMap;
       }
       if (!gqlField.args) {
         // TODO
@@ -486,5 +483,19 @@ export class GqlBuilder extends MetadataBuilder {
 
   private prefix(prefix: string, suffix: string) {
     return prefix + suffix;
+  }
+
+  private getObjectTypes(classType: Function, name?: string, gqlTypeName?: GqlType) {
+    return this._objectTypesList.filter((objectType) => {
+      return (
+        objectType.class === classType &&
+        name ? objectType.params.name === name : true &&
+        gqlTypeName ? objectType.params.gqlTypeName === gqlTypeName : true
+      );
+    });
+  }
+
+  private getOneObjectType(classType: Function, gqlTypeName?: GqlType) {
+    return this.getObjectTypes(classType, gqlTypeName)[0];
   }
 }

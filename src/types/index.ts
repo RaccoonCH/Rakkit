@@ -26,13 +26,18 @@ export * from "./Decorators/Gql/INamed";
 export * from "./Decorators/Gql/IPartial";
 export * from "./Decorators/Gql/IInterface";
 export * from "./Decorators/Gql/IRequired";
+export * from "./Decorators/Gql/IArg";
 export * from "./Decorators/Gql/IParam";
+export * from "./Decorators/Gql/IIsArray";
+export * from "./Decorators/Gql/IHasType";
+export * from "./Decorators/Gql/IFlat";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
 
 export * from "./DecoratorsParams/Gql/IFieldParams";
 export * from "./DecoratorsParams/Gql/IGqlTypeParams";
 export * from "./DecoratorsParams/Gql/IObjectTypeParams";
+export * from "./DecoratorsParams/Gql/IArgParams";
 
 export * from "./REST/HttpMethod";
 

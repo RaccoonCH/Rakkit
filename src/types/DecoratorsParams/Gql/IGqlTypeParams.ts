@@ -3,5 +3,4 @@ import {
 } from "../..";
 
 export interface IGqlTypeParams extends
-  Partial<INamed>
-{}
+  Partial<INamed> {}

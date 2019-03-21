@@ -5,5 +5,4 @@ import {
 
 export interface IObjectTypeParams extends
   IGqlTypeParams,
-  Partial<IInterface>
-{}
+  Partial<IInterface> {}
