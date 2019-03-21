@@ -18,7 +18,7 @@ export class ExampleResolver3 {
   @Query()
   helloWorlsd(
     @Args()
-    args: ExampleInputType,
+    args: String,
     context
   ): ExampleObjectType {
     ExampleObjectType;

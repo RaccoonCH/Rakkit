@@ -434,6 +434,9 @@ export class GqlBuilder extends MetadataBuilder {
           gqlField.args = argMap;
         }
       }
+      if (!gqlField.args) {
+        // TODO
+      }
       gqlField.resolve = async (root, args, context, info) => {
         return await this.bindContext(
           field,
