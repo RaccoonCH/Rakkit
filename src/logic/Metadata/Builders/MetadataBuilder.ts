@@ -36,4 +36,23 @@ export abstract class MetadataBuilder {
     }
     return finalPath;
   }
+
+  protected copyDecoratorType<DecoratorType>(
+    decoratorType: IDecorator<DecoratorType>,
+    changes?: Partial<IDecorator<Partial<DecoratorType>>>
+  ): IDecorator<DecoratorType> {
+    let definedChanges = changes;
+    if (!definedChanges) {
+      definedChanges = {};
+      definedChanges.params = {};
+    }
+    return {
+      ...decoratorType,
+      ...(changes || {}),
+      params: {
+        ...decoratorType.params,
+        ...definedChanges.params
+      }
+    };
+  }
 }

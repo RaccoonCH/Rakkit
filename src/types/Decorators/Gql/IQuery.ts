@@ -1,5 +1,3 @@
-import { IField } from "./IField";
-
-export interface IQuery extends IField {
+export interface IQuery {
   function: Function;
 }

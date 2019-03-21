@@ -6,13 +6,13 @@ export class ExampleInputType {
   hello3: string;
 }
 
-@ObjectType("ak")
+@ObjectType()
 export class ExampleObjectType0 {
   @Field()
   hello0: string;
 }
 
-@ObjectType("psoap")
+@ObjectType()
 export class ExampleObjectType {
   @Field({ nullable: true, partial: true })
   hello: string;

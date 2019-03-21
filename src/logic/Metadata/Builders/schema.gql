@@ -4,19 +4,15 @@ input aaa {
   hello3: String!
 }
 
-type ak {
-  hello0: String!
-}
-
 interface asd {
   hello4: String!
 }
 
-type cacapsoapak implements dsss & asd {
+type caca implements dsss & asd {
   hello3: String!
   hello4: String!
-  items: [Requiredpsoap]
-  items2: ak!
+  items: [RequiredExampleObjectType]
+  items2: ExampleObjectType0!
 }
 
 """
@@ -28,16 +24,20 @@ interface dsss {
   hello3: String!
 }
 
-type ExampleObjectType2 implements dsss & asd {
-  hello3: String!
-  hello4: String!
-  hello2: psoap
-  date: DateTime!
+type ExampleObjectType {
+  hello: String
+}
+
+type ExampleObjectType0 {
   hello0: String!
 }
 
-type psoap {
-  hello: String
+type ExampleObjectType2 implements dsss & asd {
+  hello3: String!
+  hello4: String!
+  hello2: ExampleObjectType
+  date: DateTime!
+  hello0: String!
 }
 
 type Query {
@@ -45,6 +45,6 @@ type Query {
   helloWorlsd: String!
 }
 
-type Requiredpsoap {
+type RequiredExampleObjectType {
   hello: String!
 }

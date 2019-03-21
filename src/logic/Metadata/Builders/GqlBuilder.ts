@@ -1,6 +1,5 @@
 import { writeFile } from "fs";
 import {
-  GraphQLFieldResolver,
   GraphQLFieldConfigMap,
   GraphQLString,
   GraphQLSchema,
@@ -20,7 +19,6 @@ import { MetadataBuilder } from "./MetadataBuilder";
 import {
   IDecorator,
   IField,
-  IQuery,
   IGqlType,
   IResolver,
   MetadataStorage,
@@ -35,6 +33,10 @@ export class GqlBuilder extends MetadataBuilder {
   private _objectTypeSetters: IDecorator<Object | Function>[] = [];
   private _schema: GraphQLSchema;
 
+  get _objectTypesList() {
+    return Array.from(this._objectTypes.values());
+  }
+
   get Schema() {
     return this._schema;
   }
@@ -48,15 +50,10 @@ export class GqlBuilder extends MetadataBuilder {
   }
 
   AddType(item: IDecorator<IGqlType>) {
-    MetadataStorage.Instance.Di.AddService(item);
     this._objectTypes.set(item.class, item);
   }
 
   AddField(item: IDecorator<IField>) {
-    this._fields.push(item);
-  }
-
-  AddQuery(item: IDecorator<IQuery>) {
     this._fields.push(item);
   }
 
@@ -100,10 +97,14 @@ export class GqlBuilder extends MetadataBuilder {
     this.writeSchemaFile();
   }
 
+  /**
+   * Merge GraphQL type with duplicate name
+   * @param gqlObjectTypeName The gqlTypeName (ObjectType, InterfaceType, ...)
+   */
   private mergeDuplicates(gqlObjectTypeName: GqlType) {
-    const duplicatedTypes = Array.from(this._objectTypes.values()).filter((dupObjectType) => {
+    const duplicatedTypes = this._objectTypesList.filter((dupObjectType) => {
       if (dupObjectType.params.gqlTypeName === gqlObjectTypeName) {
-        return Array.from(this._objectTypes.values()).find((foundDup) => {
+        return this._objectTypesList.find((foundDup) => {
           return (
             dupObjectType.params.name === foundDup.params.name &&
             dupObjectType !== foundDup
@@ -125,19 +126,19 @@ export class GqlBuilder extends MetadataBuilder {
     });
   }
 
+  /**
+   * Apply ObjectTypeSetters to ObjectTypes
+   */
   private applyObjectTypeSetters() {
     this._objectTypeSetters.map((setter) => {
       const objectType = this._objectTypes.get(setter.class);
-      if (objectType) {
-        const params = this.getSetterParams(setter, objectType);
-        objectType.params = {
-          ...objectType.params,
-          ...params
-        };
-      }
+      this.setSetterParams(setter, objectType);
     });
   }
 
+  /**
+   * Apply FieldSetters to Fields
+   */
   private applyFieldSetters() {
     this._fieldSetters.map((setter) => {
       const field = this._fields.find((field) => {
@@ -146,32 +147,31 @@ export class GqlBuilder extends MetadataBuilder {
           field.key === setter.key
         );
       });
-      if (field) {
-        const params = this.getSetterParams(setter, field);
-        field.params = {
-          ...field.params,
-          ...params
-        };
-      }
+      this.setSetterParams(setter, field);
     });
   }
 
+  /**
+   * Apply the type Ihneritance to ObjectTypes
+   */
   private applyIhneritance() {
-    Array.from(this._objectTypes.values()).map((objectType) => {
+    this._objectTypesList.map((objectType) => {
       const superClassType = Object.getPrototypeOf(objectType.class);
       const superClass = this._objectTypes.get(superClassType);
       if (superClass) {
+        // Implements the superclass's interfaces to the ihnerited class
         objectType.params.interfaces = objectType.params.interfaces.concat(superClass.params.interfaces);
+        // Copy the fields of the superclass to the ihnerited class
         this._fields.reduce<IDecorator<IField>[]>((prev, field) => {
           const alreadyExists = prev.find((existing) => existing.key === field.key);
           if (
             field.class === superClass.class &&
             !alreadyExists
           ) {
-            const newField = {
-              ...field,
-              class: objectType.class
-            };
+            const newField = this.copyDecoratorType(
+              field,
+              { class: objectType.class }
+            );
             this._fields.push(newField);
             return [
               ...prev,
@@ -199,15 +199,23 @@ export class GqlBuilder extends MetadataBuilder {
     });
   }
 
+  /**
+   * Apply a transformation to each field of a specified FieldType (FieldType is a relation to ObjectType)
+   * The type of a field is an ObjectType and it duplicated the ObjectType with the applied transformation of his fields
+   * @param transformKey The key condition to apply transformation
+   * @param transformation The transformation to apply
+   */
   private applyChildFieldsTransformation(transformKey: keyof IField, transformation: Partial<IField>) {
     const prefix = transformKey.charAt(0).toUpperCase() + transformKey.slice(1);
     const classes: Map<string, Function> = new Map();
+    // Get types to copy
     const types = this._fields.reduce<IDecorator<IGqlType>[]>((prev, field) => {
       if (field.params[transformKey]) {
         const fieldType: Function = field.params.type();
         const fieldObjectType = this._objectTypes.get(fieldType);
         if (fieldObjectType && !prev.includes(fieldObjectType)) {
           const name = this.prefix(prefix, fieldObjectType.params.name);
+          // Create a new class (fake class, function) to set the type of field that own the transformation
           const classType = () => name;
           classes.set(name, classType);
           field.params.type = () => classType;
@@ -219,37 +227,43 @@ export class GqlBuilder extends MetadataBuilder {
     types.map((type) => {
       const name = this.prefix(prefix, type.params.name);
       const classType = classes.get(name);
-      const newType: IDecorator<IGqlType> = {
-        ...type,
-        class: classType,
-        key: name,
-        params: {
-          ...type.params,
-          name
+      // Copy the type
+      const newType = this.copyDecoratorType(
+        type,
+        {
+          class: classType,
+          key: name,
+          params: {
+            name
+          }
         }
-      };
+      );
       this._objectTypes.set(classType, newType);
+      // Copy each field of the type with transformation
       this._fields.map((field) => {
         if (field.class === type.class) {
-          const newField: IDecorator<IField> = {
-            ...field,
-            class: classType,
-            params: {
-              ...field.params,
-              ...transformation
+          const newField = this.copyDecoratorType(
+            field,
+            {
+              class: classType,
+              params: {
+                ...transformation
+              }
             }
-          };
+          );
           this._fields.push(newField);
         }
       });
     });
   }
 
-  private buildObjectTypes<GqlObjectType = GraphQLObjectType>(
-    gqlObjectTypeName: GqlType
-  ): GqlObjectType[] {
+  /**
+   * Build a GraphQL type (type, interface, input, ...)
+   * @param gqlObjectTypeName The gql type to build
+   */
+  private buildObjectTypes<GqlObjectType = GraphQLObjectType>(gqlObjectTypeName: GqlType): GqlObjectType[] {
     this.mergeDuplicates(gqlObjectTypeName);
-    const gqlObjects = Array.from(this._objectTypes.values()).reduce((prev, objectType) => {
+    const gqlObjects = this._objectTypesList.reduce((prev, objectType) => {
       if (objectType.params.gqlTypeName === gqlObjectTypeName) {
         const baseParams = {
           name: objectType.params.name,
@@ -292,9 +306,11 @@ export class GqlBuilder extends MetadataBuilder {
     return gqlObjects;
   }
 
-  private getInterfaces(
-    objectType: IDecorator<IGqlType>
-  ) {
+  /**
+   * Get interfaces of an ObjectType
+   * @param objectType The ObjectType to get interfaced
+   */
+  private getInterfaces(objectType: IDecorator<IGqlType>) {
     if (objectType.params.interfaces) {
       return objectType.params.interfaces.reduce<IDecorator<IGqlType>[]>((prev, interfaceType) => {
         const foundInterface = this._objectTypes.get(interfaceType);
@@ -310,6 +326,11 @@ export class GqlBuilder extends MetadataBuilder {
     return [];
   }
 
+  /**
+   * Get fields of an ObjectType
+   * @param objectType The object to get fields
+   * @param interfaces The interfaces of the ObjectType to implements fields
+   */
   private getFieldsFunction<FieldType = GraphQLFieldConfigMap<any, any>>(
     objectType: IDecorator<IGqlType>,
     interfaces: IDecorator<IGqlType>[] = []
@@ -326,6 +347,7 @@ export class GqlBuilder extends MetadataBuilder {
             deprecationReason: field.params.deprecationReason,
             description: field.params.description
           };
+          this.applyResolveToField(gqlField, field);
           prev[field.key] = gqlField;
         }
         return prev;
@@ -334,6 +356,10 @@ export class GqlBuilder extends MetadataBuilder {
     };
   }
 
+  /**
+   * Get the type of a field based on his defined app type
+   * @param field The field to get the type
+   */
   private parseTypeToGql(field: IDecorator<IField>): GraphQLOutputType {
     let finalType: GraphQLOutputType = undefined;
     const baseType = field.params.type();
@@ -364,18 +390,29 @@ export class GqlBuilder extends MetadataBuilder {
     return finalType;
   }
 
-  private resolveField(field: IDecorator<any>): GraphQLFieldResolver<any, any, any> {
+  /**
+   * Execute a function (resolve) field (Query)
+   * @param field The field to be resolved
+   */
+  private applyResolveToField(
+    gqlField: GraphQLFieldConfig<any, any>,
+    field: IDecorator<any>
+  ) {
     if (field.params.function) {
-      return async (root, args, context, info) => {
+      gqlField.resolve = async (root, args, context, info) => {
         return await this.bindContext(
           field,
           field.params.function
         )(args, context, info, root);
       };
     }
-    return undefined;
+    return gqlField;
   }
 
+  /**
+   * TODO: AppConfig Path
+   * Write the schema to a file
+   */
   private async writeSchemaFile() {
     const alert = "# DO NOT EDIT THIS FILE, IT'S GENERATED AT EACH APP STARTUP #";
     const data = `${alert}\n\n${printSchema(this._schema)}`;
@@ -390,15 +427,26 @@ export class GqlBuilder extends MetadataBuilder {
     });
   }
 
-  private prefix(prefix: string, suffix: string) {
-    return prefix + suffix;
+  /**
+   * Get the params of the Field or ObjectType params setter
+   * @param setter The Field or ObjectType setter
+   * @param current The Field or ObjectType to mutate
+   */
+  private setSetterParams(setter: IDecorator<Object | Function>, current?: IDecorator<any>) {
+    if (current) {
+      let params = setter.params;
+      if (typeof params === "function") {
+        params = (setter.params as Function)(current);
+      }
+      current.params = {
+        ...current.params,
+        params
+      };
+      return current;
+    }
   }
 
-  private getSetterParams(setter: IDecorator<Object | Function>, current: IDecorator<any>) {
-    let params = setter.params;
-    if (typeof params === "function") {
-      params = (setter.params as Function)(current);
-    }
-    return params;
+  private prefix(prefix: string, suffix: string) {
+    return prefix + suffix;
   }
 }
