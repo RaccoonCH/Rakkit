@@ -13,7 +13,9 @@ import {
   GraphQLOutputType,
   GraphQLNonNull,
   GraphQLList,
-  GraphQLInterfaceType
+  GraphQLInterfaceType,
+  GraphQLFieldConfigArgumentMap,
+  GraphQLInputType
 } from "graphql";
 import { MetadataBuilder } from "./MetadataBuilder";
 import {
@@ -23,11 +25,13 @@ import {
   IResolver,
   MetadataStorage,
   GqlType,
-  GraphQLISODateTime
+  GraphQLISODateTime,
+  IParam
 } from "../../..";
 
 export class GqlBuilder extends MetadataBuilder {
   private _objectTypes: Map<Function, IDecorator<IGqlType>> = new Map();
+  private _params: Map<Function, IDecorator<IParam>> = new Map();
   private _fields: IDecorator<IField>[] = [];
   private _fieldSetters: IDecorator<Object | Function>[] = [];
   private _objectTypeSetters: IDecorator<Object | Function>[] = [];
@@ -62,6 +66,10 @@ export class GqlBuilder extends MetadataBuilder {
     this._objectTypes.set(item.class, item);
   }
 
+  AddParam(item: IDecorator<IParam>) {
+    this._params.set(item.class, item);
+  }
+
   AddFieldSetter<Type>(item: IDecorator<Type>) {
     this._fieldSetters.push(item);
   }
@@ -69,6 +77,7 @@ export class GqlBuilder extends MetadataBuilder {
   AddTypeSetter<Type>(item: IDecorator<Type>) {
     this._objectTypeSetters.push(item);
   }
+
 
   Build() {
     this.applyObjectTypeSetters();
@@ -347,6 +356,7 @@ export class GqlBuilder extends MetadataBuilder {
             deprecationReason: field.params.deprecationReason,
             description: field.params.description
           };
+          field.params.compiled = gqlField;
           this.applyResolveToField(gqlField, field);
           prev[field.key] = gqlField;
         }
@@ -396,9 +406,34 @@ export class GqlBuilder extends MetadataBuilder {
    */
   private applyResolveToField(
     gqlField: GraphQLFieldConfig<any, any>,
-    field: IDecorator<any>
+    field: IDecorator<IField>
   ) {
     if (field.params.function) {
+      if (field.params.args) {
+        const argsType = field.params.args();
+        if (!field.params.flatArgs) {
+          const objectType = this._objectTypes.get(argsType);
+          if (objectType) {
+            const args: GraphQLFieldConfigArgumentMap = {
+              [objectType.params.name]: {
+                type: objectType.params.compiled as GraphQLInputType
+              }
+            };
+            gqlField.args = args;
+          }
+        } else {
+          const fieldType = field.params.type();
+          const argMap = this._fields.reduce<GraphQLFieldConfigArgumentMap>((prev, argField) => {
+            if (fieldType === argField.class) {
+              prev[argField.key] = {
+                type: this.parseTypeToGql(argField) as GraphQLInputType
+              };
+            }
+            return prev;
+          }, {});
+          gqlField.args = argMap;
+        }
+      }
       gqlField.resolve = async (root, args, context, info) => {
         return await this.bindContext(
           field,
@@ -440,7 +475,7 @@ export class GqlBuilder extends MetadataBuilder {
       }
       current.params = {
         ...current.params,
-        params
+        ...params
       };
       return current;
     }

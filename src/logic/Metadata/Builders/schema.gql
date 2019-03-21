@@ -8,7 +8,7 @@ interface asd {
   hello4: String!
 }
 
-type caca implements dsss & asd {
+type cacaExampleObjectTypeExampleObjectType0 implements dsss & asd {
   hello3: String!
   hello4: String!
   items: [RequiredExampleObjectType]
@@ -42,7 +42,7 @@ type ExampleObjectType2 implements dsss & asd {
 
 type Query {
   helloWorld: String!
-  helloWorlsd: String!
+  helloWorlsd(aaa: aaa): ExampleObjectType!
 }
 
 type RequiredExampleObjectType {

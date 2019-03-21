@@ -12,7 +12,7 @@ export function Field(typeOrParams?: IFieldParams | TypeFn, params?: IFieldParam
   const isType = typeof typeOrParams === "function";
   const definedType = isType ? typeOrParams as Function : undefined;
   const definedParams: IFieldParams = isType ? params : typeOrParams as IFieldParams;
-  return (target: Object, key: string, descriptor?: PropertyDescriptor): void => {
+  return (target: Object, key: string): void => {
     const reflectType = () => Reflect.getMetadata("design:type", target, key) as Function;
     const finalType: Function = definedType || reflectType;
     const isArray = Array.isArray(reflectType().prototype);
@@ -21,6 +21,8 @@ export function Field(typeOrParams?: IFieldParams | TypeFn, params?: IFieldParam
       key,
       category: "gql",
       params: {
+        flatArgs: false,
+        args: undefined,
         function: undefined,
         partial: false,
         required: false,

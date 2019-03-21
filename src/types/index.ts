@@ -26,6 +26,7 @@ export * from "./Decorators/Gql/INamed";
 export * from "./Decorators/Gql/IPartial";
 export * from "./Decorators/Gql/IInterface";
 export * from "./Decorators/Gql/IRequired";
+export * from "./Decorators/Gql/IParam";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
 
@@ -48,3 +49,4 @@ export * from "./WS/WsOptions";
 export * from "./WS/Socket";
 
 export * from "./Gql/GqlType";
+export * from "./Gql/Param";

@@ -1,5 +1,5 @@
-import { Resolver, Query } from "../../../../src";
-import { ExampleObjectType } from "../objects/ExampleObjectType";
+import { Resolver, Query, Args, FlatArgs } from "../../../../src";
+import { ExampleObjectType, ExampleInputType } from "../objects/ExampleObjectType";
 
 @Resolver()
 export class ExampleResolver {
@@ -17,10 +17,12 @@ export class ExampleResolver {
 export class ExampleResolver3 {
   @Query()
   helloWorlsd(
+    @Args()
+    args: ExampleInputType,
     context
-  ): String {
+  ): ExampleObjectType {
     ExampleObjectType;
     console.log("hello world");
-    return "aass";
+    return;
   }
 }

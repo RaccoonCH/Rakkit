@@ -20,5 +20,7 @@ export * from "./Gql/Type/ArgsType";
 export * from "./Gql/Type/NameFrom";
 export * from "./Gql/Query/Resolver";
 export * from "./Gql/Query/Query";
+export * from "./Gql/Query/Args";
+export * from "./Gql/Query/FlatArgs";
 export * from "./Gql/Field/Field";
 export * from "./Gql/Type/InterfaceType";
