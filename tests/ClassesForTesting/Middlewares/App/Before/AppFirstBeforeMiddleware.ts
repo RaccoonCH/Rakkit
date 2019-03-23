@@ -1,13 +1,13 @@
 import {
   BeforeMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction
 } from "../../../../../src";
 
 @BeforeMiddleware()
 export class AppFirstBeforeMiddleware implements IBaseMiddleware {
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     context.body = "ab1;";
     await next();
   }

@@ -1,13 +1,13 @@
 import {
   BeforeMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction
 } from "../../../../../src";
 
 @BeforeMiddleware()
 export class RouterSecondBeforeMiddleware implements IBaseMiddleware {
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     context.body += "rb2;";
     await next();
   }

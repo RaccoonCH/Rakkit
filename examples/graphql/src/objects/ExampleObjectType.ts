@@ -39,8 +39,11 @@ export class ExampleInterfaceType2 {
   hello4: string;
 }
 
+@ObjectType()
 export abstract class Response<Type, Type2> implements ExampleInterfaceType, ExampleInterfaceType2 {
+  @Field()
   hello3: string;
+  @Field()
   hello4: string;
   items?: Type[];
   items2: Type2;
@@ -53,6 +56,10 @@ export function getItems<Type, Type2>(
   @NameFrom(itemsType, itemsType2)
   @InputType()
   class GenericResponse extends Response<Type, Type2> {
+    get A() {
+      return this.items;
+    }
+
     @Field(type => itemsType, {
       nullable: true
     })
@@ -60,6 +67,10 @@ export function getItems<Type, Type2>(
 
     @Field(type => itemsType2)
     items2;
+
+    hello() {
+      console.log("sss");
+    }
   }
   return GenericResponse as any;
 }

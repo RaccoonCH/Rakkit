@@ -10,8 +10,8 @@ export class App {
     });
     const server = new ApolloServer({
       schema: MetadataStorage.Instance.Gql.Schema,
-      context: (context, next) => ({
-        context, next
+      context: ({ctx}) => ({
+        ...ctx
       })
     });
     server.applyMiddleware({

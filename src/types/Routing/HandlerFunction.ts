@@ -1,6 +1,6 @@
-import { Context, NextFunction } from "..";
+import { IContext, NextFunction } from "..";
 
 export type HandlerFunction = (
-  context: Context,
+  context: IContext,
   next: NextFunction
 ) => Promise<any>;

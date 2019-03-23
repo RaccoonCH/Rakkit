@@ -8,7 +8,7 @@ import { AppFirstBeforeMiddleware } from "./ClassesForTesting/Middlewares/App/Be
 import { AppSecondAfterMiddleware } from "./ClassesForTesting/Middlewares/App/After/AppSecondAfterMiddleware";
 import { AppFirstAfterMiddleware } from "./ClassesForTesting/Middlewares/App/After/AppFirstAfterMiddleware";
 import { Start } from "./Utils/Start";
-import { Rakkit, Router, UseMiddleware, Get, NextFunction, Context } from "../src";
+import { Rakkit, Router, UseMiddleware, Get, NextFunction, IContext } from "../src";
 
 const getMergedMiddlewareString = (...mwStrings: string[]) => {
   return `${mwStrings.join(";")};`;
@@ -38,7 +38,7 @@ export class MergeMw2 {
   @UseMiddleware(
     GlobalFirstBeforeMiddleware
   )
-  async get1(context: Context, next: NextFunction) {
+  async get1(context: IContext, next: NextFunction) {
     context.body += "1;";
     await next();
   }
@@ -47,7 +47,7 @@ export class MergeMw2 {
     GlobalSecondBeforeMiddleware,
     GlobalFirstAfterMiddleware
   )
-  async get2(context: Context, next: NextFunction) {
+  async get2(context: IContext, next: NextFunction) {
     context.body += "2;";
     await next();
   }

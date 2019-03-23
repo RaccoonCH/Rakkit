@@ -2,7 +2,7 @@ import { TestService } from "../../../TestService";
 import {
   BeforeMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction,
   Inject
 } from "../../../../../src";
@@ -12,13 +12,13 @@ export class GlobalFirstBeforeMiddleware implements IBaseMiddleware {
   @Inject()
   private _testService: TestService;
 
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     if (!context.request.body) {
       throw new Error("BodyParser error");
     }
     if (!this) {
-      throw new Error("Context not binded");
+      throw new Error("IContext not binded");
     }
     this._testService.TestValue.firstBeforeGlobal = true;
     if (context.body) {

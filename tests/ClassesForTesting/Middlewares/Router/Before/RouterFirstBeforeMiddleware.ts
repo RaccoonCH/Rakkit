@@ -2,7 +2,7 @@ import { TestService } from "../../../TestService";
 import {
   BeforeMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction,
   Inject
 } from "../../../../../src";
@@ -12,7 +12,7 @@ export class RouterFirstBeforeMiddleware implements IBaseMiddleware {
   @Inject()
   private _testService: TestService;
 
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     this._testService.TestValue.firstBeforeRouter = true;
     context.body += "rb1;";
     await next();

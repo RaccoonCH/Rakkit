@@ -1,13 +1,13 @@
 import {
   AfterMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction
 } from "../../../../../src";
 
 @AfterMiddleware()
 export class EndpointSecondAfterMiddleware implements IBaseMiddleware {
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     context.body += "ea2;";
     await next();
   }

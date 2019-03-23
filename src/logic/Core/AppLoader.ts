@@ -27,7 +27,7 @@ export class AppLoader {
         }
         return prev;
       }, []);
-      router.use(KoaCompose(mws));
+      router.use(KoaCompose(mws as KoaCompose.Middleware<any>[]));
     }
   }
 

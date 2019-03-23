@@ -45,6 +45,8 @@ type ExampleObjectType2 implements ExampleInterfaceType & ExampleInterfaceType2 
 input GenericResponseInputTypeExampleInputTypeExampleInputType2 {
   items: InputTypeExampleInputType
   items2: ExampleInputType2!
+  hello3: String!
+  hello4: String!
 }
 
 input InputTypeExampleInputType {
@@ -56,9 +58,14 @@ interface InterfaceTypeExampleInputType {
 }
 
 type Query {
-  a(items: InputTypeExampleInputType, items2: ExampleInputType2!, aaa: Float!): a!
+  a(items: InputTypeExampleInputType, items2: ExampleInputType2!, hello3: String!, hello4: String!, aaa: Float!): a!
 }
 
 type RequiredExampleObjectType {
   hello: String!
+}
+
+type Response {
+  hello3: String!
+  hello4: String!
 }

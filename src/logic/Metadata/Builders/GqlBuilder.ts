@@ -27,8 +27,10 @@ import {
   GqlType,
   GraphQLISODateTime,
   IParam,
-  IHasType
+  IHasType,
+  IContext
 } from "../../..";
+import { IClassType } from '../../../types';
 
 export class GqlBuilder extends MetadataBuilder {
   private _gqlTypes: IDecorator<IGqlType>[] = [];
@@ -467,15 +469,37 @@ export class GqlBuilder extends MetadataBuilder {
         }, {});
         gqlField.args = argMap;
       }
-      if (!gqlField.args) {
-        // TODO
-      }
       gqlField.resolve = async (root, args, context, info) => {
-        const argList = Object.values(args);
+        const argList = field.params.args.reduce((prev, arg) => {
+          if (arg.flat) {
+            const gqlType = this.GetOneGqlType(arg.type());
+            const classType = gqlType.class as IClassType<any>;
+            const instance = new classType();
+            this._fields.map((field) => {
+              if (
+                field.class === gqlType.class &&
+                Object.keys(args).includes(field.key)
+              ) {
+                instance[field.key] = args[field.key];
+              }
+            });
+            prev.push(instance);
+          } else {
+            prev.push(args[arg.name]);
+          }
+          return prev;
+        }, []);
+        const gqlContext: IContext = {
+          args: argList,
+          info,
+          root,
+          apiType: "gql",
+          ...context
+        };
         return await this.bindContext(
           field,
           field.params.function
-        )(...argList, context, info, root);
+        )(...argList, gqlContext);
       };
     }
     return gqlField;

@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg } from "../../../../src";
+import { Resolver, Query, Arg, IContext } from "../../../../src";
 import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
@@ -11,7 +11,7 @@ export class ExampleResolver3 {
     str: Response<ExampleInputType, ExampleInputType2>,
     @Arg({ name: "aaa" })
     aaa: number,
-    context
+    context: IContext
   ): ExampleInputType {
     console.log(str, aaa, context);
     return;

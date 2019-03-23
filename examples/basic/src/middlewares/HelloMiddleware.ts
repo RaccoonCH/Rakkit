@@ -1,6 +1,6 @@
 import {
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction,
   BeforeMiddleware,
   Inject
@@ -12,7 +12,7 @@ export class HelloMiddleware implements IBaseMiddleware {
   @Inject()
   private _exampleService: ExampleService;
 
-  async use (context: Context, next: NextFunction) {
+  async use (context: IContext, next: NextFunction) {
     this._exampleService.MyServiceValue = "I've passed to HelloMiddleware :)";
     console.log("Hello");
     await next();

@@ -1,3 +1,4 @@
+import { Middleware } from "koa";
 import { MetadataBuilder } from "./MetadataBuilder";
 import {
   IDecorator,
@@ -219,9 +220,9 @@ export class RestBuilder extends MetadataBuilder {
     const tempRouter = new ApiRouter(router.opts);
     const restBeforeMiddlewares = this.GetBeforeMiddlewares(middlewares);
     const restAfterMiddlewares = this.GetAfterMiddlewares(middlewares);
-    tempRouter.use(...restBeforeMiddlewares);
+    tempRouter.use(...restBeforeMiddlewares as Middleware[]);
     tempRouter.use(router.prefix("/").routes());
-    tempRouter.use(...restAfterMiddlewares);
+    tempRouter.use(...restAfterMiddlewares as Middleware[]);
 
     return tempRouter;
   }

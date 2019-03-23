@@ -10,7 +10,7 @@ import { wait } from "../Utils/Waiter";
 import {
   Router,
   Get,
-  Context,
+  IContext,
   UseMiddleware,
   NextFunction
 } from "../../src";
@@ -24,7 +24,7 @@ import {
 )
 export class TestMiddlewareRouter {
   @Get("/")
-  async get(context: Context, next: NextFunction) {
+  async get(context: IContext, next: NextFunction) {
     await wait();
     context.body += "hello world;";
     await next();
@@ -37,20 +37,20 @@ export class TestMiddlewareRouter {
     EndpointSecondBeforeMiddleware,
     EndpointSecondAfterMiddleware
   )
-  async getMw(context: Context, next: NextFunction) {
+  async getMw(context: IContext, next: NextFunction) {
     await wait();
     context.body += "0;";
     await next();
   }
 
   @Get("/merge")
-  async merge1(context: Context, next: NextFunction) {
+  async merge1(context: IContext, next: NextFunction) {
     await wait();
     context.body += "-1;";
     await next();
   }
   @Get("/merge")
-  async merge2(context: Context, next: NextFunction) {
+  async merge2(context: IContext, next: NextFunction) {
     await wait();
     context.body += "0;";
     await next();
@@ -61,7 +61,7 @@ export class TestMiddlewareRouter {
     EndpointFirstBeforeMiddleware,
     EndpointFirstAfterMiddleware
   )
-  async mergeMw1(context: Context, next: NextFunction) {
+  async mergeMw1(context: IContext, next: NextFunction) {
     await wait();
     context.body += "-1;";
     await next();
@@ -71,7 +71,7 @@ export class TestMiddlewareRouter {
     EndpointSecondBeforeMiddleware,
     EndpointSecondAfterMiddleware
   )
-  async mergeMw2(context: Context, next: NextFunction) {
+  async mergeMw2(context: IContext, next: NextFunction) {
     await wait();
     context.body += "0;";
     await next();
@@ -82,7 +82,7 @@ export class TestMiddlewareRouter {
     EndpointFirstBeforeMiddleware,
     EndpointFirstAfterMiddleware
   )
-  async mergeMw31(context: Context, next: NextFunction) {
+  async mergeMw31(context: IContext, next: NextFunction) {
     await wait();
     context.body += "-2;";
     await next();
@@ -92,7 +92,7 @@ export class TestMiddlewareRouter {
     EndpointSecondBeforeMiddleware,
     EndpointSecondAfterMiddleware
   )
-  async mergeMw32(context: Context, next: NextFunction) {
+  async mergeMw32(context: IContext, next: NextFunction) {
     await wait();
     context.body += "-1;";
     await next();
@@ -102,7 +102,7 @@ export class TestMiddlewareRouter {
     EndpointSecondBeforeMiddleware,
     EndpointSecondAfterMiddleware
   )
-  async mergeMw33(context: Context, next: NextFunction) {
+  async mergeMw33(context: IContext, next: NextFunction) {
     await wait();
     context.body += `${context.params.param};`;
     await next();

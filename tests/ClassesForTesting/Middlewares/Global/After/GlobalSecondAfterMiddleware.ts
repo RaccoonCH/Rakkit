@@ -1,13 +1,13 @@
 import {
   AfterMiddleware,
   IBaseMiddleware,
-  Context,
+  IContext,
   NextFunction
 } from "../../../../../src";
 
 @AfterMiddleware()
 export class GlobalSecondAfterMiddleware implements IBaseMiddleware {
-  async use(context: Context, next: NextFunction) {
+  async use(context: IContext, next: NextFunction) {
     context.body += "ga2;";
     await next();
   }

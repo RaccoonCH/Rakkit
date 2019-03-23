@@ -1,7 +1,7 @@
 import {
   Router,
   Get,
-  Context,
+  IContext,
   Post,
   Put,
   Delete,
@@ -18,50 +18,50 @@ export class TestMiddlewareRouter {
   _b: TestService;
 
   @Get()
-  async get(context: Context) {
+  async get(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
   @Get("/:param")
-  async getParam(context: Context) {
+  async getParam(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Post("/")
-  async post(context: Context) {
+  async post(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
   @Post("/:param")
-  async postParam(context: Context) {
+  async postParam(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Put("/")
-  async put(context: Context) {
+  async put(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
   @Put("/:param")
-  async putParam(context: Context) {
+  async putParam(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
 
   @Delete()
-  async delete(context: Context) {
+  async delete(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
   @Delete("/:param")
-  async deleteParam(context: Context) {
+  async deleteParam(context: IContext) {
     await wait();
     context.body = this.getReturnedBody(context);
   }
 
-  private getReturnedBody(context: Context) {
+  private getReturnedBody(context: IContext) {
     return {
       method: context.method,
       params: context.params,
