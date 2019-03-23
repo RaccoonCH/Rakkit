@@ -1,5 +1,5 @@
 import { Rakkit, MetadataStorage } from "../../../src";
-import { ApolloServer } from "apollo-server";
+import { ApolloServer } from "apollo-server-koa";
 
 export class App {
   private _resolvers = [`${__dirname}/resolvers/*`];
@@ -14,8 +14,9 @@ export class App {
         context, next
       })
     });
-    const { url } = await server.listen(4002);
-    console.log(`Server is running, GraphQL Playground available at ${url}`);
+    server.applyMiddleware({
+      app: Rakkit.Instance.KoaApp
+    });
   }
 }
 

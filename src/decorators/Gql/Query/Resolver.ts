@@ -1,15 +1,9 @@
-import { MetadataStorage } from "../../..";
+import { DecoratorHelper, MetadataStorage } from "../../../logic";
 
 export function Resolver(): Function {
   return (target: Function): void => {
-    MetadataStorage.Instance.Gql.AddResolver({
-      class: target,
-      key: target.name,
-      category: "gql",
-      params: {
-        gqlTypeName: "Query",
-        name: "Query"
-      }
-    });
+    MetadataStorage.Instance.Gql.AddResolver(
+      DecoratorHelper.getAddTypeParams(target, "ObjectType", "Query")
+    );
   };
 }

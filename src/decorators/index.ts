@@ -16,7 +16,6 @@ export * from "./WS/Websocket";
 
 export * from "./Gql/Type/ObjectType";
 export * from "./Gql/Type/InputType";
-export * from "./Gql/Type/ArgsType";
 export * from "./Gql/Type/NameFrom";
 export * from "./Gql/Query/Resolver";
 export * from "./Gql/Query/Query";

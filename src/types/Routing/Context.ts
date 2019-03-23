@@ -1,7 +1,8 @@
 import { Context } from "koa";
+import { KeyValue } from "../..";
 
 export type Context = Context & {
-  params: {
-    [objKey: string]: string
-  };
+  // apiType: "gql" | "rest",
+  // gqlArgs?: KeyValue;
+  params: KeyValue;
 };

@@ -1,6 +1,7 @@
 export * from "./Core/IAppConfig";
 export * from "./Core/IClassType";
 export * from "./Core/InstanceOf";
+export * from "./Core/KeyValue";
 
 export * from "./Decorators/DI/IInject";
 export * from "./Decorators/DI/IService";

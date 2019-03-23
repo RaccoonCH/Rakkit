@@ -94,8 +94,8 @@ export class Rakkit extends AppLoader {
   }
 
   private async startAllServices() {
-    const startRest = Rakkit.Instance._config.routers && Rakkit.Instance._config.routers.length > 0;
-    const startWs = Rakkit.Instance._config.websockets && Rakkit.Instance._config.websockets.length > 0;
+    const startRest = Rakkit.Instance._config.routers.length + Rakkit.Instance._config.resolvers.length > 0;
+    const startWs = Rakkit.Instance._config.websockets.length > 0;
     if (startRest || startWs) {
       this._httpServer.listen(this._config.port, this._config.host);
     }

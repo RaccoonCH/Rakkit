@@ -1,19 +1,21 @@
 import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom } from "../../../../src";
 
 @InputType()
+@ObjectType("a")
+@InterfaceType()
 export class ExampleInputType {
   @Field()
   hello3: string;
 }
 
 @InputType()
+@ObjectType("aa", ExampleInputType)
 export class ExampleInputType2 {
   @Field()
   hello12: string;
 }
 
 @ObjectType()
-// @InputType()
 export class ExampleObjectType0 {
   @Field()
   hello0: string;

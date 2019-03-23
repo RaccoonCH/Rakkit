@@ -7,16 +7,13 @@ const params = getItems(ExampleInputType, ExampleInputType2);
 export class ExampleResolver3 {
   @Query()
   a(
-    @Arg(type => params, {
-      nullable: true
-    })
+    @Arg(type => params, { nullable: true, flat: true })
     str: Response<ExampleInputType, ExampleInputType2>,
-    @Arg()
+    @Arg({ name: "aaa" })
     aaa: number,
     context
-  ): ExampleObjectType {
-    ExampleObjectType;
-    console.log("hello world");
+  ): ExampleInputType {
+    console.log(str, aaa, context);
     return;
   }
 }

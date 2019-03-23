@@ -1,4 +1,4 @@
-import { DecoratorHelper } from "../../../logic";
+import { DecoratorHelper, MetadataStorage } from "../../../logic";
 
 export function ObjectType();
 export function ObjectType(name: string);
@@ -9,6 +9,8 @@ export function ObjectType(nameOrInterfaces?: string | Function[], ...interfaces
   const definedName: string = isName ? nameOrInterfaces as string : undefined;
   const definedInterfaces: Function[] = isName ? interfaces : nameOrInterfaces as Function[];
   return (target: Function): void => {
-    DecoratorHelper.getAddTypeFunction(target, "ObjectType", definedName, definedInterfaces);
+    MetadataStorage.Instance.Gql.AddType(
+      DecoratorHelper.getAddTypeParams(target, "ObjectType", definedName, definedInterfaces)
+    );
   };
 }

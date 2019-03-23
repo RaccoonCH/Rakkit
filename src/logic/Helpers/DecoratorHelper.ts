@@ -2,30 +2,39 @@ import {
   MetadataStorage,
   HttpMethod,
   MiddlewareExecutionTime,
-  GqlType
+  GqlType,
+  IDecorator,
+  IGqlType
 } from "../..";
 
 export class DecoratorHelper {
   static getAddTypeDecorator(gqlTypeName: GqlType) {
     return (name?: string) => {
       return (target: Function): void => {
-        this.getAddTypeFunction(target, gqlTypeName, name);
+        MetadataStorage.Instance.Gql.AddType(
+          this.getAddTypeParams(target, gqlTypeName, name)
+        );
       };
     };
   }
 
-  static getAddTypeFunction(target: Function, gqlTypeName: GqlType, name?: string, interfaces: Function[] = []) {
+  static getAddTypeParams(
+    target: Function,
+    gqlTypeName: GqlType,
+    name?: string,
+    interfaces: Function[] = []
+  ): IDecorator<IGqlType> {
     const definedName = name || target.name;
-    MetadataStorage.Instance.Gql.AddType({
+    return {
       class: target,
-      key: name,
+      key: target.name,
       category: "gql",
       params: {
         interfaces,
         gqlTypeName,
         name: definedName
       }
-    });
+    };
   }
 
   static getAddEndpointDecorator(method: HttpMethod) {
