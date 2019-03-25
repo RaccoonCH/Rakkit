@@ -30,9 +30,9 @@ import {
   IHasType,
   IContext,
   IClassType,
-  NextFunction
+  NextFunction,
+  TypeFn
 } from "../../..";
-import { TypeFn } from '../../../types';
 
 export class GqlBuilder extends MetadataBuilder {
   private _gqlTypes: IDecorator<IGqlType>[] = [];
@@ -394,7 +394,11 @@ export class GqlBuilder extends MetadataBuilder {
           implementsField
         ) {
           const gqlField: GraphQLFieldConfig<any, any> = {
-            type: this.parseTypeToGql(field.params, objectType),
+            type: this.parseTypeToGql(
+              field.params,
+              objectType,
+              !!implementsField
+            ),
             deprecationReason: field.params.deprecationReason,
             description: field.params.description
           };
@@ -412,11 +416,43 @@ export class GqlBuilder extends MetadataBuilder {
    * Get the type of a field based on his defined app type
    * @param field The field to get the type
    */
-  private parseTypeToGql(typed: IHasType, objectType?: IDecorator<IGqlType>): GraphQLOutputType {
+  private parseTypeToGql(
+    typed: IHasType,
+    objectType?: IDecorator<IGqlType>,
+    fromInterface: boolean = false
+  ): GraphQLOutputType {
     let finalType: GraphQLOutputType = undefined;
     const baseType = typed.type();
     if (objectType) {
-      const relation = this.GetOneGqlType(baseType, objectType.params.gqlTypeName);
+      // An interface can only have a relation to a "type"
+      let relation;
+
+      // An field from an ObjectType try first to make a relation to an InterfaceType,
+      // beause a field that come from an implements can come firstly from an InterfaceType and secondly from an ObjectType.
+      // If the relation with an InterfaceType doesn't exists it will fallback to an ObjectType relation
+      if (fromInterface && objectType.params.gqlTypeName === "ObjectType") {
+        relation = this.GetOneGqlType(
+          baseType,
+          "InterfaceType"
+        );
+      }
+
+      if (!relation) {
+        relation = this.GetOneGqlType(
+          baseType,
+          objectType.params.gqlTypeName
+        );
+      }
+
+      // A field from an InterfaceType field try first to make a relation a an InterfaceType.
+      // If the relation doesn't exists with an interface type try with an ObjectType
+      if (!relation && objectType.params.gqlTypeName === "InterfaceType") {
+        relation = this.GetOneGqlType(
+          baseType,
+          "ObjectType"
+        );
+      }
+
       if (relation) {
         finalType = relation.params.compiled as GraphQLOutputType;
       }
@@ -592,22 +628,6 @@ export class GqlBuilder extends MetadataBuilder {
     return fieldValue;
   }
 
-  // private parseFieldTypeToInstance(arg: IDe) {
-  //   const gqlType = this.GetOneGqlType(field.params.type());
-  //   let instance = undefined;
-  //   if (gqlType) {
-  //     instance = new (gqlType.class as IClassType)();
-  //     this._fields.map((instanceField) => {
-  //       if (instanceField.class = gqlType.class) {
-  //         const parentProp = instance[field.key];
-  //         if (parentProp)
-  //         [instanceField.key] = this.parseFieldTypeToInstance(instanceField);
-  //       }
-  //     });
-  //   }
-  //   return instance;
-  // }
-
   /**
    * TODO: AppConfig Path
    * Write the schema to a file
@@ -643,6 +663,19 @@ export class GqlBuilder extends MetadataBuilder {
       };
       return current;
     }
+  }
+
+  private getTypeFields(
+    gqlType: IDecorator<IGqlType>,
+    additionalCondition?: (
+      field: IDecorator<IField>,
+      gqlType: IDecorator<IGqlType>
+    ) => boolean
+  ) {
+    return this._fields.filter((field) =>
+      field.class === gqlType.class &&
+      (additionalCondition ? additionalCondition(field, gqlType) : true)
+    );
   }
 
   private prefix(...strings: string[]) {

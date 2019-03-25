@@ -1,7 +1,7 @@
 import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom } from "../../../../src";
 
 @InputType()
-@ObjectType("a")
+@ObjectType()
 @InterfaceType()
 export class ExampleInputType {
   @Field()
@@ -9,15 +9,41 @@ export class ExampleInputType {
 }
 
 @InputType()
-@ObjectType("aa", ExampleInputType)
+@ObjectType()
+@InterfaceType()
+export class PO0 {
+  @Field()
+  po: string;
+}
+
+@InputType()
+@ObjectType()
+@InterfaceType()
+export class PO1 {
+  @Field()
+  po0: PO0;
+}
+
+@InputType()
+@ObjectType([PO1])
+export class PO2 implements PO1 {
+  @Field()
+  str: string;
+  po0: PO0;
+}
+
+@InputType()
+@ObjectType()
 export class ExampleInputType2 {
-  @Field({ name: "akakaaaa", nullable: true })
+  hello3: string;
+
+  @Field({ nullable: true })
   hello12: string;
 }
 
 @ObjectType()
 export class ExampleObjectType0 {
-  @Field({ name: "akaka" })
+  @Field()
   hello0: string;
 }
 
@@ -27,12 +53,13 @@ export class ExampleObjectType {
   hello: string;
 }
 
+@ObjectType()
 @InterfaceType()
 export class ExampleInterfaceType {
   @Field()
   hello3: string;
-  // @Field()
-  // m: ExampleInputType;
+  @Field()
+  ms: ExampleInputType;
 }
 
 @InterfaceType()
@@ -45,10 +72,11 @@ export class ExampleInterfaceType2 {
 export abstract class Response<Type, Type2> implements ExampleInterfaceType, ExampleInterfaceType2 {
   @Field({ nullable: true })
   hello3: string;
-  @Field({ name: "akakasada" })
+  @Field()
   hello4: string;
   @Field({ nullable: true })
   hello6: ExampleInputType;
+  ms: ExampleInputType;
   items?: Type[];
   items2: Type2;
 }
@@ -81,16 +109,15 @@ export function getItems<Type, Type2>(
 
 @ObjectType([ExampleInterfaceType, ExampleInterfaceType2])
 export class ExampleObjectType2 extends ExampleObjectType0 implements ExampleInterfaceType, ExampleInterfaceType2 {
-  hello4: string;
-  hello3: string;
-
+  @Field()
+  date: Date;
   @Field(type => ExampleObjectType, {
     nullable: true
   })
   hello2?: Required<ExampleObjectType>;
 
+  hello4: string;
+  hello3: string;
   hello: string;
-
-  @Field()
-  date: Date;
+  ms: ExampleInputType;
 }
