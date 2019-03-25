@@ -427,13 +427,13 @@ export class GqlBuilder extends MetadataBuilder {
       // An interface can only have a relation to a "type"
       let relation;
 
-      // An field from an ObjectType try first to make a relation to an InterfaceType,
-      // beause a field that come from an implements can come firstly from an InterfaceType and secondly from an ObjectType.
-      // If the relation with an InterfaceType doesn't exists it will fallback to an ObjectType relation
-      if (fromInterface && objectType.params.gqlTypeName === "ObjectType") {
+      // A field from an InterfaceType field try first to make a relation a an ObjectType.
+      // Because an interface can have a relation to a type or an interface.
+      // If the relation doesn't exists with an interface type try with an InterfaceType.
+      if (objectType.params.gqlTypeName === "InterfaceType") {
         relation = this.GetOneGqlType(
           baseType,
-          "InterfaceType"
+          "ObjectType"
         );
       }
 
@@ -444,12 +444,13 @@ export class GqlBuilder extends MetadataBuilder {
         );
       }
 
-      // A field from an InterfaceType field try first to make a relation a an InterfaceType.
-      // If the relation doesn't exists with an interface type try with an ObjectType
-      if (!relation && objectType.params.gqlTypeName === "InterfaceType") {
+      // An field from an ObjectType try first to make a relation to an ObjectType.
+      // Because a type can have a relation to a type or an interface.
+      // If the relation with an ObjectType doesn't exists it will fallback to an InterfaceType relation
+      if (!relation && objectType.params.gqlTypeName === "ObjectType") {
         relation = this.GetOneGqlType(
           baseType,
-          "ObjectType"
+          "InterfaceType"
         );
       }
 

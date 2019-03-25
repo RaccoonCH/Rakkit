@@ -9,7 +9,6 @@ export class ExampleInputType {
 }
 
 @InputType()
-@ObjectType()
 @InterfaceType()
 export class PO0 {
   @Field()
@@ -17,7 +16,6 @@ export class PO0 {
 }
 
 @InputType()
-@ObjectType()
 @InterfaceType()
 export class PO1 {
   @Field()
@@ -29,6 +27,8 @@ export class PO1 {
 export class PO2 implements PO1 {
   @Field()
   str: string;
+  @Field()
+  po02: PO0;
   po0: PO0;
 }
 
