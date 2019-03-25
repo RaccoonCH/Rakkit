@@ -74,13 +74,11 @@ export class RoutingBuilder extends MetadataBuilder {
 
   GetBeforeAfterMiddlewares(middlewares: MiddlewareType[], beforeAfter: MiddlewareExecutionTime) {
     if (middlewares) {
+      this.LoadAnonymousMiddlewares(middlewares);
       return middlewares.reduce<HandlerFunction[]>((arr, item) => {
         const foundMiddleware = this._middlewares.get(item);
         if (foundMiddleware && foundMiddleware.params.executionTime === beforeAfter) {
-          return [
-            ...arr,
-            foundMiddleware.params.function
-          ];
+          arr.push(foundMiddleware.params.function);
         }
         return arr;
       }, []);
@@ -138,12 +136,13 @@ export class RoutingBuilder extends MetadataBuilder {
   }
 
   GetUsedMiddlewares(decorator: IDecorator<any>, fn?: Function) {
+    // Reverse to have the correct execution time
     return this._usedMiddlewares.filter((usedMw) => {
       return (
         usedMw.class === decorator.class &&
         (fn ? fn === usedMw.params.applyOn : true)
       );
-    });
+    }).reverse();
   }
 
   ExtractMiddlewares(arr: IDecorator<IUsedMiddleware>[]): MiddlewareType[] {

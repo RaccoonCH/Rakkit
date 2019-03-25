@@ -11,19 +11,19 @@ export class ExampleInputType {
 @InputType()
 @ObjectType("aa", ExampleInputType)
 export class ExampleInputType2 {
-  @Field()
+  @Field({ name: "akakaaaa", nullable: true })
   hello12: string;
 }
 
 @ObjectType()
 export class ExampleObjectType0 {
-  @Field()
+  @Field({ name: "akaka" })
   hello0: string;
 }
 
 @ObjectType()
 export class ExampleObjectType {
-  @Field({ nullable: true, partial: true })
+  @Field({ nullable: true })
   hello: string;
 }
 
@@ -31,6 +31,8 @@ export class ExampleObjectType {
 export class ExampleInterfaceType {
   @Field()
   hello3: string;
+  // @Field()
+  // m: ExampleInputType;
 }
 
 @InterfaceType()
@@ -41,10 +43,12 @@ export class ExampleInterfaceType2 {
 
 @ObjectType()
 export abstract class Response<Type, Type2> implements ExampleInterfaceType, ExampleInterfaceType2 {
-  @Field()
+  @Field({ nullable: true })
   hello3: string;
-  @Field()
+  @Field({ name: "akakasada" })
   hello4: string;
+  @Field({ nullable: true })
+  hello6: ExampleInputType;
   items?: Type[];
   items2: Type2;
 }
@@ -81,8 +85,7 @@ export class ExampleObjectType2 extends ExampleObjectType0 implements ExampleInt
   hello3: string;
 
   @Field(type => ExampleObjectType, {
-    nullable: true,
-    required: true
+    nullable: true
   })
   hello2?: Required<ExampleObjectType>;
 

@@ -4,7 +4,8 @@ import {
   IPartial,
   IRequired,
   IQuery,
-  IHasType
+  IHasType,
+  INamed
 } from "../..";
 
 export interface IField extends
@@ -12,7 +13,8 @@ export interface IField extends
   IDeprecation,
   IPartial,
   IRequired,
-  IQuery {
+  IQuery,
+  INamed {
   description?: string;
   compiled?: GraphQLFieldConfig<any, any>;
 }

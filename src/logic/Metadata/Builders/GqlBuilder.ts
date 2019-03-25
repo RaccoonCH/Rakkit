@@ -29,8 +29,10 @@ import {
   IParam,
   IHasType,
   IContext,
-  IClassType
+  IClassType,
+  NextFunction
 } from "../../..";
+import { TypeFn } from '../../../types';
 
 export class GqlBuilder extends MetadataBuilder {
   private _gqlTypes: IDecorator<IGqlType>[] = [];
@@ -398,7 +400,7 @@ export class GqlBuilder extends MetadataBuilder {
           };
           field.params.compiled = gqlField;
           this.applyResolveToField(gqlField, field);
-          prev[field.key] = gqlField;
+          prev[field.params.name] = gqlField;
         }
         return prev;
       }, {}) as FieldType;
@@ -454,16 +456,17 @@ export class GqlBuilder extends MetadataBuilder {
       if (field.params.args) {
         const argMap = field.params.args.reduce<GraphQLFieldConfigArgumentMap>((prev, arg) => {
           const argType = arg.type();
-          const objectType = this.GetOneGqlType(argType);
+          let objectType = this.GetOneGqlType(argType);
           if (arg.flat) {
             this._fields.map((field) => {
               if (field.class === objectType.class) {
-                prev[field.key] = {
+                prev[field.params.name] = {
                   type: this.parseTypeToGql(field.params, objectType) as GraphQLInputType
                 };
               }
             });
           } else {
+            objectType = this.GetOneGqlType(argType, "InputType");
             prev[arg.name] = {
               type: this.parseTypeToGql(arg, objectType) as GraphQLInputType
             };
@@ -473,44 +476,137 @@ export class GqlBuilder extends MetadataBuilder {
         gqlField.args = argMap;
       }
 
-      gqlField.resolve = async (root, args, context, info) => {
-        const argList = field.params.args.reduce((prev, arg) => {
-          const gqlType = this.GetOneGqlType(arg.type());
-          if (arg.flat) {
-            // Group args to one variable and instanciate it
-            const classType = gqlType.class as IClassType<any>;
-            const instance = new classType();
-            this._fields.map((field) => {
-              if (
-                field.class === gqlType.class &&
-                Object.keys(args).includes(field.key)
-              ) {
-                instance[field.key] = args[field.key];
-              }
-            });
-            prev[arg.name] = instance;
-          } else {
-            // To do: deep instantation
-            prev[arg.name] = args[arg.name];
-          }
-          return prev;
-        }, {});
-        const gqlContext: IContext = {
-          args: argList,
-          rawArgs: args,
-          info,
-          root,
-          apiType: "gql",
-          ...context
-        };
-        return await this.bindContext(
+      const usedMiddlewares = this._routingStorage.GetUsedMiddlewares(field);
+      const usedMiddlewaresFn = this._routingStorage.ExtractMiddlewares(usedMiddlewares);
+      const beforeMiddlewares = this._routingStorage.GetBeforeMiddlewares(usedMiddlewaresFn);
+      const afterMiddlewares = this._routingStorage.GetAfterMiddlewares(usedMiddlewaresFn);
+
+      const mainFn = async (gqlContext: IContext, next: NextFunction) => {
+        const bindedFn: Function = this.bindContext(
           field,
           field.params.function
-        )(...Object.values(argList), gqlContext);
+        );
+        const argsList = Array.from(Object.values(gqlContext.args));
+        await bindedFn(...argsList, gqlContext, next);
       };
+      gqlField.resolve = this.createResolveFn(
+        field,
+        beforeMiddlewares,
+        mainFn,
+        afterMiddlewares
+      );
     }
     return gqlField;
   }
+
+  private createResolveFn(
+    field: IDecorator<IField>,
+    beforeMiddlewares: Function[],
+    main: Function,
+    afterMiddlewares: Function[]
+  ) {
+    let mwIndex = -1;
+    const allMiddlewares = [
+      ...beforeMiddlewares,
+      main,
+      ...afterMiddlewares
+    ];
+    return async(root, args, context, info) => {
+      const argList = this.parseArgs(field, args);
+
+      const returnType = field.params.type();
+      const returnGqlType = this.GetOneGqlType(returnType, "ObjectType");
+      const baseResponse = returnGqlType ? new (returnGqlType.class as IClassType)() : {};
+
+      const gqlContext: IContext = {
+        args: argList,
+        rawArgs: args,
+        info,
+        gqlResponse: baseResponse,
+        root,
+        apiType: "gql",
+        ...context
+      };
+
+      const next = async () => {
+        mwIndex++;
+        if (mwIndex < allMiddlewares.length) {
+          await allMiddlewares[mwIndex](
+            gqlContext,
+            next
+          );
+        }
+      };
+
+      await next();
+      mwIndex = 0;
+      return gqlContext.gqlResponse;
+    };
+  }
+
+  private parseArgs(field: IDecorator<IField>, args: Object) {
+    const fieldArgs = field.params.args;
+    const parsedArgs = fieldArgs.reduce((finalArg, fieldArg) => {
+      if (fieldArg.flat) {
+        const groupedArg = {};
+        const parentType = fieldArg.type();
+        this._fields.map((flatField) => {
+          if (flatField.class === parentType) {
+            groupedArg[flatField.params.name] = args[flatField.params.name];
+          }
+        });
+        finalArg[fieldArg.name] = this.createFieldInstance(
+          fieldArg.type,
+          groupedArg
+        );
+      } else {
+        finalArg[fieldArg.name] = this.createFieldInstance(
+          fieldArg.type,
+          args[fieldArg.name]
+        );
+      }
+      return finalArg;
+    }, {});
+    return parsedArgs;
+  }
+
+  private createFieldInstance(
+    typeFn: TypeFn,
+    fieldValue: any
+  ) {
+    if (typeFn) {
+      const fieldType = typeFn();
+      const fieldGqlType = this.GetOneGqlType(fieldType);
+      if (fieldGqlType && fieldValue) {
+        const instance = new (fieldType as IClassType)();
+        Object.entries(fieldValue).map(([key, value]) => {
+          const childField = this._fields.find((field) =>
+            field.class === fieldType &&
+            field.params.name === key
+          );
+          instance[childField.key] = this.createFieldInstance(childField.params.type, value);
+        });
+        return instance;
+      }
+    }
+    return fieldValue;
+  }
+
+  // private parseFieldTypeToInstance(arg: IDe) {
+  //   const gqlType = this.GetOneGqlType(field.params.type());
+  //   let instance = undefined;
+  //   if (gqlType) {
+  //     instance = new (gqlType.class as IClassType)();
+  //     this._fields.map((instanceField) => {
+  //       if (instanceField.class = gqlType.class) {
+  //         const parentProp = instance[field.key];
+  //         if (parentProp)
+  //         [instanceField.key] = this.parseFieldTypeToInstance(instanceField);
+  //       }
+  //     });
+  //   }
+  //   return instance;
+  // }
 
   /**
    * TODO: AppConfig Path

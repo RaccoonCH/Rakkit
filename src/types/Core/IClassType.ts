@@ -1,3 +1,3 @@
-export interface IClassType<Class> extends Function {
+export interface IClassType<Class = any> extends Function {
   new(...args: any[]): Class;
 }
