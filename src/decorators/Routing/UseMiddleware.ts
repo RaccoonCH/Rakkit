@@ -13,10 +13,10 @@ export function UseMiddleware(...middlewares: MiddlewareType[]) {
       middlewares
     };
 
-    MetadataStorage.Instance.Rest.AddUsedMiddleware({
+    MetadataStorage.Instance.Routing.AddUsedMiddleware({
       class: (mw.target as Function),
       key: mw.fieldName,
-      category: "rest",
+      category: "routing",
       params: {
         applyOn: mw.isClass ? prototype : descriptor!.value,
         isClass: mw.isClass,

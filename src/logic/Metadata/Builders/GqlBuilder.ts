@@ -28,9 +28,9 @@ import {
   GraphQLISODateTime,
   IParam,
   IHasType,
-  IContext
+  IContext,
+  IClassType
 } from "../../..";
-import { IClassType } from '../../../types';
 
 export class GqlBuilder extends MetadataBuilder {
   private _gqlTypes: IDecorator<IGqlType>[] = [];
@@ -39,6 +39,10 @@ export class GqlBuilder extends MetadataBuilder {
   private _fieldSetters: IDecorator<Object | Function>[] = [];
   private _objectTypeSetters: IDecorator<Object | Function>[] = [];
   private _schema: GraphQLSchema;
+
+  private get _routingStorage() {
+    return MetadataStorage.Instance.Routing;
+  }
 
   get Schema() {
     return this._schema;
@@ -76,7 +80,6 @@ export class GqlBuilder extends MetadataBuilder {
   AddTypeSetter<Type>(item: IDecorator<Type>) {
     this._objectTypeSetters.push(item);
   }
-
 
   Build() {
     this.renameWithTypeName();
@@ -469,10 +472,12 @@ export class GqlBuilder extends MetadataBuilder {
         }, {});
         gqlField.args = argMap;
       }
+
       gqlField.resolve = async (root, args, context, info) => {
         const argList = field.params.args.reduce((prev, arg) => {
+          const gqlType = this.GetOneGqlType(arg.type());
           if (arg.flat) {
-            const gqlType = this.GetOneGqlType(arg.type());
+            // Group args to one variable and instanciate it
             const classType = gqlType.class as IClassType<any>;
             const instance = new classType();
             this._fields.map((field) => {
@@ -483,14 +488,16 @@ export class GqlBuilder extends MetadataBuilder {
                 instance[field.key] = args[field.key];
               }
             });
-            prev.push(instance);
+            prev[arg.name] = instance;
           } else {
-            prev.push(args[arg.name]);
+            // To do: deep instantation
+            prev[arg.name] = args[arg.name];
           }
           return prev;
-        }, []);
+        }, {});
         const gqlContext: IContext = {
           args: argList,
+          rawArgs: args,
           info,
           root,
           apiType: "gql",
@@ -499,7 +506,7 @@ export class GqlBuilder extends MetadataBuilder {
         return await this.bindContext(
           field,
           field.params.function
-        )(...argList, gqlContext);
+        )(...Object.values(argList), gqlContext);
       };
     }
     return gqlField;

@@ -60,10 +60,10 @@ export class DecoratorHelper {
         const isClass = !key;
         const finalKey = isClass ? target.name : key;
         const finalFunc = isClass ? target : descriptor.value;
-        MetadataStorage.Instance.Rest.AddMiddleware({
+        MetadataStorage.Instance.Routing.AddMiddleware({
           class: finalFunc,
           key: finalKey,
-          category: "rest",
+          category: "routing",
           params: {
             executionTime,
             function: finalFunc,

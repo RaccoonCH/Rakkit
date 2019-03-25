@@ -72,10 +72,10 @@ export class Rakkit extends AppLoader {
 
   private async start() {
     this.LoadControllers(this._config);
-    const rest = MetadataStorage.Instance.Rest;
-    rest.LoadAnonymousMiddlewares(this._config.globalRestMiddlewares);
-    rest.LoadAnonymousMiddlewares(this._config.globalRootMiddlewares);
-    rest.LoadAnonymousMiddlewares(this._config.appMiddlewares);
+    const routing = MetadataStorage.Instance.Routing;
+    routing.LoadAnonymousMiddlewares(this._config.globalRestMiddlewares);
+    routing.LoadAnonymousMiddlewares(this._config.globalRootMiddlewares);
+    routing.LoadAnonymousMiddlewares(this._config.appMiddlewares);
     await MetadataStorage.Instance.BuildAll();
     this.startAllServices();
     return this;
@@ -148,17 +148,17 @@ export class Rakkit extends AppLoader {
   }
 
   private loadAppMiddlewares(middlewares: MiddlewareType[], executionTime: MiddlewareExecutionTime = "BEFORE") {
-    const rest = MetadataStorage.Instance.Rest;
+    const routing = MetadataStorage.Instance.Routing;
     let allMiddlewares;
     switch (executionTime) {
       case "BEFORE":
-        allMiddlewares = rest.BeforeMiddlewares;
+        allMiddlewares = routing.BeforeMiddlewares;
         break;
       case "AFTER":
-        allMiddlewares = rest.AfterMiddlewares;
+        allMiddlewares = routing.AfterMiddlewares;
         break;
     }
-    Rakkit.loadMiddlewares(
+    routing.LoadMiddlewares(
       middlewares,
       this._koaApp,
       allMiddlewares
