@@ -21,6 +21,7 @@ export function Field(typeOrParams?: IFieldParams | TypeFn, params?: IFieldParam
       key,
       category: "gql",
       params: {
+        resolveType: undefined,
         name: key,
         args: undefined,
         function: undefined,

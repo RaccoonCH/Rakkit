@@ -18,6 +18,7 @@ export * from "./Gql/Type/ObjectType";
 export * from "./Gql/Type/InputType";
 export * from "./Gql/Type/NameFrom";
 export * from "./Gql/Query/Resolver";
+export * from "./Gql/Query/Mutation";
 export * from "./Gql/Query/Query";
 export * from "./Gql/Query/Arg";
 export * from "./Gql/Field/Field";

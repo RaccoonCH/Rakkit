@@ -31,7 +31,8 @@ import {
   IContext,
   IClassType,
   NextFunction,
-  TypeFn
+  TypeFn,
+  DecoratorHelper
 } from "../../..";
 
 export class GqlBuilder extends MetadataBuilder {
@@ -41,9 +42,21 @@ export class GqlBuilder extends MetadataBuilder {
   private _fieldSetters: IDecorator<Object | Function>[] = [];
   private _objectTypeSetters: IDecorator<Object | Function>[] = [];
   private _schema: GraphQLSchema;
+  private _mutationType: IDecorator<IGqlType>;
+  private _queryType: IDecorator<IGqlType>;
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
+  }
+
+  constructor() {
+    super();
+
+    this._queryType = this.createObjectType("Query");
+    this._mutationType = this.createObjectType("Mutation");
+
+    this.AddType(this._queryType);
+    this.AddType(this._mutationType);
   }
 
   get Schema() {
@@ -63,6 +76,14 @@ export class GqlBuilder extends MetadataBuilder {
   }
 
   AddField(item: IDecorator<IField>) {
+    switch (item.params.resolveType) {
+      case "Mutation":
+        item.class = this._mutationType.class;
+        break;
+      case "Query":
+        item.class = this._queryType.class;
+        break;
+    }
     this._fields.push(item);
   }
 
@@ -87,26 +108,26 @@ export class GqlBuilder extends MetadataBuilder {
     this.renameWithTypeName();
     this.applyObjectTypeSetters();
     this.applyFieldSetters();
-    this.applyPartials();
-    this.applyRequired();
     this.applyIhneritance();
 
     const interfaceTypes = this.buildObjectTypes<GraphQLInterfaceType>("InterfaceType");
     const inputTypes = this.buildObjectTypes<GraphQLInputObjectType>("InputType");
     const objectTypes = this.buildObjectTypes("ObjectType");
-    const query = objectTypes.find((objectType) => objectType.name === "Query");
-    const mutation = objectTypes.find((objectType) => objectType.name === "Mutation");
+    const query = objectTypes.find((gqlType) => gqlType.name === "Query");
+    const mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
 
     const types = [
       ...interfaceTypes,
       ...inputTypes,
       ...objectTypes
     ];
+
     this._schema = new GraphQLSchema({
       query,
       mutation,
       types
     });
+
     this.writeSchemaFile();
   }
 
@@ -122,6 +143,38 @@ export class GqlBuilder extends MetadataBuilder {
 
   GetOneGqlType(classType: Function, gqlTypeName?: GqlType) {
     return this.GetGqlTypes(classType, gqlTypeName)[0];
+  }
+
+  // TODO: Prefix
+  CreatePartial(classType: Function): Function[];
+  // TODO: better way for RenameWithTypeName()
+  CreatePartial(classType: Function, gqlTypeName: GqlType, name?: string): Function;
+  CreatePartial(
+    classType: Function,
+    gqlTypeName?: GqlType,
+    name?: string
+  ): Function[] | Function {
+    this.renameWithTypeName();
+    const targetTypes = this.GetGqlTypes(classType, gqlTypeName);
+    const newTypes = targetTypes.map((targetType) => {
+      const partialName = name || `Partial${targetType.params.name}`;
+      const newType = DecoratorHelper.getAddTypeParams(
+        () => name,
+        targetType.params.gqlTypeName,
+        partialName,
+        targetType.params.interfaces
+      );
+      this.copyFieldsWithTransformation(
+        targetType,
+        newType,
+        { nullable: true }
+      );
+      return newType;
+    });
+    if (gqlTypeName) {
+      return newTypes[0].class;
+    }
+    return newTypes.map((newType) => newType.class);
   }
 
   /**
@@ -175,6 +228,15 @@ export class GqlBuilder extends MetadataBuilder {
         });
       }
     });
+  }
+
+  private createObjectType(name: string, gqlTypeName: GqlType = "ObjectType") {
+    return DecoratorHelper.getAddTypeParams(
+      () => name,
+      gqlTypeName,
+      name,
+      []
+    );
   }
 
   /**
@@ -236,75 +298,20 @@ export class GqlBuilder extends MetadataBuilder {
     return [];
   }
 
-  private applyPartials() {
-    this.applyChildFieldsTransformation("partial", {
-      partial: false,
-      nullable: true
-    });
-  }
-
-  private applyRequired() {
-    this.applyChildFieldsTransformation("required", {
-      required: false,
-      nullable: false
-    });
-  }
-
-  /**
-   * Apply a transformation to each field of a specified FieldType (FieldType is a relation to ObjectType)
-   * The type of a field is an ObjectType and it duplicated the ObjectType with the applied transformation of his fields
-   * @param transformKey The key condition to apply transformation
-   * @param transformation The transformation to apply
-   */
-  private applyChildFieldsTransformation(transformKey: keyof IField, transformation: Partial<IField>) {
-    const prefix = transformKey.charAt(0).toUpperCase() + transformKey.slice(1);
-    const classes: Map<string, Function> = new Map();
-    // Get types to copy
-    const types = this._fields.reduce<IDecorator<IGqlType>[]>((prev, field) => {
-      if (field.params[transformKey]) {
-        const fieldType: Function = field.params.type();
-        const fieldObjectType = this.GetOneGqlType(fieldType);
-        if (fieldObjectType && !prev.includes(fieldObjectType)) {
-          const name = this.prefix(prefix, fieldObjectType.params.name);
-          // Create a new class (fake class, function) to set the type of field that own the transformation
-          const classType = () => name;
-          classes.set(name, classType);
-          field.params.type = () => classType;
-          prev.push(fieldObjectType);
-        }
+  private copyFieldsWithTransformation(
+    objectType: IDecorator<IGqlType>,
+    destination: IDecorator<IGqlType>,
+    transformation: Partial<IField>
+  ) {
+    this.AddType(destination);
+    this._fields.map((field) => {
+      if (field.class === objectType.class) {
+        const newField = this.copyDecoratorType(field, {
+          class: destination.class,
+          params: transformation
+        });
+        this.AddField(newField);
       }
-      return prev;
-    }, []);
-    types.map((type) => {
-      const name = this.prefix(prefix, type.params.name);
-      const classType = classes.get(name);
-      // Copy the type
-      const newType = this.copyDecoratorType(
-        type,
-        {
-          class: classType,
-          key: name,
-          params: {
-            name
-          }
-        }
-      );
-      this.AddType(newType);
-      // Copy each field of the type with transformation
-      this._fields.map((field) => {
-        if (field.class === type.class) {
-          const newField = this.copyDecoratorType(
-            field,
-            {
-              class: classType,
-              params: {
-                ...transformation
-              }
-            }
-          );
-          this._fields.push(newField);
-        }
-      });
     });
   }
 
@@ -316,45 +323,53 @@ export class GqlBuilder extends MetadataBuilder {
     this.mergeDuplicates(gqlObjectTypeName);
     const gqlObjects = this._gqlTypes.reduce((prev, objectType) => {
       if (objectType.params.gqlTypeName === gqlObjectTypeName) {
-        const baseParams = {
-          name: objectType.params.name,
-          fields: this.getFieldsFunction(objectType)
-        };
-        let compiled = {};
-        switch (gqlObjectTypeName) {
-          case "InputType":
-            compiled = new GraphQLInputObjectType({
-              ...baseParams,
-              fields: this.getFieldsFunction<GraphQLInputFieldMap>(objectType)
-            });
-            break;
-          case "InterfaceType":
-            compiled = new GraphQLInterfaceType({
-              ...baseParams
-            });
-            break;
-          default:
-            const interfaces = this.getInterfaces(objectType);
-            compiled = new GraphQLObjectType({
-              ...baseParams,
-              fields: this.getFieldsFunction(objectType, interfaces),
-              interfaces: () => {
-                return interfaces.map((gqlInterface) => {
-                  return gqlInterface.params.compiled as GraphQLInterfaceType;
-                });
-              }
-            });
-            break;
-        }
-        objectType.params.compiled = compiled;
+        const buildedObjectType = this.buildObjectType(
+          objectType,
+          gqlObjectTypeName
+        );
         return [
           ...prev,
-          compiled
+          buildedObjectType.params.compiled
         ];
       }
       return prev;
     }, []);
     return gqlObjects;
+  }
+
+  private buildObjectType(objectType: IDecorator<IGqlType>, gqlObjectTypeName: GqlType) {
+    const baseParams = {
+      name: objectType.params.name,
+      fields: this.getFieldsFunction(objectType)
+    };
+    let compiled = {};
+    switch (gqlObjectTypeName) {
+      case "InputType":
+        compiled = new GraphQLInputObjectType({
+          ...baseParams,
+          fields: this.getFieldsFunction<GraphQLInputFieldMap>(objectType)
+        });
+        break;
+      case "InterfaceType":
+        compiled = new GraphQLInterfaceType({
+          ...baseParams
+        });
+        break;
+      default:
+        const interfaces = this.getInterfaces(objectType);
+        compiled = new GraphQLObjectType({
+          ...baseParams,
+          fields: this.getFieldsFunction(objectType, interfaces),
+          interfaces: () => {
+            return interfaces.map((gqlInterface) => {
+              return gqlInterface.params.compiled as GraphQLInterfaceType;
+            });
+          }
+        });
+        break;
+    }
+    objectType.params.compiled = compiled;
+    return objectType;
   }
 
   /**

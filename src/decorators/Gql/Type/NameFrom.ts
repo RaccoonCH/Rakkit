@@ -9,6 +9,7 @@ export function NameFrom(...types: IClassType<any>[]): Function {
       params: (
         type: IDecorator<IGqlType>
       ): INamed => ({
+        // TODO: For multiple types
         name: type.params.name + types.reduce((prev, classType) => {
           const objectType = MetadataStorage.Instance.Gql.GetOneGqlType(classType, type.params.gqlTypeName);
           if (objectType) {

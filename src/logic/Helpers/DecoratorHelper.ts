@@ -4,7 +4,9 @@ import {
   MiddlewareExecutionTime,
   GqlType,
   IDecorator,
-  IGqlType
+  IGqlType,
+  TypeFn,
+  GqlResolveType
 } from "../..";
 
 export class DecoratorHelper {
@@ -34,6 +36,36 @@ export class DecoratorHelper {
         gqlTypeName,
         name: definedName
       }
+    };
+  }
+
+  static getAddResolveDecorator(
+    typeOrName?: string | TypeFn,
+    name?: string,
+    resolveType: GqlResolveType = "Query"
+  ) {
+    const isType = typeof typeOrName === "function";
+    return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
+      const baseType = () => Reflect.getMetadata("design:returntype", target, key);
+      const definedName = (isType ? name : typeOrName as string) || key;
+      const definedType = isType ? typeOrName as TypeFn : baseType;
+      MetadataStorage.Instance.Gql.AddField({
+        class: target.constructor,
+        key,
+        category: "gql",
+        params: {
+          resolveType,
+          name: definedName,
+          args: [],
+          partial: false,
+          required: false,
+          function: descriptor.value,
+          deprecationReason: undefined,
+          type: definedType,
+          isArray: false,
+          nullable: false
+        }
+      });
     };
   }
 

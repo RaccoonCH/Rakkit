@@ -1,9 +1,13 @@
 import { GoodbyeMiddleware } from "./../../../basic/src/middlewares/GoodbyeMiddleware";
 import { HelloMiddleware } from "./../../../basic/src/middlewares/HelloMiddleware";
-import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction } from "../../../../src";
+import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, MetadataStorage } from "../../../../src";
 import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2, ExampleObjectType2 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
+const partialType = MetadataStorage.Instance.Gql.CreatePartial(
+  ExampleInputType,
+  "ObjectType"
+);
 
 @Resolver()
 @UseMiddleware(
@@ -12,7 +16,7 @@ const params = getItems(ExampleInputType, ExampleInputType2);
   async (context, next) => { console.log("hi"); await next(); }
 )
 export class ExampleResolver3 {
-  @Query(returns => ExampleObjectType)
+  @Query(returns => partialType)
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async a(
     @Arg(type => params, { nullable: true, flat: true })
@@ -36,6 +40,15 @@ export class ExampleResolver3 {
 export class ExampleResolver {
   @Query()
   helloWorld(
+    context
+  ): String {
+    ExampleObjectType;
+    console.log("hello world");
+    return "aass";
+  }
+
+  @Mutation()
+  helloWorldMutation(
     context
   ): String {
     ExampleObjectType;

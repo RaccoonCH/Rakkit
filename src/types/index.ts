@@ -57,4 +57,5 @@ export * from "./WS/WsOptions";
 export * from "./WS/Socket";
 
 export * from "./Gql/GqlType";
+export * from "./Gql/GqlResolveType";
 export * from "./Gql/Param";
