@@ -1,7 +1,8 @@
 import {
   MetadataStorage,
   TypeFn,
-  IFieldParams
+  IFieldParams,
+  DecoratorHelper
 } from "../../..";
 
 export function Field();
@@ -16,23 +17,14 @@ export function Field(typeOrParams?: IFieldParams | TypeFn, params?: IFieldParam
     const reflectType: TypeFn = () => Reflect.getMetadata("design:type", target, key);
     const finalType = definedType || reflectType;
     const isArray = Array.isArray(reflectType().prototype);
-    MetadataStorage.Instance.Gql.AddField({
-      class: target.constructor,
-      key,
-      category: "gql",
-      params: {
-        resolveType: undefined,
-        name: key,
-        args: undefined,
-        function: undefined,
-        partial: false,
-        required: false,
-        type: finalType,
-        deprecationReason: undefined,
-        nullable: false,
+    MetadataStorage.Instance.Gql.AddField(
+      DecoratorHelper.getAddFieldParams(
+        target.constructor,
+        key,
+        finalType,
         isArray,
-        ...definedParams
-      }
-    });
+        definedParams
+      )
+    );
   };
 }

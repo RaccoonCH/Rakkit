@@ -6,7 +6,8 @@ import {
   IDecorator,
   IGqlType,
   TypeFn,
-  GqlResolveType
+  GqlResolveType,
+  IField
 } from "../..";
 
 export class DecoratorHelper {
@@ -20,6 +21,34 @@ export class DecoratorHelper {
     };
   }
 
+  static getAddFieldParams(
+    target: Function,
+    key: string,
+    typeFn: TypeFn,
+    isArray: boolean,
+    extraParams?: Partial<IField>
+  ): IDecorator<IField> {
+    const definedParams = extraParams || {};
+    return {
+      class: target,
+      key,
+      category: "gql",
+      params: {
+        resolveType: undefined,
+        name: definedParams.name || key,
+        args: undefined,
+        function: undefined,
+        partial: false,
+        required: false,
+        type: typeFn,
+        deprecationReason: undefined,
+        nullable: false,
+        isArray,
+        ...definedParams
+      }
+    };
+  }
+
   static getAddTypeParams(
     target: Function,
     gqlTypeName: GqlType,
@@ -29,7 +58,7 @@ export class DecoratorHelper {
     const definedName = name || target.name;
     return {
       class: target,
-      key: target.name,
+      key: target.name || definedName,
       category: "gql",
       params: {
         interfaces,

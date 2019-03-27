@@ -1,1 +1,1 @@
-export type TypeFn = (type?: any) => Function;
+export type TypeFn = (type?: any) => any;

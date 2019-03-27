@@ -4,10 +4,18 @@ import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, 
 import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2, ExampleObjectType2 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
-const partialType = MetadataStorage.Instance.Gql.CreatePartial(
-  ExampleInputType,
-  "ObjectType"
-);
+// const partialType = MetadataStorage.Instance.Gql.CreatePartial(
+//   ExampleInputType,
+//   "ObjectType"
+// );
+
+enum Test {
+  a = "a",
+  b = "b"
+}
+
+const enumType = MetadataStorage.Instance.Gql.CreateEnum(Test, "enum", "enum");
+const union = MetadataStorage.Instance.Gql.CreateUnion(ExampleInputType, ExampleInputType2);
 
 @Resolver()
 @UseMiddleware(
@@ -16,7 +24,7 @@ const partialType = MetadataStorage.Instance.Gql.CreatePartial(
   async (context, next) => { console.log("hi"); await next(); }
 )
 export class ExampleResolver3 {
-  @Query(returns => partialType)
+  @Query(type => enumType)
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async a(
     @Arg(type => params, { nullable: true, flat: true })
@@ -38,21 +46,19 @@ export class ExampleResolver3 {
 @Resolver()
 @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
-  @Query()
+  @Query(type => union)
   helloWorld(
     context
   ): String {
-    ExampleObjectType;
     console.log("hello world");
-    return "aass";
+    return "hello";
   }
 
   @Mutation()
   helloWorldMutation(
     context
   ): String {
-    ExampleObjectType;
     console.log("hello world");
-    return "aass";
+    return "hello";
   }
 }

@@ -2,12 +2,13 @@ import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom } fro
 
 @InputType()
 @ObjectType()
-@InterfaceType()
+@InterfaceType("Test")
 export class ExampleInputType {
   @Field()
   hello3: string;
 }
 
+@NameFrom(ExampleInputType)
 @InputType()
 @InterfaceType()
 @ObjectType()

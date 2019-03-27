@@ -15,7 +15,10 @@ import {
   GraphQLList,
   GraphQLInterfaceType,
   GraphQLFieldConfigArgumentMap,
-  GraphQLInputType
+  GraphQLInputType,
+  GraphQLEnumType,
+  GraphQLEnumValueConfigMap,
+  GraphQLUnionType
 } from "graphql";
 import { MetadataBuilder } from "./MetadataBuilder";
 import {
@@ -44,6 +47,7 @@ export class GqlBuilder extends MetadataBuilder {
   private _schema: GraphQLSchema;
   private _mutationType: IDecorator<IGqlType>;
   private _queryType: IDecorator<IGqlType>;
+  private _compileAfter: Function[] = [];
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
@@ -116,10 +120,21 @@ export class GqlBuilder extends MetadataBuilder {
     const query = objectTypes.find((gqlType) => gqlType.name === "Query");
     const mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
 
+    this.compileAfter();
+
+    const enums = this.getGqlTypeByTypeName("EnumType").map((enumType) =>
+      enumType.params.compiled
+    ) as GraphQLEnumType[];
+    const unions = this.getGqlTypeByTypeName("UnionType").map((union) =>
+      union.params.compiled
+    ) as GraphQLUnionType[];
+
     const types = [
       ...interfaceTypes,
       ...inputTypes,
-      ...objectTypes
+      ...objectTypes,
+      ...enums,
+      ...unions
     ];
 
     this._schema = new GraphQLSchema({
@@ -131,6 +146,7 @@ export class GqlBuilder extends MetadataBuilder {
     this.writeSchemaFile();
   }
 
+  // From generic instance typename ?
   GetGqlTypes(classType: Function, gqlTypeName?: GqlType) {
     const types = this._gqlTypes.filter((objectType) => {
       return (
@@ -145,16 +161,67 @@ export class GqlBuilder extends MetadataBuilder {
     return this.GetGqlTypes(classType, gqlTypeName)[0];
   }
 
-  // TODO: Prefix
+  CreateEnum<EnumType extends Object>(
+    enumType: EnumType,
+    name: string,
+    description?: string
+  ) {
+    const gqlType = this.createObjectType(
+      name,
+      "ObjectType"
+    );
+
+    const compile = () => {
+      const values: GraphQLEnumValueConfigMap = {};
+      Object.entries(enumType).map(([key, value]) => {
+        values[key] = {
+          value
+        };
+      });
+      const compiled = new GraphQLEnumType({
+        name,
+        values,
+        description
+      });
+      gqlType.params.compiled = compiled;
+      this.AddType(gqlType);
+    };
+    this._compileAfter.push(compile);
+
+    return gqlType.class;
+  }
+
+  CreateUnion(...types: Function[]) {
+    const gqlType = this.createObjectType(
+      `union${this._compileAfter.length}`,
+      "ObjectType"
+    );
+    const compile = () => {
+      const gqlTypes = types.map((type) =>
+        this.GetOneGqlType(type, "ObjectType").params.compiled
+      ) as GraphQLObjectType[];
+      const name = gqlTypes.reduce((prev, gqlType) => prev + gqlType.name, "");
+      gqlType.params.name = name;
+      gqlType.key = name;
+      const unionType = new GraphQLUnionType({
+        types: gqlTypes,
+        name
+      });
+      gqlType.params.compiled = unionType;
+      this.AddType(gqlType);
+    };
+    this._compileAfter.push(compile);
+
+    return gqlType.class;
+  }
+
   CreatePartial(classType: Function): Function[];
-  // TODO: better way for RenameWithTypeName()
   CreatePartial(classType: Function, gqlTypeName: GqlType, name?: string): Function;
   CreatePartial(
     classType: Function,
     gqlTypeName?: GqlType,
     name?: string
   ): Function[] | Function {
-    this.renameWithTypeName();
     const targetTypes = this.GetGqlTypes(classType, gqlTypeName);
     const newTypes = targetTypes.map((targetType) => {
       const partialName = name || `Partial${targetType.params.name}`;
@@ -169,12 +236,17 @@ export class GqlBuilder extends MetadataBuilder {
         newType,
         { nullable: true }
       );
+      this.AddType(newType);
       return newType;
     });
     if (gqlTypeName) {
       return newTypes[0].class;
     }
     return newTypes.map((newType) => newType.class);
+  }
+
+  private getGqlTypeByTypeName(gqlTypeName: GqlType) {
+    return this._gqlTypes.filter((gqlType) => gqlType.params.gqlTypeName === gqlTypeName);
   }
 
   /**
@@ -230,6 +302,10 @@ export class GqlBuilder extends MetadataBuilder {
     });
   }
 
+  private compileAfter() {
+    this._compileAfter.map((compile) => compile());
+  }
+
   private createObjectType(name: string, gqlTypeName: GqlType = "ObjectType") {
     return DecoratorHelper.getAddTypeParams(
       () => name,
@@ -239,13 +315,24 @@ export class GqlBuilder extends MetadataBuilder {
     );
   }
 
+  private createField(name: string, typeFn: Function, isArray: boolean): IDecorator<IField> {
+    return DecoratorHelper.getAddFieldParams(
+      () => name,
+      name,
+      () => typeFn,
+      isArray
+    );
+  }
+
   /**
    * Apply ObjectTypeSetters to ObjectTypes
    */
   private applyObjectTypeSetters() {
     this._objectTypeSetters.map((setter) => {
-      const objectType = this.GetOneGqlType(setter.class);
-      this.setSetterParams(setter, objectType);
+      const gqlTypes = this.GetGqlTypes(setter.class);
+      gqlTypes.map((gqlType) => {
+        this.setSetterParams(setter, gqlType);
+      });
     });
   }
 

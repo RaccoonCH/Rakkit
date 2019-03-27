@@ -1,8 +1,4 @@
-import {
-  GraphQLInputType,
-  GraphQLInputObjectType,
-  GraphQLObjectType
-} from "graphql";
+import { GraphQLOutputType } from "graphql";
 import {
   GqlType,
   INamed,
@@ -11,5 +7,5 @@ import {
 
 export interface IGqlType extends INamed, IInterface {
   gqlTypeName: GqlType;
-  compiled?: GraphQLInputType | GraphQLInputObjectType | GraphQLObjectType | {};
+  compiled?: GraphQLOutputType | {};
 }
