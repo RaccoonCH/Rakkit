@@ -19,6 +19,7 @@ export * from "./Decorators/WS/IWebsocket";
 export * from "./Decorators/Gql/IField";
 export * from "./Decorators/Gql/IGqlType";
 export * from "./Decorators/Gql/IQuery";
+export * from "./Decorators/Gql/IDescription";
 export * from "./Decorators/Gql/IResolver";
 export * from "./Decorators/Gql/IDeprecation";
 export * from "./Decorators/Gql/INullable";
@@ -39,6 +40,7 @@ export * from "./DecoratorsParams/Gql/IFieldParams";
 export * from "./DecoratorsParams/Gql/IGqlTypeParams";
 export * from "./DecoratorsParams/Gql/IObjectTypeParams";
 export * from "./DecoratorsParams/Gql/IArgParams";
+export * from "./DecoratorsParams/Gql/ICreateParams";
 
 export * from "./REST/HttpMethod";
 

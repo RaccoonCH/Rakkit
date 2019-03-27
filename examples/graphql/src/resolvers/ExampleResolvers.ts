@@ -4,18 +4,17 @@ import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, 
 import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2, ExampleObjectType2 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
-// const partialType = MetadataStorage.Instance.Gql.CreatePartial(
-//   ExampleInputType,
-//   "ObjectType"
-// );
 
 enum Test {
   a = "a",
   b = "b"
 }
 
-const enumType = MetadataStorage.Instance.Gql.CreateEnum(Test, "enum", "enum");
-const union = MetadataStorage.Instance.Gql.CreateUnion(ExampleInputType, ExampleInputType2);
+const enumType = MetadataStorage.Instance.Gql.CreateEnum(Test, { name: "testenum" });
+const union = MetadataStorage.Instance.Gql.CreateUnion(
+  { name: "test" },
+  ExampleInputType, ExampleInputType2
+);
 
 @Resolver()
 @UseMiddleware(

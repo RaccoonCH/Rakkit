@@ -5,12 +5,6 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-"""enum"""
-enum enum {
-  a
-  b
-}
-
 interface ExampleInterfaceType2 {
   hello4: String!
 }
@@ -90,8 +84,6 @@ type ObjectTypeExampleInputType2 {
   hello12: String
 }
 
-union ObjectTypeExampleInputTypeObjectTypeExampleInputType2 = ObjectTypeExampleInputType | ObjectTypeExampleInputType2
-
 type ObjectTypeExampleInterfaceType {
   hello3: String!
   ms: ObjectTypeExampleInputType!
@@ -114,8 +106,8 @@ type ObjectTypePO2 implements InterfaceTypePO1 {
 }
 
 type Query {
-  a: enum!
-  helloWorld: ObjectTypeExampleInputTypeObjectTypeExampleInputType2!
+  a: testenum!
+  helloWorld: test!
 }
 
 type Response {
@@ -124,6 +116,13 @@ type Response {
   hello6: ObjectTypeExampleInputType
 }
 
+union test = ObjectTypeExampleInputType | ObjectTypeExampleInputType2
+
 interface Test {
   hello3: String!
+}
+
+enum testenum {
+  a
+  b
 }

@@ -35,7 +35,8 @@ import {
   IClassType,
   NextFunction,
   TypeFn,
-  DecoratorHelper
+  DecoratorHelper,
+  ICreateParams
 } from "../../..";
 
 export class GqlBuilder extends MetadataBuilder {
@@ -163,25 +164,27 @@ export class GqlBuilder extends MetadataBuilder {
 
   CreateEnum<EnumType extends Object>(
     enumType: EnumType,
-    name: string,
-    description?: string
+    params?: ICreateParams
   ) {
+    const values: GraphQLEnumValueConfigMap = {};
+    const generatedName = Object.entries(enumType).reduce((prev, [key, value]) => {
+      values[key] = {
+        value
+      };
+      return prev + key;
+    }, "");
+    const definedParams = params || {};
+    const definedName = definedParams.name || generatedName;
     const gqlType = this.createObjectType(
-      name,
+      definedName,
       "ObjectType"
     );
 
     const compile = () => {
-      const values: GraphQLEnumValueConfigMap = {};
-      Object.entries(enumType).map(([key, value]) => {
-        values[key] = {
-          value
-        };
-      });
       const compiled = new GraphQLEnumType({
-        name,
+        name: definedName,
         values,
-        description
+        ...definedParams
       });
       gqlType.params.compiled = compiled;
       this.AddType(gqlType);
@@ -191,21 +194,30 @@ export class GqlBuilder extends MetadataBuilder {
     return gqlType.class;
   }
 
-  CreateUnion(...types: Function[]) {
+  CreateUnion(params: ICreateParams, ...types: Function[]);
+  CreateUnion(types: Function[]);
+  CreateUnion(paramsOrTypes?: ICreateParams | Function[], ...types: Function[]) {
+    const isTypes = Array.isArray(paramsOrTypes);
+    const definedParams: ICreateParams = isTypes ? {} : paramsOrTypes as ICreateParams;
+    const definedTypes = isTypes ? paramsOrTypes as Function[] : types ;
+
     const gqlType = this.createObjectType(
       `union${this._compileAfter.length}`,
       "ObjectType"
     );
     const compile = () => {
-      const gqlTypes = types.map((type) =>
+      const gqlTypes = definedTypes.map((type) =>
         this.GetOneGqlType(type, "ObjectType").params.compiled
       ) as GraphQLObjectType[];
-      const name = gqlTypes.reduce((prev, gqlType) => prev + gqlType.name, "");
-      gqlType.params.name = name;
-      gqlType.key = name;
+      if (!definedParams.name) {
+        definedParams.name = `Union${gqlTypes.reduce((prev, gqlType) => prev + gqlType.name, "")}`;
+      }
+      gqlType.params.name = definedParams.name;
+      gqlType.key = definedParams.name;
       const unionType = new GraphQLUnionType({
         types: gqlTypes,
-        name
+        name: definedParams.name,
+        ...definedParams
       });
       gqlType.params.compiled = unionType;
       this.AddType(gqlType);
