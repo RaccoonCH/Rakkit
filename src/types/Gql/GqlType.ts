@@ -1,6 +1,14 @@
+import {
+  GraphQLObjectType,
+  GraphQLEnumType,
+  GraphQLInputObjectType,
+  GraphQLUnionType,
+  GraphQLInterfaceType
+} from "graphql";
+
 export type GqlType =
-  "InputType" |
-  "ObjectType" |
-  "InterfaceType" |
-  "EnumType" |
-  "UnionType";
+  typeof GraphQLObjectType |
+  typeof GraphQLInputObjectType |
+  typeof GraphQLEnumType |
+  typeof GraphQLUnionType |
+  typeof GraphQLInterfaceType;

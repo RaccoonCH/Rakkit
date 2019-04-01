@@ -92,6 +92,7 @@ export class DiBuilder extends MetadataBuilder {
     const isClass = typeof itemOrClass === "function";
     const classFunc = isClass ? (itemOrClass as ClassType) : (itemOrClass as IDecorator).class;
     const service: IDecorator<IService> = {
+      originalClass: (classFunc as Function),
       class: (classFunc as Function),
       key: classFunc.constructor.name,
       category: "di",
@@ -139,6 +140,7 @@ export class DiBuilder extends MetadataBuilder {
       );
       const newInjections = classInjections.map<IDecorator<IInject>>((injection) => {
         return {
+          originalClass: classType,
           class: classType,
           key: injection.key,
           category: "di",
@@ -175,8 +177,10 @@ export class DiBuilder extends MetadataBuilder {
               // For each injection get the services with the specified ids
               // constructor(@Inject(type => MyService, 1, 2) private _myService: MyService[])
               const instances = injection.params.ids.map((id) => {
+                const classType = injection.params.injectionType() || param;
                 const serviceItem: IDecorator<IDiId> = {
-                  class: injection.params.injectionType() || param,
+                  originalClass: classType,
+                  class: classType,
                   key: undefined,
                   category: "di",
                   params: {
@@ -199,6 +203,7 @@ export class DiBuilder extends MetadataBuilder {
               // If the constructor injection is not decorated but the type is a service
               // constructor(private _service: MyService)
               const serviceItem: IDecorator<IDiId> = {
+                originalClass: param,
                 class: param,
                 key: undefined,
                 category: "di",

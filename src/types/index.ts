@@ -33,6 +33,7 @@ export * from "./Decorators/Gql/IParam";
 export * from "./Decorators/Gql/IIsArray";
 export * from "./Decorators/Gql/IHasType";
 export * from "./Decorators/Gql/IFlat";
+export * from "./Decorators/Gql/SetterType";
 export * from "./Decorators/IDecorator";
 export * from "./Decorators/DecoratorCategory";
 

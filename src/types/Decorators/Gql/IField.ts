@@ -12,10 +12,8 @@ import {
 export interface IField extends
   IHasType,
   IDeprecation,
-  IPartial,
-  IRequired,
   IQuery,
   INamed,
-  IDescription {
+  Partial<IDescription> {
   compiled?: GraphQLFieldConfig<any, any>;
 }

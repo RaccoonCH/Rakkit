@@ -5,12 +5,6 @@ import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputTy
 
 const params = getItems(ExampleInputType, ExampleInputType2);
 
-enum Test {
-  a = "a",
-  b = "b"
-}
-
-const enumType = MetadataStorage.Instance.Gql.CreateEnum(Test, { name: "testenum" });
 const union = MetadataStorage.Instance.Gql.CreateUnion(
   { name: "test" },
   ExampleInputType, ExampleInputType2
@@ -23,7 +17,7 @@ const union = MetadataStorage.Instance.Gql.CreateUnion(
   async (context, next) => { console.log("hi"); await next(); }
 )
 export class ExampleResolver3 {
-  @Query(type => enumType)
+  @Query(type => ExampleObjectType)
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async a(
     @Arg(type => params, { nullable: true, flat: true })
@@ -45,7 +39,7 @@ export class ExampleResolver3 {
 @Resolver()
 @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
-  @Query(type => union)
+  @Query(type => ExampleObjectType)
   helloWorld(
     context
   ): String {

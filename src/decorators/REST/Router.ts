@@ -7,6 +7,7 @@ import { MetadataStorage } from "../../logic";
 export function Router(path: string): Function {
   return (target: Function): void => {
     MetadataStorage.Instance.Rest.AddRouter({
+      originalClass: target,
       class: target,
       key: target.name,
       category: "rest",

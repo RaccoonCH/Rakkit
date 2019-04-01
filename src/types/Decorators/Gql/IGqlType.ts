@@ -1,11 +1,10 @@
-import { GraphQLOutputType } from "graphql";
 import {
   GqlType,
   INamed,
   IInterface
 } from "../..";
 
-export interface IGqlType extends INamed, IInterface {
-  gqlTypeName: GqlType;
-  compiled?: GraphQLOutputType | {};
+export interface IGqlType<Type extends GqlType = any> extends INamed, IInterface {
+  gqlType: Type;
+  compiled?: InstanceType<Type>;
 }

@@ -1,4 +1,5 @@
 import { DecoratorHelper, MetadataStorage } from "../../../logic";
+import { GraphQLObjectType } from "graphql";
 
 export function ObjectType();
 export function ObjectType(name: string);
@@ -10,7 +11,7 @@ export function ObjectType(nameOrInterfaces?: string | Function[], ...interfaces
   const definedInterfaces: Function[] = isName ? interfaces : nameOrInterfaces as Function[];
   return (target: Function): void => {
     MetadataStorage.Instance.Gql.AddType(
-      DecoratorHelper.getAddTypeParams(target, "ObjectType", definedName, definedInterfaces)
+      DecoratorHelper.getAddTypeParams(target, GraphQLObjectType, definedName, definedInterfaces)
     );
   };
 }

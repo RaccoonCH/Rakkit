@@ -21,11 +21,10 @@ export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
     const definedType = isType ? typeOrParams as TypeFn : () => Reflect.getMetadata("design:paramtypes", target, key)[index];
     const definedParams = isType ? params : typeOrParams;
     const reflectType: Function = Reflect.getMetadata("design:paramtypes", target, key)[index];
-    MetadataStorage.Instance.Gql.AddFieldSetter<
-      (field: IDecorator<IField>) => Partial<IQuery>
-    >({
+    MetadataStorage.Instance.Gql.AddFieldSetter({
       category: "gql",
       class: target.constructor,
+      originalClass: target.constructor,
       key,
       params: (field) => {
         const newArg: IArg = {

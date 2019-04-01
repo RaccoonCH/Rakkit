@@ -1,4 +1,11 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom } from "../../../../src";
+import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, MetadataStorage } from "../../../../src";
+
+enum TestEnum {
+  a = "a",
+  b = "b"
+}
+
+const enumType = MetadataStorage.Instance.Gql.CreateEnum(TestEnum, { name: "testenum" });
 
 @InputType()
 @ObjectType()
@@ -6,6 +13,9 @@ import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom } fro
 export class ExampleInputType {
   @Field()
   hello3: string;
+
+  @Field(type => enumType)
+  enumz: TestEnum;
 }
 
 @NameFrom(ExampleInputType)

@@ -89,6 +89,7 @@ export class RoutingBuilder extends MetadataBuilder {
   AnonymousFnToMw(mw: MiddlewareType): IDecorator<IMiddleware> {
     const fnMw = mw as HandlerFunction;
     return {
+      originalClass: fnMw,
       class: fnMw,
       key: fnMw.name,
       category: "rest",

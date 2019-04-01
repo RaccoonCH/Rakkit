@@ -14,6 +14,7 @@ export function UseMiddleware(...middlewares: MiddlewareType[]) {
     };
 
     MetadataStorage.Instance.Routing.AddUsedMiddleware({
+      originalClass: (mw.target as Function),
       class: (mw.target as Function),
       key: mw.fieldName,
       category: "routing",

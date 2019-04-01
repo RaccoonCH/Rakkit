@@ -30,6 +30,7 @@ export class DecoratorHelper {
   ): IDecorator<IField> {
     const definedParams = extraParams || {};
     return {
+      originalClass: target,
       class: target,
       key,
       category: "gql",
@@ -38,8 +39,6 @@ export class DecoratorHelper {
         name: definedParams.name || key,
         args: undefined,
         function: undefined,
-        partial: false,
-        required: false,
         type: typeFn,
         deprecationReason: undefined,
         nullable: false,
@@ -49,20 +48,21 @@ export class DecoratorHelper {
     };
   }
 
-  static getAddTypeParams(
+  static getAddTypeParams<Type extends GqlType>(
     target: Function,
-    gqlTypeName: GqlType,
+    gqlType: Type,
     name?: string,
     interfaces: Function[] = []
-  ): IDecorator<IGqlType> {
+  ): IDecorator<IGqlType<Type>> {
     const definedName = name || target.name;
     return {
+      originalClass: target,
       class: target,
       key: target.name || definedName,
       category: "gql",
       params: {
         interfaces,
-        gqlTypeName,
+        gqlType,
         name: definedName
       }
     };
@@ -79,6 +79,7 @@ export class DecoratorHelper {
       const definedName = (isType ? name : typeOrName as string) || key;
       const definedType = isType ? typeOrName as TypeFn : baseType;
       MetadataStorage.Instance.Gql.AddField({
+        originalClass: target.constructor,
         class: target.constructor,
         key,
         category: "gql",
@@ -86,8 +87,6 @@ export class DecoratorHelper {
           resolveType,
           name: definedName,
           args: [],
-          partial: false,
-          required: false,
           function: descriptor.value,
           deprecationReason: undefined,
           type: definedType,
@@ -102,6 +101,7 @@ export class DecoratorHelper {
     return (endpoint?: string): Function => {
       return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
         MetadataStorage.Instance.Rest.AddEndpoint({
+          originalClass: target.constructor,
           class: target.constructor,
           key,
           category: "rest",
@@ -122,6 +122,7 @@ export class DecoratorHelper {
         const finalKey = isClass ? target.name : key;
         const finalFunc = isClass ? target : descriptor.value;
         MetadataStorage.Instance.Routing.AddMiddleware({
+          originalClass: finalFunc,
           class: finalFunc,
           key: finalKey,
           category: "routing",
