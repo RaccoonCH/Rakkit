@@ -2,9 +2,14 @@ import "reflect-metadata";
 import { createServer, Server } from "http";
 import * as SocketIo from "socket.io";
 import * as Koa from "koa";
-import { AppLoader, MetadataStorage } from "./logic";
-import { IAppConfig, MiddlewareType, MiddlewareExecutionTime } from "./types";
-import { Color } from "./misc";
+import { AppLoader } from "./Logic/AppLoader";
+import {
+  IAppConfig,
+  MiddlewareType,
+  MiddlewareExecutionTime,
+  Color,
+  MetadataStorage
+} from ".";
 
 export class Rakkit extends AppLoader {
   protected static _instance: Rakkit;

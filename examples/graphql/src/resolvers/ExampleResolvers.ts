@@ -1,11 +1,11 @@
 import { GoodbyeMiddleware } from "./../../../basic/src/middlewares/GoodbyeMiddleware";
 import { HelloMiddleware } from "./../../../basic/src/middlewares/HelloMiddleware";
-import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, MetadataStorage } from "../../../../src";
+import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, MetadataStorage, TypeCreator } from "../../../../src";
 import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2, ExampleObjectType2 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
 
-const union = MetadataStorage.Instance.Gql.CreateUnion(
+const union = TypeCreator.CreateUnion(
   { name: "test" },
   ExampleInputType, ExampleInputType2
 );
@@ -17,7 +17,7 @@ const union = MetadataStorage.Instance.Gql.CreateUnion(
   async (context, next) => { console.log("hi"); await next(); }
 )
 export class ExampleResolver3 {
-  @Query(type => ExampleObjectType)
+  @Query(type => union)
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async a(
     @Arg(type => params, { nullable: true, flat: true })

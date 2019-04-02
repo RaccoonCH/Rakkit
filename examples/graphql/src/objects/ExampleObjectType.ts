@@ -1,11 +1,11 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, MetadataStorage } from "../../../../src";
+import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, MetadataStorage, TypeCreator } from "../../../../src";
 
 enum TestEnum {
   a = "a",
   b = "b"
 }
 
-const enumType = MetadataStorage.Instance.Gql.CreateEnum(TestEnum, { name: "testenum" });
+const enumType = TypeCreator.CreateEnum(TestEnum, { name: "testenum" });
 
 @InputType()
 @ObjectType()
