@@ -73,34 +73,22 @@ export class TypeCreator {
    * @param classType
    */
   // WIP (remove private when done)
-  // private CreatePartial(classType: Function): Function[];
-  // private CreatePartial(classType: Function, gqlType: GqlType, name?: string): Function;
-  // private CreatePartial(
+  // static CreatePartial(classType: Function);
+  // static CreatePartial<Type extends GqlType>(classType: Function, gqlType: Type, name?: string);
+  // static CreatePartial<Type extends GqlType = any>(
   //   classType: Function,
-  //   gqlType?: GqlType,
+  //   gqlType?: Type,
   //   name?: string
-  // ): Function[] | Function {
-  //   const targetTypes = this.GetGqlTypeDefs(classType, gqlType);
-  //   const newTypes = targetTypes.map((targetType) => {
-  //     const partialName = name || `Partial${targetType.params.name}`;
-  //     const newType = DecoratorHelper.getAddTypeParams(
-  //       () => name,
-  //       targetType.params.gqlType,
-  //       partialName,
-  //       targetType.params.interfaces
-  //     );
-  //     this.copyFieldsWithTransformation(
-  //       targetType,
-  //       newType,
-  //       { nullable: true }
-  //     );
-  //     this.AddType(newType);
-  //     return newType;
+  // ): (() => any) {
+  //   return MetadataStorage.Instance.Gql.AddTransformation({
+  //     target: classType,
+  //     gqlType,
+  //     fieldsTransformation: {
+  //       params: {
+  //         nullable: true
+  //       }
+  //     }
   //   });
-  //   if (gqlType) {
-  //     return newTypes[0].class;
-  //   }
-  //   return newTypes.map((newType) => newType.class);
   // }
 
   /**

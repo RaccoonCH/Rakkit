@@ -27,6 +27,7 @@ export * from "./Decorator/Types/IIsArray";
 export * from "./Decorator/Types/IHasType";
 export * from "./Decorator/Types/IFlat";
 export * from "./Decorator/Types/SetterType";
+export * from "./Decorator/Types/ITypeTransformation";
 
 export * from "./Decorator/Params/ICreateParams";
 export * from "./Decorator/Params/IArgParams";
@@ -43,3 +44,6 @@ export * from "./Logic/TypeCreator";
 
 export * from "./Scalars/IsoDateTime";
 export * from "./Scalars/TimeStamp";
+export * from "./Scalars/Internal/GraphQLRakkitType";
+export * from "./Scalars/Internal/GraphQLPartialType";
+export * from "./Scalars/Internal/GraphQLRequiredType";

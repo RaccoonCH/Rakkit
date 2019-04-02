@@ -1,9 +1,8 @@
-import { GraphQLObjectType, GraphQLEnumValueConfigMap } from "graphql";
+import { GraphQLEnumValueConfigMap } from "graphql";
 import {
   GqlType,
   INamed,
-  IInterface,
-  IDecorator
+  IInterface
 } from "../../../..";
 
 export interface IGqlType<Type extends GqlType = any> extends INamed, IInterface {

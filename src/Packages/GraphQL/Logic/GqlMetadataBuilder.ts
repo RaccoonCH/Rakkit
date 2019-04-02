@@ -17,7 +17,8 @@ import {
   GraphQLFieldConfigArgumentMap,
   GraphQLInputType,
   GraphQLEnumType,
-  GraphQLUnionType
+  GraphQLUnionType,
+  GraphQLNamedType
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
 import {
@@ -35,11 +36,15 @@ import {
   NextFunction,
   TypeFn,
   DecoratorHelper,
-  SetterType
+  SetterType,
+  GraphQLPartialType,
+  GraphQLRequiredType,
+  ITypeTransformation
 } from "../../..";
 
 export class GqlMetadataBuilder extends MetadataBuilder {
   private _gqlTypeDefs: IDecorator<IGqlType>[] = [];
+  private _transformationGqlDef: ITypeTransformation[] = [];
   private _gqlTypeDefSetters: IDecorator<SetterType<IGqlType>>[] = [];
   private _fieldDefs: IDecorator<IField>[] = [];
   private _fieldDefSetters: IDecorator<SetterType<IField>>[] = [];
@@ -78,6 +83,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     this._gqlTypeDefs.push(item);
   }
 
+  AddTransformation(item: ITypeTransformation) {
+    this._transformationGqlDef.push(item);
+  }
+
   AddField(item: IDecorator<IField>) {
     this.setClassIfResolver(item);
     this._fieldDefs.push(item);
@@ -107,11 +116,13 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     this.applyFieldSetters();
     this.applyIhneritance();
 
+    // TODO?: TypesToBuild list
     const interfaceTypes = this.buildGqlTypes(GraphQLInterfaceType);
     const inputTypes = this.buildGqlTypes(GraphQLInputObjectType);
     const objectTypes = this.buildGqlTypes(GraphQLObjectType);
     const enumTypes = this.buildGqlTypes(GraphQLEnumType);
     const unionTypes = this.buildGqlTypes(GraphQLUnionType);
+
     const query = objectTypes.find((gqlType) => gqlType.name === "Query");
     const mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
 
@@ -189,10 +200,33 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
   //#region Build utils
   /**
+   * Copy a fieldDef and parent gqlType and apply transformations to the field (used for partial and required feature)
+   * @param gqlType The gqlTypeDef
+   * @param destination the newGqlTypeDef parent
+   * @param transformation The transformation to apply to the field
+   */
+  private copyFieldsWithTransformation(
+    gqlTypeDef: IDecorator<IGqlType>,
+    destination: IDecorator<IGqlType>,
+    transformation: Partial<IField>
+  ) {
+    this.AddType(destination);
+    this._fieldDefs.map((fieldDef) => {
+      if (fieldDef.class === gqlTypeDef.class) {
+        const newFieldDef = this.copyDecoratorType(fieldDef, {
+          class: destination.class,
+          params: transformation
+        });
+        this.AddField(newFieldDef);
+      }
+    });
+  }
+
+  /**
    * Build a GraphQL type (type, interface, input, ...)
    * @param gqlObjectTypeName The gql type to build
    */
-  private buildGqlTypes<Type extends GqlType>(gqlType: Type): InstanceType<Type>[] {
+  private buildGqlTypes<Type extends GqlType>(gqlType: Type) {
     this.mergeDuplicates(gqlType);
     const gqlTypes = this._gqlTypeDefs.reduce((prev, gqlTypeDef) => {
       if (gqlTypeDef.params.gqlType === gqlType) {
@@ -259,6 +293,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             throw new Error(`No type for the class ${unionClassType.name} was found to create the ${gqlTypeDef.params.name} union type`);
           })
         });
+        break;
+      case GraphQLPartialType:
+        break;
+      case GraphQLRequiredType:
         break;
     }
     gqlTypeDef.params.compiled = compiled;
@@ -497,29 +535,6 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         );
       });
       this.setSetterParams(setter, fieldDef);
-    });
-  }
-
-  /**
-   * Copy a fieldDef and parent gqlType and apply transformations to the field (used for partial and required feature)
-   * @param gqlType The gqlTypeDef
-   * @param destination the newGqlTypeDef parent
-   * @param transformation The transformation to apply to the field
-   */
-  private copyFieldsWithTransformation(
-    gqlTypeDef: IDecorator<IGqlType>,
-    destination: IDecorator<IGqlType>,
-    transformation: Partial<IField>
-  ) {
-    this.AddType(destination);
-    this._fieldDefs.map((fieldDef) => {
-      if (fieldDef.class === gqlTypeDef.class) {
-        const newFieldDef = this.copyDecoratorType(fieldDef, {
-          class: destination.class,
-          params: transformation
-        });
-        this.AddField(newFieldDef);
-      }
     });
   }
 
