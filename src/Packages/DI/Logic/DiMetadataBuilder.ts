@@ -25,13 +25,13 @@ export class DiMetadataBuilder extends MetadataBuilder {
 
   Build() {
     this._services.map((item) => {
-      this.extendsSuperclass(item.class);
+      this.extendsSuperclass(item.originalClass);
       this.initializeInstance(item);
     });
     this._injections.map((item) => {
       if (item.key) {
         const destinationServices = this._services.filter((service) =>
-          service.class === item.class
+          service.originalClass === item.originalClass
         );
         const type = item.params.injectionType();
         const services = item.params.ids.reduce((prev, id) => {
@@ -62,10 +62,10 @@ export class DiMetadataBuilder extends MetadataBuilder {
     id?: string | number
   ) {
     const isService = typeof classtypeOrService !== "function";
-    const comparedClassType = isService ? (classtypeOrService as IDecorator<any>).class : classtypeOrService;
+    const comparedClassType = isService ? (classtypeOrService as IDecorator<any>).originalClass : classtypeOrService;
     const comparedId = isService ? (classtypeOrService as IDecorator<IDiId>).params.id : id;
     const service = this._services.find((service) =>
-      service.class === comparedClassType && service.params.id === comparedId
+      service.originalClass === comparedClassType && service.params.id === comparedId
     );
     if (service) {
       if (isService) {
@@ -90,7 +90,7 @@ export class DiMetadataBuilder extends MetadataBuilder {
     id?: DiId
   ) {
     const isClass = typeof itemOrClass === "function";
-    const classFunc = isClass ? (itemOrClass as ClassType) : (itemOrClass as IDecorator).class;
+    const classFunc = isClass ? (itemOrClass as ClassType) : (itemOrClass as IDecorator).originalClass;
     const service: IDecorator<IService> = {
       originalClass: (classFunc as Function),
       class: (classFunc as Function),
@@ -136,7 +136,7 @@ export class DiMetadataBuilder extends MetadataBuilder {
         console.log("a");
       }
       const classInjections = this._injections.filter((injection) =>
-        injection.class === (superClass as Function)
+        injection.originalClass === (superClass as Function)
       );
       const newInjections = classInjections.map<IDecorator<IInject>>((injection) => {
         return {
@@ -158,9 +158,9 @@ export class DiMetadataBuilder extends MetadataBuilder {
   private initializeInstance(item: IDecorator<IService>) {
     if (item) {
       if (!item.params.instance) {
-        const classType = item.class as IClassType<any>;
+        const classType = item.originalClass as IClassType<any>;
         // Get the constructor params of the class
-        const initParams: Function[] = Reflect.getMetadata("design:paramtypes", item.class);
+        const initParams: Function[] = Reflect.getMetadata("design:paramtypes", item.originalClass);
         if (initParams) {
           const instances = initParams.reduce<ReturnedService<any>[]>((prev, param, index) => {
             let value = undefined;
@@ -169,7 +169,7 @@ export class DiMetadataBuilder extends MetadataBuilder {
             // at the same index
             const injection = this._injections.find((injection) => {
               return (
-                injection.class === item.class &&
+                injection.originalClass === item.originalClass &&
                 injection.params.paramIndex === index
               );
             });
@@ -195,7 +195,7 @@ export class DiMetadataBuilder extends MetadataBuilder {
               // TODO: Verify array
               const isArray = Array.isArray(param.prototype);
               if (isArray && !injection.params.injectionType()) {
-                throw new ArrayDiError(item.class, ` On constructor at index: ${index}`);
+                throw new ArrayDiError(item.originalClass, ` On constructor at index: ${index}`);
               }
               const isServicesAnArray = instances.length > 1;
               value = isServicesAnArray ? instances : instances[0];

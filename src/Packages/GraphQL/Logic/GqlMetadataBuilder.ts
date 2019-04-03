@@ -244,6 +244,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         const interfaces = this.getInterfaces(gqlTypeDef);
         compiled = new GraphQLObjectType({
           ...baseParams,
+          isTypeOf: (source, context, info) => {
+            return gqlTypeDef.params.compiled;
+          },
           fields: this.getFieldsFunction(gqlTypeDef, interfaces),
           interfaces: () => {
             return interfaces.map((gqlInterface) => {
@@ -261,6 +264,24 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       case GraphQLUnionType:
         compiled = new GraphQLUnionType({
           ...baseParams,
+          resolveType: (value) => {
+            const valueKeys = Object.keys(value);
+            const possibleTypes = this._fieldDefs.reduce<IDecorator<IGqlType<typeof GraphQLObjectType>>[]>((prev, fieldDef) => {
+              if (
+                valueKeys.includes(fieldDef.params.name) &&
+                gqlTypeDef.params.unionTypes.includes(fieldDef.originalClass)
+              ) {
+                const fieldGqlTypeDef = this.GetOneGqlTypeDef(fieldDef.originalClass, GraphQLObjectType);
+                if (fieldGqlTypeDef && !prev.includes(fieldGqlTypeDef)) {
+                  prev.push(fieldGqlTypeDef);
+                }
+              }
+              return prev;
+            }, []);
+            if (possibleTypes.length > 0) {
+              return possibleTypes[0].params.compiled;
+            }
+          },
           types: gqlTypeDef.params.unionTypes.map((unionClassType) => {
             const unionGqlTypeDef = this.GetOneGqlTypeDef(unionClassType, GraphQLObjectType);
             if (unionGqlTypeDef) {
@@ -818,15 +839,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       const fieldType = typeFn();
       const fieldGqlTypeDef = this.GetOneGqlTypeDef(fieldType);
       if (fieldGqlTypeDef && fieldValue) {
-        const instance = new (fieldType as IClassType)();
-        Object.entries(fieldValue).map(([key, value]) => {
-          const childField = this._fieldDefs.find((fieldDef) =>
-            fieldDef.class === fieldType &&
-            fieldDef.params.name === key
-          );
-          instance[childField.key] = this.createFieldInstance(childField.params.type, value);
-        });
-        return instance;
+        if (fieldGqlTypeDef.params.gqlType === GraphQLEnumType) {
+          return fieldGqlTypeDef.params.enumValues[fieldValue].value;
+        } else {
+          const instance = new (fieldType as IClassType)();
+          Object.entries(fieldValue).map(([key, value]) => {
+            const childField = this._fieldDefs.find((fieldDef) =>
+              fieldDef.class === fieldType &&
+              fieldDef.params.name === key
+            );
+            instance[childField.key] = this.createFieldInstance(childField.params.type, value);
+          });
+          return instance;
+        }
       }
     }
     return fieldValue;

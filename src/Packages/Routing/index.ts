@@ -17,3 +17,4 @@ export * from "./Types/IRestContext";
 export * from "./Types/MiddlewareExecutionTime";
 export * from "./Types/MiddlewareType";
 export * from "./Types/NextFunction";
+export * from "./Types/IRoutingConfig";

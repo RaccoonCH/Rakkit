@@ -6,9 +6,9 @@ import {
 
 export class AppLoader {
   LoadControllers(options: IAppConfig) {
-    this.load(options.routers);
-    this.load(options.websockets);
-    this.load(options.resolvers);
+    this.load(options.rest.routers);
+    this.load(options.ws.websockets);
+    this.load(options.gql.resolvers);
   }
 
   private load(items: ClassOrString[]) {

@@ -41,23 +41,38 @@ export class Rakkit extends AppLoader {
   private constructor(config?: IAppConfig) {
     super();
     this._config = config || {};
+    // TODO?: Function to do it
     this._config = {
-      globalRestMiddlewares: this._config.globalRestMiddlewares || [],
-      globalRootMiddlewares: this._config.globalRootMiddlewares || [],
-      appMiddlewares: this._config.appMiddlewares || [],
+      rest: {
+        endpoint: "/rest",
+        globalAppMiddlewares: [],
+        globalRestMiddlewares: [],
+        globalRootMiddlewares: [],
+        routers: [],
+        ...(this._config.rest || {})
+      },
+      ws: {
+        options: {
+          path: "/ws"
+        },
+        websockets: [],
+        ...(this._config.ws || {})
+      },
+      gql: {
+        globalMiddlewares: [],
+        resolvers: [],
+        ...(this._config.gql || {})
+      },
+      routing: {
+        globalMiddlewares: [],
+        ...(this._config.routing || {})
+      },
       host: this._config.host || "localhost",
       port: this._config.port || 4000,
-      restEndpoint: this._config.restEndpoint === undefined ? "/rest" : config.restEndpoint,
-      routers: this._config.routers || [],
-      websockets: this._config.websockets || [],
-      resolvers: this._config.resolvers || [],
-      silent: this._config.silent || false,
-      socketioOptions: this._config.socketioOptions || {}
+      silent: this._config.silent || false
     };
-    const socketioPath = this._config.socketioOptions.path;
-    this._config.socketioOptions.path = socketioPath === undefined ? "/ws" : socketioPath;
-    const restEndpoint = this._config.restEndpoint;
-    this._config.restEndpoint = restEndpoint === "/" ? "" : restEndpoint;
+    const restEndpoint = this._config.rest.endpoint;
+    this._config.rest.endpoint = restEndpoint === "/" ? "" : restEndpoint;
     this._koaApp = new Koa();
     this._httpServer = createServer(this._koaApp.callback());
   }
@@ -78,9 +93,14 @@ export class Rakkit extends AppLoader {
   private async start() {
     this.LoadControllers(this._config);
     const routing = MetadataStorage.Instance.Routing;
-    routing.LoadAnonymousMiddlewares(this._config.globalRestMiddlewares);
-    routing.LoadAnonymousMiddlewares(this._config.globalRootMiddlewares);
-    routing.LoadAnonymousMiddlewares(this._config.appMiddlewares);
+    const allMiddlewares = [
+      ...this._config.rest.globalAppMiddlewares,
+      ...this._config.rest.globalRootMiddlewares,
+      ...this._config.rest.globalRestMiddlewares,
+      ...this._config.gql.globalMiddlewares,
+      ...this._config.routing.globalMiddlewares
+    ];
+    routing.LoadAnonymousMiddlewares(allMiddlewares);
     await MetadataStorage.Instance.BuildAll();
     this.startAllServices();
     return this;
@@ -99,18 +119,24 @@ export class Rakkit extends AppLoader {
   }
 
   private async startAllServices() {
-    const startRest = Rakkit.Instance._config.routers.length + Rakkit.Instance._config.resolvers.length > 0;
-    const startWs = Rakkit.Instance._config.websockets.length > 0;
-    if (startRest || startWs) {
+    const startGql = this._config.gql.resolvers.length > 0;
+    const startRest = this._config.rest.routers.length > 0;
+    const startWs = this._config.ws.websockets.length > 0;
+
+    if (startRest || startWs || startGql) {
       this._httpServer.listen(this._config.port, this._config.host);
+      this.startMessage("HTTP    ", "/");
     }
     if (startRest) {
       await this.startRest();
-      this.startMessage("REST  ", this._config.restEndpoint);
+      this.startMessage("REST    ", this._config.rest.endpoint);
     }
     if (startWs) {
       await this.startWs();
-      this.startMessage("WS    ", this._config.socketioOptions.path);
+      this.startMessage("WS      ", this._config.ws.options.path);
+    }
+    if (startGql) {
+      this.startMessage("GraphQL ", "Started at the URL that you specified to your GraphQL server provider", true);
     }
     if (startRest && !this._config.silent) {
       const routers = Array.from(MetadataStorage.Instance.Rest.Routers.values());
@@ -119,14 +145,14 @@ export class Rakkit extends AppLoader {
           Color("\nRouters:", "cmd.underscore")
         );
         routers.map((router) => {
-          console.log(`✅  ${this.Url}${this._config.restEndpoint}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
+          console.log(`✅  ${this.Url}${this._config.rest.endpoint}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
         });
       }
     }
   }
 
   private async startWs() {
-    this._socketio = SocketIo(this._httpServer, this._config.socketioOptions);
+    this._socketio = SocketIo(this._httpServer, this._config.ws.options);
     Array.from(MetadataStorage.Instance.Ws.Websockets.values()).map((ws) => {
       const nsp = this._socketio.of(ws.params.namespace);
       nsp.on("connection", (socket) => {
@@ -145,9 +171,11 @@ export class Rakkit extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
-      this.loadAppMiddlewares(this._config.appMiddlewares);
+      this.loadAppMiddlewares(this._config.routing.globalMiddlewares);
+      this.loadAppMiddlewares(this._config.rest.globalAppMiddlewares);
       this._koaApp.use(MetadataStorage.Instance.Rest.MainRouter.routes());
-      this.loadAppMiddlewares(this._config.appMiddlewares, "AFTER");
+      this.loadAppMiddlewares(this._config.rest.globalAppMiddlewares, "AFTER");
+      this.loadAppMiddlewares(this._config.routing.globalMiddlewares, "AFTER");
       resolve();
     });
   }
@@ -170,10 +198,10 @@ export class Rakkit extends AppLoader {
     );
   }
 
-  private startMessage(type: string, suffix: string) {
+  private startMessage(type: string, suffix: string, noUrl: boolean = false) {
     if (!this._config.silent) {
       console.log(Color(
-        `${type}: ${this.Url}${suffix}`,
+        `${type}: ${noUrl ? "" : this.Url}${suffix}`,
         "fg.black", "bg.green"
       ));
     }

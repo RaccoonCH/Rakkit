@@ -1,19 +1,16 @@
 import {
-  MiddlewareType,
-  WsOptions,
-  ClassOrString
+  IRestConfig,
+  IGqlConfig,
+  IWsConfig,
+  IRoutingConfig
 } from "..";
 
 export interface IAppConfig {
   silent?: boolean;
   host?: string;
   port?: number;
-  restEndpoint?: string;
-  socketioOptions?: WsOptions;
-  routers?: ClassOrString[];
-  websockets?: ClassOrString[];
-  resolvers?: ClassOrString[];
-  globalRestMiddlewares?: MiddlewareType[];
-  globalRootMiddlewares?: MiddlewareType[];
-  appMiddlewares?: MiddlewareType[];
+  rest?: Partial<IRestConfig>;
+  ws?: Partial<IWsConfig>;
+  gql?: Partial<IGqlConfig>;
+  routing?: Partial<IRoutingConfig>;
 }

@@ -39,6 +39,7 @@ export * from "./Decorator/Params/IObjectTypeParams";
 export * from "./Types/GqlResolveType";
 export * from "./Types/GqlType";
 export * from "./Types/Param";
+export * from "./Types/IGqlConfig";
 
 export * from "./Logic/GqlMetadataBuilder";
 export * from "./Logic/TypeCreator";

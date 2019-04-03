@@ -39,7 +39,7 @@ export class RestMetadataBuilder extends MetadataBuilder {
 
   Build() {
     this._restRouter = new ApiRouter({
-      prefix: Rakkit.Instance.Config.restEndpoint
+      prefix: Rakkit.Instance.Config.rest.endpoint
     });
     this._endpoints.map((item) => {
       const router = this._routers.get(item.class);
@@ -83,8 +83,8 @@ export class RestMetadataBuilder extends MetadataBuilder {
       );
     });
 
-    const rootMiddlewares = Rakkit.Instance.Config.globalRootMiddlewares;
-    const restMiddlewares = Rakkit.Instance.Config.globalRestMiddlewares;
+    const rootMiddlewares = Rakkit.Instance.Config.rest.globalRootMiddlewares;
+    const restMiddlewares = Rakkit.Instance.Config.rest.globalRestMiddlewares;
     this._restRouter = this.mountMiddlewaresToRouter(
       restMiddlewares,
       this._restRouter

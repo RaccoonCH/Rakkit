@@ -158,10 +158,12 @@ describe("DI", () => {
 
   beforeAll(async () => {
     await Start({
-      globalRestMiddlewares: [
-        BodyParser(),
-        GlobalFirstBeforeMiddleware
-      ]
+      rest: {
+        globalRestMiddlewares: [
+          BodyParser(),
+          GlobalFirstBeforeMiddleware
+        ]
+      }
     });
     socketConnection = SocketConnect("http://localhost:3000", { path: "/ws2" });
     api = Axios.create({

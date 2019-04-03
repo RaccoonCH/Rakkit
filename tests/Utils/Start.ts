@@ -9,17 +9,24 @@ export const Start = async (config?: IAppConfig) => {
   const wsGlob = getDirName("*Ws.ts");
   const routerGlob = getDirName("*Router.ts");
   const routers = [routerGlob];
+  const definedConfig = config || {};
   return Rakkit.start({
-    port: 3000,
-    websockets: [wsGlob],
-    routers,
-    globalRootMiddlewares: [
-      BodyParser()
-    ],
-    socketioOptions: {
-      path: "/ws2"
-    },
     silent: false, // False for codecov
-    ...(config || {})
+    port: 3000,
+    ...(definedConfig.rest || {}),
+    ws: {
+      websockets: [wsGlob],
+      options: {
+        path: "/ws2"
+      },
+      ...(definedConfig.rest || {})
+    },
+    rest: {
+      routers,
+      globalRootMiddlewares: [
+        BodyParser()
+      ],
+      ...(definedConfig.rest || {})
+    }
   });
 };

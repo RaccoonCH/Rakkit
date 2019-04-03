@@ -26,13 +26,13 @@ export class ExampleResolver3 {
     stra: ExampleInputType2,
     @Arg({ name: "aa" })
     aaa: number,
-    context: IContext<ExampleObjectType>,
+    context: IContext<ExampleInputType | ExampleInputType2>,
     next: NextFunction
   ) {
     await next();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    context.gqlResponse.hello = "b";
-    console.log(str, aaa);
+    context.gqlResponse.hello3 = "yop";
+    console.log(str, stra, aaa);
   }
 }
 

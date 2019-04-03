@@ -6,7 +6,9 @@ export class App {
 
   async start() {
     await Rakkit.start({
-      resolvers: this._resolvers
+      gql: {
+        resolvers: this._resolvers
+      }
     });
     const server = new ApolloServer({
       schema: MetadataStorage.Instance.Gql.Schema,

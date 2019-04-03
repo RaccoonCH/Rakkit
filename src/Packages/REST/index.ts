@@ -9,3 +9,4 @@ export * from "./Decorator/Types/IRouter";
 export * from "./Logic/RestMetadataBuilder";
 
 export * from "./Types/HttpMethod";
+export * from "./Types/IRestConfig";

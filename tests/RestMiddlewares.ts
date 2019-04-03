@@ -58,18 +58,20 @@ describe("REST Middlewares", () => {
 
   beforeAll(async () => {
     await Start({
-      appMiddlewares: [
-        AppFirstBeforeMiddleware,
-        AppSecondBeforeMiddleware,
-        AppFirstAfterMiddleware,
-        AppSecondAfterMiddleware
-      ],
-      globalRestMiddlewares: [
-        GlobalFirstBeforeMiddleware,
-        GlobalFirstAfterMiddleware,
-        GlobalSecondBeforeMiddleware,
-        GlobalSecondAfterMiddleware
-      ]
+      rest: {
+        globalAppMiddlewares: [
+          AppFirstBeforeMiddleware,
+          AppSecondBeforeMiddleware,
+          AppFirstAfterMiddleware,
+          AppSecondAfterMiddleware
+        ],
+        globalRestMiddlewares: [
+          GlobalFirstBeforeMiddleware,
+          GlobalFirstAfterMiddleware,
+          GlobalSecondBeforeMiddleware,
+          GlobalSecondAfterMiddleware
+        ]
+      }
     });
     api = Axios.create({
       baseURL: "http://localhost:3000/rest"
