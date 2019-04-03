@@ -1,4 +1,4 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, MetadataStorage, TypeCreator } from "../../../../src";
+import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator } from "../../../../src";
 
 enum TestEnum {
   a = "a",
@@ -18,7 +18,9 @@ export class ExampleInputType {
   enumz: TestEnum;
 }
 
-@NameFrom(ExampleInputType)
+const PartialA = TypeCreator.CreateRequired(ExampleInputType);
+
+@NameFrom(PartialA)
 @InputType()
 @InterfaceType()
 @ObjectType()
@@ -29,7 +31,7 @@ export class PO0 {
 
 @InputType()
 @InterfaceType()
-@ObjectType([PO0])
+@ObjectType()
 export class PO1 implements PO0 {
   @Field()
   po: string;
@@ -39,7 +41,7 @@ export class PO1 implements PO0 {
 }
 
 @InputType()
-@ObjectType([PO1])
+@ObjectType({ implements: [PO1] })
 export class PO2 implements PO1 {
   @Field()
   str: string;
@@ -129,8 +131,11 @@ export function getItems<Type, Type2>(
   return GenericResponse as any;
 }
 
-@ObjectType([ExampleInterfaceType, ExampleInterfaceType2])
-export class ExampleObjectType2 extends ExampleObjectType0 implements ExampleInterfaceType, ExampleInterfaceType2 {
+@ObjectType({
+  implements: [ExampleInterfaceType, ExampleInterfaceType2],
+  extends: PartialA
+})
+export class ExampleObjectType2 implements ExampleInterfaceType, ExampleInterfaceType2 {
   @Field()
   date: Date;
   @Field(type => ExampleObjectType, {
@@ -140,6 +145,5 @@ export class ExampleObjectType2 extends ExampleObjectType0 implements ExampleInt
 
   hello4: string;
   hello3: string;
-  hello: string;
   ms: ExampleInputType;
 }

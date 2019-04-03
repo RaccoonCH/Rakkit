@@ -39,20 +39,20 @@ input GraphQLInputObjectTypeExampleInputType2 {
   hello12: String
 }
 
-input GraphQLInputObjectTypePO0GraphQLInputObjectTypeExampleInputType {
+input GraphQLInputObjectTypePO0_ {
   po: String!
 }
 
 input GraphQLInputObjectTypePO1 {
   po: String!
-  po0: GraphQLInputObjectTypePO0GraphQLInputObjectTypeExampleInputType!
+  po0: GraphQLInputObjectTypePO0_!
 }
 
 input GraphQLInputObjectTypePO2 {
   str: String!
   po: String!
-  po02: GraphQLInputObjectTypePO0GraphQLInputObjectTypeExampleInputType!
-  po0: GraphQLInputObjectTypePO0GraphQLInputObjectTypeExampleInputType!
+  po02: GraphQLInputObjectTypePO0_!
+  po0: GraphQLInputObjectTypePO0_!
 }
 
 interface GraphQLInterfaceTypeExampleInterfaceType {
@@ -60,13 +60,13 @@ interface GraphQLInterfaceTypeExampleInterfaceType {
   ms: GraphQLObjectTypeExampleInputType!
 }
 
-interface GraphQLInterfaceTypePO0Test {
+interface GraphQLInterfaceTypePO0RequiredTest {
   po: String!
 }
 
 interface GraphQLInterfaceTypePO1 {
   po: String!
-  po0: GraphQLObjectTypePO0GraphQLObjectTypeExampleInputType!
+  po0: GraphQLObjectTypePO0_!
 }
 
 type GraphQLObjectTypeExampleInputType {
@@ -83,20 +83,20 @@ type GraphQLObjectTypeExampleInterfaceType {
   ms: GraphQLObjectTypeExampleInputType!
 }
 
-type GraphQLObjectTypePO0GraphQLObjectTypeExampleInputType {
+type GraphQLObjectTypePO0_ {
   po: String!
 }
 
-type GraphQLObjectTypePO1 implements GraphQLInterfaceTypePO0Test {
+type GraphQLObjectTypePO1 {
   po: String!
-  po0: GraphQLObjectTypePO0GraphQLObjectTypeExampleInputType!
+  po0: GraphQLObjectTypePO0_!
 }
 
 type GraphQLObjectTypePO2 implements GraphQLInterfaceTypePO1 {
   po: String!
-  po0: GraphQLObjectTypePO0GraphQLObjectTypeExampleInputType!
+  po0: GraphQLObjectTypePO0_!
   str: String!
-  po02: GraphQLObjectTypePO0GraphQLObjectTypeExampleInputType!
+  po02: GraphQLObjectTypePO0_!
 }
 
 type Mutation {
@@ -105,7 +105,12 @@ type Mutation {
 
 type Query {
   a(items: GraphQLInputObjectTypeExampleInputType, items2: GraphQLInputObjectTypeExampleInputType2!, hello12: String, aa: Float!): test!
-  helloWorld: ExampleObjectType!
+  helloWorld: GraphQLObjectTypeExampleInputType!
+}
+
+interface RequiredTest {
+  hello3: String!
+  enumz: testenum!
 }
 
 type Response {

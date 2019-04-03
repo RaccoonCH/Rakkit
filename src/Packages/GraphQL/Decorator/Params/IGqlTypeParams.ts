@@ -1,6 +1,3 @@
-import {
-  INamed
-} from "../..";
-
-export interface IGqlTypeParams extends
-  Partial<INamed> {}
+export interface IGqlTypeParams {
+  extends?: Function;
+}

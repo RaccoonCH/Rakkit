@@ -37,8 +37,6 @@ import {
   TypeFn,
   DecoratorHelper,
   SetterType,
-  GraphQLPartialType,
-  GraphQLRequiredType,
   ITypeTransformation
 } from "../../..";
 
@@ -111,6 +109,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   }
 
   Build() {
+    this.applyTransformationTypes();
     this.renameWithTypeName();
     this.applyObjectTypeSetters();
     this.applyFieldSetters();
@@ -200,35 +199,12 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
   //#region Build utils
   /**
-   * Copy a fieldDef and parent gqlType and apply transformations to the field (used for partial and required feature)
-   * @param gqlType The gqlTypeDef
-   * @param destination the newGqlTypeDef parent
-   * @param transformation The transformation to apply to the field
-   */
-  private copyFieldsWithTransformation(
-    gqlTypeDef: IDecorator<IGqlType>,
-    destination: IDecorator<IGqlType>,
-    transformation: Partial<IField>
-  ) {
-    this.AddType(destination);
-    this._fieldDefs.map((fieldDef) => {
-      if (fieldDef.class === gqlTypeDef.class) {
-        const newFieldDef = this.copyDecoratorType(fieldDef, {
-          class: destination.class,
-          params: transformation
-        });
-        this.AddField(newFieldDef);
-      }
-    });
-  }
-
-  /**
    * Build a GraphQL type (type, interface, input, ...)
    * @param gqlObjectTypeName The gql type to build
    */
   private buildGqlTypes<Type extends GqlType>(gqlType: Type) {
     this.mergeDuplicates(gqlType);
-    const gqlTypes = this._gqlTypeDefs.reduce((prev, gqlTypeDef) => {
+    const gqlTypes = this._gqlTypeDefs.reduce<InstanceType<Type>[]>((prev, gqlTypeDef) => {
       if (gqlTypeDef.params.gqlType === gqlType) {
         const compiledGqlType = this.buildGqlType<Type>(gqlTypeDef);
         return [
@@ -294,13 +270,57 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           })
         });
         break;
-      case GraphQLPartialType:
-        break;
-      case GraphQLRequiredType:
-        break;
     }
     gqlTypeDef.params.compiled = compiled;
     return gqlTypeDef;
+  }
+
+  /**
+   * Copy a fieldDef and parent gqlType and apply transformations to the field (used for partial and required feature)
+   * @param gqlType The gqlTypeDef
+   * @param destination the newGqlTypeDef parent
+   * @param transformation The transformation to apply to the field
+   */
+  private copyFieldsWithTransformation(
+    gqlTypeDef: IDecorator<IGqlType>,
+    destination: IDecorator<IGqlType>,
+    transformation: Partial<IDecorator<Partial<IField>>>
+  ) {
+    return this._fieldDefs.reduce((prev, fieldDef) => {
+      if (fieldDef.class === gqlTypeDef.class) {
+        const newFieldDef = this.copyDecoratorType(fieldDef, {
+          class: destination.class,
+          params: transformation.params
+        });
+        prev.push(newFieldDef);
+        this.AddField(newFieldDef);
+      }
+      return prev;
+    }, []);
+  }
+
+  /**
+   * Create the transformed types and register them
+   */
+  private applyTransformationTypes() {
+    this._gqlTypeDefs.map((gqlTypeDef) => {
+      const transformation = gqlTypeDef.params.transformation;
+      if (transformation) {
+        const searchGqlType = gqlTypeDef.params.gqlType ? [gqlTypeDef.params.gqlType] : [];
+        const originalTypeDef = this.GetOneGqlTypeDef(transformation.target, ...searchGqlType);
+        if (originalTypeDef) {
+          gqlTypeDef.params.gqlType = originalTypeDef.params.gqlType;
+          if (transformation.prefix) {
+            gqlTypeDef.params.name = transformation.prefix + originalTypeDef.params.name;
+          }
+          this.copyFieldsWithTransformation(
+            originalTypeDef,
+            gqlTypeDef,
+            transformation.fieldsTransformation
+          );
+        }
+      }
+    });
   }
 
   /**
@@ -308,17 +328,22 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    */
   private applyIhneritance() {
     this._gqlTypeDefs.map((gqlTypeDef) => {
-      const superClass = Object.getPrototypeOf(gqlTypeDef.class);
-      const superTypeDef = this.GetOneGqlTypeDef(superClass);
+      let superClass = Object.getPrototypeOf(gqlTypeDef.class);
+      if (gqlTypeDef.params.extends) {
+        superClass = gqlTypeDef.params.extends;
+      }
+      const superTypeDef = this.GetOneGqlTypeDef(superClass, gqlTypeDef.params.gqlType);
+      // gqlTypeDef -> ihneriter
+      // superTypeDef -> ihnerited
       if (superTypeDef) {
         // Implements the superclass's interfaces to the ihnerited class
-        gqlTypeDef.params.interfaces = gqlTypeDef.params.interfaces.concat(superTypeDef.params.interfaces);
+        gqlTypeDef.params.implements = gqlTypeDef.params.implements.concat(superTypeDef.params.implements);
         // Copy the fields of the superclass to the ihnerited class
         this._fieldDefs.reduce<IDecorator<IField>[]>((prev, field) => {
           // Overrided
           const alreadyExists = prev.find((existing) => existing.key === field.key);
           if (
-            field.class === superClass.class &&
+            field.class === superClass &&
             !alreadyExists
           ) {
             const newField = this.copyDecoratorType(
@@ -422,8 +447,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * @param gqlType Get the interfaces of this gqlTyeDef
    */
   private getInterfaces(gqlTypeDef: IDecorator<IGqlType>) {
-    if (gqlTypeDef.params.interfaces) {
-      return gqlTypeDef.params.interfaces.reduce<IDecorator<IGqlType<typeof GraphQLInterfaceType>>[]>((prev, interfaceType) => {
+    if (gqlTypeDef.params.implements) {
+      return gqlTypeDef.params.implements.reduce<IDecorator<IGqlType<typeof GraphQLInterfaceType>>[]>((prev, interfaceType) => {
         const foundInterface = this.GetOneGqlTypeDef(interfaceType, GraphQLInterfaceType);
         if (foundInterface) {
           return [
@@ -461,8 +486,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     return DecoratorHelper.getAddTypeParams<Type>(
       () => name,
       gqlType,
-      name,
-      []
+      name
     );
   }
 

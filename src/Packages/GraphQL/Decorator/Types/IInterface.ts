@@ -1,3 +1,3 @@
 export interface IInterface {
-  interfaces?: Function[];
+  implements: Function[];
 }

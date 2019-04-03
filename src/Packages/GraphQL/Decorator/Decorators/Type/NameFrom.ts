@@ -1,11 +1,10 @@
 import {
   MetadataStorage,
-  IClassType,
   IDecorator,
   IGqlType
 } from "../../../../..";
 
-export function NameFrom(...types: IClassType<any>[]): Function {
+export function NameFrom(...types: Function[]): Function {
   return (target: Function): void => {
     MetadataStorage.Instance.Gql.AddTypeSetter({
       originalClass: target,

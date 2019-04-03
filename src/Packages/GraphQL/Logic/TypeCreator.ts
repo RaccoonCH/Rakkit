@@ -1,13 +1,16 @@
 import {
   GraphQLEnumValueConfigMap,
   GraphQLEnumType,
-  GraphQLUnionType
+  GraphQLUnionType,
+  GraphQLObjectType
 } from "graphql";
 import {
   ICreateParams,
   DecoratorHelper,
   GqlType,
-  MetadataStorage
+  MetadataStorage,
+  IField,
+  ICustomTypeCreatorParams
 } from "../../..";
 
 export class TypeCreator {
@@ -69,27 +72,72 @@ export class TypeCreator {
   }
 
   /**
-   * Create a GraphQL partial type from an existing type (Equivalent to (TS): Partial<YourType>)
-   * @param classType
+   * Create a Partial type from an another type (Equivalent to (TS): Partial<Type>)
+   * @param target The target class
+   * @param params The creation options
    */
-  // WIP (remove private when done)
-  // static CreatePartial(classType: Function);
-  // static CreatePartial<Type extends GqlType>(classType: Function, gqlType: Type, name?: string);
-  // static CreatePartial<Type extends GqlType = any>(
-  //   classType: Function,
-  //   gqlType?: Type,
-  //   name?: string
-  // ): (() => any) {
-  //   return MetadataStorage.Instance.Gql.AddTransformation({
-  //     target: classType,
-  //     gqlType,
-  //     fieldsTransformation: {
-  //       params: {
-  //         nullable: true
-  //       }
-  //     }
-  //   });
-  // }
+  static CreateRequired(target: Function);
+  static CreateRequired(target: Function, params: ICustomTypeCreatorParams);
+  static CreateRequired(
+    target: Function,
+    params?: ICustomTypeCreatorParams
+  ) {
+    const definedParams = params || {};
+    return this.createTransformation(
+      target,
+      "Required",
+      { nullable: false },
+      definedParams.gqlType,
+      definedParams.name
+    );
+  }
+
+  /**
+   * Create a Required type from an another type (Equivalent to (TS): Required<Type>)
+   * @param target The target class
+   * @param params The creation options
+   */
+  static CreatePartial(target: Function);
+  static CreatePartial(target: Function, params: ICustomTypeCreatorParams);
+  static CreatePartial(
+    target: Function,
+    params?: ICustomTypeCreatorParams
+  ) {
+    const definedParams = params || {};
+    return this.createTransformation(
+      target,
+      "Partial",
+      { nullable: true },
+      definedParams.gqlType,
+      definedParams.name
+    );
+  }
+
+  /**
+   * Generic method to create transformed type
+   */
+  private static createTransformation<Type extends GqlType = typeof GraphQLObjectType>(
+    target: Function,
+    prefix: string,
+    fieldsTransformation: Partial<IField>,
+    gqlType?: Type,
+    name?: string
+  ): Function {
+    const gqlTypeDef = this.createGqlTypeDef(
+      name || target.name,
+      gqlType
+    );
+    gqlTypeDef.params.transformation = {
+      prefix: name ? undefined : prefix,
+      target,
+      rootTransformation: {},
+      fieldsTransformation: {
+        params: fieldsTransformation
+      }
+    };
+    MetadataStorage.Instance.Gql.AddType(gqlTypeDef);
+    return gqlTypeDef.class;
+  }
 
   /**
    * Create an artificial GqlTypeDef at runtime
@@ -104,7 +152,7 @@ export class TypeCreator {
       () => name,
       gqlType,
       name,
-      []
+      {}
     );
   }
 }

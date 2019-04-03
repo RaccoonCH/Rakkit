@@ -39,7 +39,7 @@ export class ExampleResolver3 {
 @Resolver()
 @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
-  @Query(type => ExampleObjectType)
+  @Query(type => ExampleInputType)
   helloWorld(
     context
   ): String {

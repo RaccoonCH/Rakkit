@@ -7,7 +7,7 @@ import {
 
 export interface ITypeTransformation<Type extends GqlType = any> {
   target: Function;
-  gqlType?: Type;
-  fieldsTransformation?: Partial<IDecorator<Partial<IField>>>;
-  rootTransformation?: Partial<IDecorator<Partial<IGqlType<Type>>>>;
+  fieldsTransformation: Partial<IDecorator<Partial<IField>>>;
+  rootTransformation: Partial<IDecorator<Partial<IGqlType<Type>>>>;
+  prefix?: string;
 }

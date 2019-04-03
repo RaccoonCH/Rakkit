@@ -9,13 +9,18 @@ import {
 } from "../../..";
 
 export class DecoratorHelper {
-  static getAddTypeDecorator(gqlTypeName: GqlType) {
-    return (name?: string) => {
-      return (target: Function): void => {
-        MetadataStorage.Instance.Gql.AddType(
-          this.getAddTypeParams(target, gqlTypeName, name)
-        );
-      };
+  static getAddTypeDecorator<ParamType extends object>(
+    gqlType: GqlType,
+    nameOrParams?: string | ParamType,
+    params?: ParamType
+  ) {
+    const isName = typeof nameOrParams === "string";
+    const definedName = isName ? nameOrParams as string : undefined;
+    const definedParams = (isName ? params : nameOrParams) || {};
+    return (target: Function): void => {
+      MetadataStorage.Instance.Gql.AddType(
+        DecoratorHelper.getAddTypeParams(target, gqlType, definedName, definedParams)
+      );
     };
   }
 
@@ -50,7 +55,7 @@ export class DecoratorHelper {
     target: Function,
     gqlType: Type,
     name?: string,
-    interfaces: Function[] = []
+    params: Partial<IGqlType> = {}
   ): IDecorator<IGqlType<Type>> {
     const definedName = name || target.name;
     return {
@@ -59,9 +64,10 @@ export class DecoratorHelper {
       key: target.name || definedName,
       category: "gql",
       params: {
-        interfaces,
         gqlType,
-        name: definedName
+        name: definedName,
+        implements: [],
+        ...params
       }
     };
   }
