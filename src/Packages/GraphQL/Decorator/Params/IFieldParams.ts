@@ -1,14 +1,13 @@
 import {
   INullable,
   IDeprecation,
-  IPartial,
-  IRequired,
+  IDescription,
   INamed
 } from "../..";
 
 export interface IFieldParams extends
-  Partial<INullable>,
-  Partial<IDeprecation>,
-  Partial<IRequired>,
-  Partial<IPartial>,
-  Partial<INamed> {}
+Partial<INullable>,
+Partial<INamed>,
+IDescription,
+IDeprecation {
+}

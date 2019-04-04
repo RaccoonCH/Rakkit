@@ -1,6 +1,6 @@
 import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator } from "../../../../src";
 
-enum TestEnum {
+export enum TestEnum {
   a = "a",
   b = "b"
 }

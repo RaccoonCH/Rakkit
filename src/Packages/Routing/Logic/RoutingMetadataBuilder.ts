@@ -38,7 +38,7 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
 
   AddMiddleware(item: IDecorator<IMiddleware>) {
     MetadataStorage.Instance.Di.AddService(item);
-    this._middlewares.set(item.class, item);
+    this._middlewares.set(item.originalClass, item);
   }
 
   AddUsedMiddleware(item: IDecorator<IUsedMiddleware>) {
@@ -49,16 +49,16 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
     this._middlewares.forEach((item) => {
       // If middleware is a class, instanciate it and use the "use" method as the middleware
       if (item.params.isClass) {
-        const instance = MetadataStorage.Instance.Di.GetService(item.class);
+        const instance = MetadataStorage.Instance.Di.GetService(item.originalClass);
         item.params.isClass = false;
         item.params.function = instance.use.bind(instance);
       }
       switch (item.params.executionTime) {
         case "AFTER":
-          this._afterMiddlewares.set(item.class, item.params.function);
+          this._afterMiddlewares.set(item.originalClass, item.params.function);
         break;
         case "BEFORE":
-          this._beforeMiddlewares.set(item.class, item.params.function);
+          this._beforeMiddlewares.set(item.originalClass, item.params.function);
         break;
       }
     });
@@ -140,7 +140,7 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
     // Reverse to have the correct execution time
     return this._usedMiddlewares.filter((usedMw) => {
       return (
-        usedMw.class === decorator.class &&
+        usedMw.originalClass === decorator.originalClass &&
         (fn ? fn === usedMw.params.applyOn : true)
       );
     }).reverse();

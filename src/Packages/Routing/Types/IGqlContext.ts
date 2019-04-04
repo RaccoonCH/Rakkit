@@ -1,10 +1,11 @@
 import { GraphQLResolveInfo } from "graphql";
-import { KeyValue } from "../../..";
+import { KeyValue, GqlResolveType } from "../../..";
 
 export interface IGqlContext<ResponseType> {
   args: KeyValue;
   rawArgs: KeyValue;
   info: GraphQLResolveInfo;
   root: any;
-  gqlResponse: ResponseType;
+  response: ResponseType;
+  queryType: GqlResolveType;
 }

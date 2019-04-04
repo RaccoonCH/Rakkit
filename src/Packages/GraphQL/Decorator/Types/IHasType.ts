@@ -5,7 +5,7 @@ import {
 } from "../../../..";
 
 export interface IHasType extends
-  INullable,
-  IIsArray {
+INullable,
+IIsArray {
   type: TypeFn;
 }

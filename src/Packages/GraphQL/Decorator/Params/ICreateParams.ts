@@ -4,5 +4,6 @@ import {
 } from "../..";
 
 export interface ICreateParams extends
-  Partial<INamed>,
-  Partial<IDescription> {}
+Partial<INamed>,
+Partial<IDescription> {
+}

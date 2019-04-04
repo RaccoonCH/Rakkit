@@ -17,8 +17,7 @@ import {
   GraphQLFieldConfigArgumentMap,
   GraphQLInputType,
   GraphQLEnumType,
-  GraphQLUnionType,
-  GraphQLNamedType
+  GraphQLUnionType
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
 import {
@@ -224,7 +223,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   private buildGqlType<Type extends GqlType>(gqlTypeDef: IDecorator<IGqlType<Type>>) {
     const baseParams = {
       name: gqlTypeDef.params.name,
-      fields: this.getFieldsFunction(gqlTypeDef)
+      description: gqlTypeDef.params.description
     };
 
     let compiled: any;
@@ -237,7 +236,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         break;
       case GraphQLInterfaceType:
         compiled = new GraphQLInterfaceType({
-          ...baseParams
+          ...baseParams,
+          fields: this.getFieldsFunction(gqlTypeDef)
         });
         break;
       case GraphQLObjectType:
@@ -730,8 +730,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           fieldDef,
           fieldDef.params.function
         );
-        const argsList = Array.from(Object.values(gqlContext.args));
-        await bindedFn(...argsList, gqlContext, next);
+        const argsList = Array.from(Object.values(gqlContext.gql.args));
+        return await bindedFn(...argsList, gqlContext, next);
       };
       gqlField.resolve = this.createResolveFn(
         fieldDef,
@@ -756,25 +756,27 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     main: Function,
     afterMiddlewares: Function[]
   ) {
-    let mwIndex = -1;
     const allMiddlewares = [
       ...beforeMiddlewares,
       main,
       ...afterMiddlewares
     ];
     return async(root, args, context, info) => {
+      let mwIndex = -1;
       const argList = this.parseArgs(fieldDef, args);
-
       const returnType = fieldDef.params.type();
-      const returnGqlType = this.GetOneGqlTypeDef(returnType, GraphQLObjectType);
+      const returnGqlType = this.GetOneGqlTypeDef<any>(returnType, GraphQLObjectType);
+      // TODO?: Parse union type ?
       const baseResponse = returnGqlType ? new (returnGqlType.class as IClassType)() : {};
-
       const gqlContext: IContext = {
-        args: argList,
-        rawArgs: args,
-        info,
-        gqlResponse: baseResponse,
-        root,
+        gql: {
+          args: argList,
+          rawArgs: args,
+          info,
+          response: baseResponse,
+          root,
+          queryType: fieldDef.params.resolveType
+        },
         apiType: "gql",
         ...context
       };
@@ -782,16 +784,18 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       const next = async () => {
         mwIndex++;
         if (mwIndex < allMiddlewares.length) {
-          await allMiddlewares[mwIndex](
+          const returnedResponse = await allMiddlewares[mwIndex](
             gqlContext,
             next
           );
+          if (returnedResponse) {
+            gqlContext.gql.response = returnedResponse;
+          }
         }
       };
 
       await next();
-      mwIndex = 0;
-      return gqlContext.gqlResponse;
+      return gqlContext.gql.response;
     };
   }
 

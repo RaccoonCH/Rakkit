@@ -5,6 +5,7 @@ import {
 } from "../..";
 
 export interface IArgParams extends
-  Partial<INullable>,
-  Partial<INamed>,
-  Partial<IFlat> {}
+Partial<INullable>,
+Partial<INamed>,
+Partial<IFlat> {
+}

@@ -8,10 +8,10 @@ import {
 } from "../..";
 
 export interface IField extends
-  IHasType,
-  IDeprecation,
-  IQuery,
-  INamed,
-  Partial<IDescription> {
+IHasType,
+IDeprecation,
+IQuery,
+INamed,
+Partial<IDescription> {
   compiled?: GraphQLFieldConfig<any, any>;
 }

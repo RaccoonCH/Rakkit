@@ -4,5 +4,8 @@ import {
 } from "../..";
 
 export interface IObjectTypeParams extends
-  IGqlTypeParams,
-  Partial<IInterface> {}
+IGqlTypeParams,
+Partial<IInterface> {
+  description?: string;
+  deprecationReason?: string;
+}

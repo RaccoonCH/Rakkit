@@ -1,7 +1,22 @@
 import { GoodbyeMiddleware } from "./../../../basic/src/middlewares/GoodbyeMiddleware";
 import { HelloMiddleware } from "./../../../basic/src/middlewares/HelloMiddleware";
-import { Resolver, Query, Arg, IContext, UseMiddleware, NextFunction, Mutation, MetadataStorage, TypeCreator } from "../../../../src";
-import { ExampleObjectType, getItems, Response, ExampleInputType, ExampleInputType2, ExampleObjectType2 } from "../objects/ExampleObjectType";
+import {
+  Resolver,
+  Query,
+  Arg,
+  IContext,
+  UseMiddleware,
+  NextFunction,
+  Mutation,
+  TypeCreator
+} from "../../../../src";
+import {
+  getItems,
+  Response,
+  ExampleInputType,
+  ExampleInputType2,
+  TestEnum
+} from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
 
@@ -31,7 +46,7 @@ export class ExampleResolver3 {
   ) {
     await next();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    context.gqlResponse.hello3 = "yop";
+    context.gql.response.hello3 = "yop";
     console.log(str, stra, aaa);
   }
 }
@@ -40,18 +55,23 @@ export class ExampleResolver3 {
 @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
   @Query(type => ExampleInputType)
-  helloWorld(
-    context
-  ): String {
+  async helloWorld(
+    context: IContext<ExampleInputType>,
+    next: NextFunction
+  ) {
     console.log("hello world");
-    return "hello";
+    context.gql.response = {
+      enumz: TestEnum.a,
+      hello3: "aa"
+    };
+    await next();
   }
 
-  @Mutation()
+  @Mutation(type => String)
   helloWorldMutation(
-    context
-  ): String {
+    context: IContext<String>
+  ) {
     console.log("hello world");
-    return "hello";
+    return "a";
   }
 }

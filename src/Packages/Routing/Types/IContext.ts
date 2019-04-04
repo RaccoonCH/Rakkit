@@ -3,8 +3,7 @@ import {
   IRestContext
 } from "../../..";
 
-export interface IContext<ResponseType = any> extends
-  IRestContext,
-  IGqlContext<ResponseType> {
+export interface IContext<ResponseType = any> extends IRestContext {
+  gql: IGqlContext<ResponseType>;
   apiType: "gql" | "rest";
 }
