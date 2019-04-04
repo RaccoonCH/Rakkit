@@ -33,6 +33,7 @@ input GenericResponseGraphQLInputObjectTypeExampleInputTypeGraphQLInputObjectTyp
 input GraphQLInputObjectTypeExampleInputType {
   hello3: String!
   enumz: testenum!
+  resolveMe: String
 }
 
 input GraphQLInputObjectTypeExampleInputType2 {
@@ -72,6 +73,7 @@ interface GraphQLInterfaceTypePO1 {
 type GraphQLObjectTypeExampleInputType {
   hello3: String!
   enumz: testenum!
+  resolveMe: String
 }
 
 type GraphQLObjectTypeExampleInputType2 {
@@ -111,6 +113,7 @@ type Query {
 interface RequiredTest {
   hello3: String!
   enumz: testenum!
+  resolveMe: String!
 }
 
 type Response {
@@ -124,6 +127,7 @@ union test = GraphQLObjectTypeExampleInputType | GraphQLObjectTypeExampleInputTy
 interface Test {
   hello3: String!
   enumz: testenum!
+  resolveMe: String
 }
 
 enum testenum {

@@ -13,13 +13,17 @@ export abstract class MetadataBuilder {
   protected bindContext(context: IDecorator<any>, fn: Function): Function;
   protected bindContext(context: IDecorator<any>, fns: Function[]): Function[];
   protected bindContext(context: IDecorator<any>, fnsOrFn: Function[] | Function) : Function[] | Function {
-    const instance = MetadataStorage.Instance.Di.GetService(context).params.instance;
-    if (Array.isArray(fnsOrFn)) {
-      return fnsOrFn.map(
-        (fn) => fn.bind(instance)
-      );
+    const service = MetadataStorage.Instance.Di.GetService(context);
+    if (service) {
+      const instance = service.params.instance;
+      if (Array.isArray(fnsOrFn)) {
+        return fnsOrFn.map(
+          (fn) => fn.bind(instance)
+        );
+      }
+      return fnsOrFn.bind(instance);
     }
-    return fnsOrFn.bind(instance);
+    return fnsOrFn;
   }
 
   /**

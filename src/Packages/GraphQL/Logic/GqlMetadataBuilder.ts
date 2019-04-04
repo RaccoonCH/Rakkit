@@ -608,7 +608,11 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
           };
-          this.applyResolveToField(gqlField, fieldDef);
+          if (
+            ![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)
+          ) {
+            this.applyResolveToField(gqlField, fieldDef);
+          }
           prev[fieldDef.params.name] = gqlField;
         }
         return prev;
@@ -730,7 +734,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           fieldDef,
           fieldDef.params.function
         );
-        const argsList = Array.from(Object.values(gqlContext.gql.args));
+        const argsList = gqlContext.gql.args ? Array.from(Object.values(gqlContext.gql.args)) : [];
         return await bindedFn(...argsList, gqlContext, next);
       };
       gqlField.resolve = this.createResolveFn(
@@ -806,28 +810,30 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    */
   private parseArgs(fieldDef: IDecorator<IField>, args: Object) {
     const fieldArgs = fieldDef.params.args;
-    const parsedArgs = fieldArgs.reduce((finalArg, fieldArg) => {
-      if (fieldArg.flat) {
-        const groupedArg = {};
-        const parentType = fieldArg.type();
-        this._fieldDefs.map((flatFieldDef) => {
-          if (flatFieldDef.class === parentType) {
-            groupedArg[flatFieldDef.params.name] = args[flatFieldDef.params.name];
-          }
-        });
-        finalArg[fieldArg.name] = this.createFieldInstance(
-          fieldArg.type,
-          groupedArg
-        );
-      } else {
-        finalArg[fieldArg.name] = this.createFieldInstance(
-          fieldArg.type,
-          args[fieldArg.name]
-        );
-      }
-      return finalArg;
-    }, {});
-    return parsedArgs;
+    if (fieldArgs) {
+      const parsedArgs = fieldArgs.reduce((finalArg, fieldArg) => {
+        if (fieldArg.flat) {
+          const groupedArg = {};
+          const parentType = fieldArg.type();
+          this._fieldDefs.map((flatFieldDef) => {
+            if (flatFieldDef.class === parentType) {
+              groupedArg[flatFieldDef.params.name] = args[flatFieldDef.params.name];
+            }
+          });
+          finalArg[fieldArg.name] = this.createFieldInstance(
+            fieldArg.type,
+            groupedArg
+          );
+        } else {
+          finalArg[fieldArg.name] = this.createFieldInstance(
+            fieldArg.type,
+            args[fieldArg.name]
+          );
+        }
+        return finalArg;
+      }, {});
+      return parsedArgs;
+    }
   }
 
   /**

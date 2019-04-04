@@ -16,6 +16,11 @@ export class ExampleInputType {
 
   @Field(type => enumType)
   enumz: TestEnum;
+
+  @Field(type => String, { nullable: true })
+  async resolveMe?(): Promise<String> {
+    return "aaa";
+  }
 }
 
 const PartialA = TypeCreator.CreateRequired(ExampleInputType);

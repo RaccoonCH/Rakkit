@@ -1,3 +1,4 @@
 export type GqlResolveType =
   "Query" |
-  "Mutation";
+  "Mutation" |
+  "Field";
