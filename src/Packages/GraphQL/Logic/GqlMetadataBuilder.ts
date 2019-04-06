@@ -1,4 +1,4 @@
-import { writeFile } from "fs";
+import { writeFile, exists } from "fs";
 import {
   GraphQLFieldConfigMap,
   GraphQLString,
@@ -237,16 +237,24 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       case GraphQLInterfaceType:
         compiled = new GraphQLInterfaceType({
           ...baseParams,
-          fields: this.getFieldsFunction(gqlTypeDef)
+          fields: this.getFieldsFunction(gqlTypeDef),
+          resolveType: (value) => {
+            const interfaceGqlTypeDef = this._gqlTypeDefs.find((interfaceGqlTypeDef) => {
+              try {
+                return value instanceof interfaceGqlTypeDef.originalClass;
+              } catch (err) {}
+            });
+            if (interfaceGqlTypeDef) {
+              return interfaceGqlTypeDef.params.compiled;
+            }
+            return this.unsafeResolveType(value, gqlTypeDef, GraphQLInterfaceType);
+          }
         });
         break;
       case GraphQLObjectType:
         const interfaces = this.getInterfaces(gqlTypeDef);
         compiled = new GraphQLObjectType({
           ...baseParams,
-          isTypeOf: (source, context, info) => {
-            return gqlTypeDef.params.compiled;
-          },
           fields: this.getFieldsFunction(gqlTypeDef, interfaces),
           interfaces: () => {
             return interfaces.map((gqlInterface) => {
@@ -264,36 +272,76 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       case GraphQLUnionType:
         compiled = new GraphQLUnionType({
           ...baseParams,
-          resolveType: (value) => {
-            const valueKeys = Object.keys(value);
-            const possibleTypes = this._fieldDefs.reduce<IDecorator<IGqlType<typeof GraphQLObjectType>>[]>((prev, fieldDef) => {
-              if (
-                valueKeys.includes(fieldDef.params.name) &&
-                gqlTypeDef.params.unionTypes.includes(fieldDef.originalClass)
-              ) {
-                const fieldGqlTypeDef = this.GetOneGqlTypeDef(fieldDef.originalClass, GraphQLObjectType);
-                if (fieldGqlTypeDef && !prev.includes(fieldGqlTypeDef)) {
-                  prev.push(fieldGqlTypeDef);
-                }
-              }
-              return prev;
-            }, []);
-            if (possibleTypes.length > 0) {
-              return possibleTypes[0].params.compiled;
-            }
-          },
           types: gqlTypeDef.params.unionTypes.map((unionClassType) => {
             const unionGqlTypeDef = this.GetOneGqlTypeDef(unionClassType, GraphQLObjectType);
             if (unionGqlTypeDef) {
               return unionGqlTypeDef.params.compiled;
             }
             throw new Error(`No type for the class ${unionClassType.name} was found to create the ${gqlTypeDef.params.name} union type`);
-          })
+          }),
+          resolveType: (value) => {
+            const unionGqlClassType = gqlTypeDef.params.unionTypes.find((unionType) => value instanceof unionType);
+            if (unionGqlClassType) {
+              return this.GetOneGqlTypeDef(unionGqlClassType, GraphQLObjectType).params.compiled;
+            }
+            return this.unsafeResolveType(value, gqlTypeDef, GraphQLUnionType);
+          }
         });
         break;
     }
     gqlTypeDef.params.compiled = compiled;
     return gqlTypeDef;
+  }
+
+  /**
+   * Resolve the GraphQL typename for UnionType and InterfaceType based on properties
+   * @param value The value object
+   * @param gqlTypeDef The GraphQL type definition
+   * @param gqlType The type to resolve
+   */
+  private unsafeResolveType<Type extends typeof GraphQLUnionType | typeof GraphQLInterfaceType>(
+    value: object,
+    gqlTypeDef: IDecorator<IGqlType<any>>,
+    gqlType: Type
+  ): GraphQLObjectType | undefined {
+    const valueKeys = Object.keys(value);
+    const possibleTypes = this._fieldDefs.reduce<[IDecorator<IGqlType<typeof GraphQLObjectType>>, IDecorator<IField>[]][]>((prev, fieldDef) => {
+      if (
+        valueKeys.includes(fieldDef.params.name) &&
+        (gqlType === GraphQLUnionType ? gqlTypeDef.params.unionTypes.includes(fieldDef.originalClass) : true)
+      ) {
+        const fieldGqlTypeDef = this.GetOneGqlTypeDef<any>(
+          fieldDef.originalClass,
+          GraphQLObjectType
+        );
+        if (
+          fieldGqlTypeDef &&
+          (gqlType === GraphQLInterfaceType ? fieldGqlTypeDef.params.implements.includes(gqlTypeDef.originalClass) : true)
+        ) {
+          let exsitingTypeDef = prev.find((existingTypeDef) => {
+            return existingTypeDef[0].originalClass === fieldGqlTypeDef.originalClass;
+          });
+          if (!exsitingTypeDef) {
+            exsitingTypeDef = [fieldGqlTypeDef, []];
+            prev.push(exsitingTypeDef);
+          }
+          const fieldExists = exsitingTypeDef[1].find((existingField) => existingField.key === fieldDef.key);
+          if (exsitingTypeDef && !fieldExists) {
+            exsitingTypeDef[1].push(fieldDef);
+          }
+        }
+      }
+      return prev;
+    }, []);
+    const bestMatch = possibleTypes.reduce((bestMatch, gqlTypeDef) => {
+      if (bestMatch[1].length < gqlTypeDef[1].length) {
+        return gqlTypeDef;
+      }
+      return bestMatch;
+    });
+    if (bestMatch) {
+      return bestMatch[0].params.compiled;
+    }
   }
 
   /**

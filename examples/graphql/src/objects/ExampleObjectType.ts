@@ -64,6 +64,7 @@ export class PO2 implements PO1 {
 @InputType()
 @ObjectType()
 export class ExampleInputType2 {
+  @Field()
   hello3: string;
 
   @Field({ nullable: true })
@@ -76,10 +77,38 @@ export class ExampleObjectType0 {
   hello0: string;
 }
 
+@InterfaceType()
+export class MyInterface {
+  @Field()
+  myInterfaceField: string;
+}
+
+@ObjectType({
+  implements: [MyInterface]
+})
+export class MyInterfaceObj1 implements MyInterface {
+  @Field()
+  myInterfaceField: string;
+
+  @Field()
+  yo: string;
+}
+
+@ObjectType({
+  implements: [MyInterface]
+})
+export class MyInterfaceObj2 implements MyInterface {
+  @Field()
+  myInterfaceField: string;
+}
+
 @ObjectType()
 export class ExampleObjectType {
   @Field({ nullable: true })
   hello: string;
+
+  @Field()
+  test: MyInterface;
 }
 
 @ObjectType()

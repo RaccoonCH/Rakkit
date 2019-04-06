@@ -15,7 +15,10 @@ import {
   Response,
   ExampleInputType,
   ExampleInputType2,
-  TestEnum
+  TestEnum,
+  MyInterface,
+  MyInterfaceObj1,
+  MyInterfaceObj2
 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
@@ -46,7 +49,10 @@ export class ExampleResolver3 {
   ) {
     await next();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    context.gql.response.hello3 = "yop";
+    const res = new ExampleInputType();
+    res.hello3 = "aa";
+    res.enumz = TestEnum.a;
+    context.gql.response = res;
     console.log(str, stra, aaa);
   }
 }
@@ -54,7 +60,7 @@ export class ExampleResolver3 {
 @Resolver()
 @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
-  @Query(type => ExampleInputType)
+  @Query(type => union)
   async helloWorld(
     context: IContext<ExampleInputType>,
     next: NextFunction
@@ -67,11 +73,14 @@ export class ExampleResolver {
     await next();
   }
 
-  @Mutation(type => String)
+  @Mutation(type => MyInterface)
   helloWorldMutation(
-    context: IContext<String>
+    context: IContext<MyInterfaceObj1>
   ) {
-    console.log("hello world");
-    return "a";
+    const res: MyInterfaceObj1 = {
+      myInterfaceField: "aa",
+      yo: "aa"
+    };
+    context.gql.response = res;
   }
 }
