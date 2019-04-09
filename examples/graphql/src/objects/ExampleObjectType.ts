@@ -1,4 +1,5 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator } from "../../../../src";
+import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator, EnumType, EnumField } from "../../../../src";
+import { GraphQLInterfaceType } from "graphql";
 
 export enum TestEnum {
   a = "a",
@@ -6,6 +7,12 @@ export enum TestEnum {
 }
 
 const enumType = TypeCreator.CreateEnum(TestEnum, { name: "testenum" });
+
+@EnumType()
+export class MyClassEnum {
+  @EnumField("jafsd")
+  yop: string;
+}
 
 @InputType()
 @ObjectType()
@@ -116,7 +123,7 @@ export class ExampleObjectType {
 export class ExampleInterfaceType {
   @Field()
   hello3: string;
-  @Field()
+  @Field({ gqlType: GraphQLInterfaceType })
   ms: ExampleInputType;
 }
 
@@ -175,7 +182,7 @@ export class ExampleObjectType2 implements ExampleInterfaceType, ExampleInterfac
   @Field(type => ExampleObjectType, {
     nullable: true
   })
-  hello2?: Required<ExampleObjectType>;
+  hello2?: ExampleObjectType;
 
   hello4: string;
   hello3: string;

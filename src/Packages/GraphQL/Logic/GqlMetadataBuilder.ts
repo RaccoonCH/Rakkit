@@ -1,4 +1,5 @@
-import { writeFile, exists } from "fs";
+import { writeFile } from "fs";
+import { PubSub } from "graphql-subscriptions";
 import {
   GraphQLFieldConfigMap,
   GraphQLString,
@@ -17,7 +18,8 @@ import {
   GraphQLFieldConfigArgumentMap,
   GraphQLInputType,
   GraphQLEnumType,
-  GraphQLUnionType
+  GraphQLUnionType,
+  GraphQLEnumValueConfigMap
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
 import {
@@ -264,6 +266,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         });
         break;
       case GraphQLEnumType:
+        // Enum from class
+        if (!gqlTypeDef.params.enumValues) {
+          gqlTypeDef.params.enumValues = this._fieldDefs.reduce<GraphQLEnumValueConfigMap>((prev, fieldDef) => {
+            if (fieldDef.originalClass === gqlTypeDef.originalClass) {
+              prev[fieldDef.key] = {
+                value: fieldDef.params.enumValue,
+                deprecationReason: fieldDef.params.deprecationReason,
+                description: fieldDef.params.description
+              };
+            }
+            return prev;
+          }, {});
+        }
         compiled = new GraphQLEnumType({
           ...baseParams,
           values: gqlTypeDef.params.enumValues
@@ -656,6 +671,12 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
           };
+          // if (fieldDef.params.subscribe) {
+          //   const pubSub = new PubSub();
+          //   gqlField.subscribe = () => {
+          //     return pubSub.asyncIterator(fieldDef.params.subscribe);
+          //   };
+          // }
           if (
             ![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)
           ) {
@@ -683,10 +704,18 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     if (gqlTypeDef) {
       let relation;
 
+      // If the user force the GqlType
+      if (typed.gqlType) {
+        relation = this.GetOneGqlTypeDef(
+          baseType,
+          typed.gqlType
+        );
+      }
+
       // A field from an InterfaceType field try first to make a relation a an ObjectType.
       // Because an interface can have a relation to a type or an interface.
       // If the relation doesn't exists with an interface type try with an InterfaceType.
-      if (gqlTypeDef.params.gqlType === GraphQLInterfaceType) {
+      if (!relation && gqlTypeDef.params.gqlType === GraphQLInterfaceType) {
         relation = this.GetOneGqlTypeDef(
           baseType,
           GraphQLObjectType

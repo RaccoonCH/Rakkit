@@ -20,7 +20,7 @@ type ExampleObjectType0 {
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
   hello3: String!
-  ms: GraphQLObjectTypeExampleInputType!
+  ms: Test!
   hello4: String!
   date: DateTime!
   hello2: ExampleObjectType
@@ -60,7 +60,7 @@ input GraphQLInputObjectTypePO2 {
 
 interface GraphQLInterfaceTypeExampleInterfaceType {
   hello3: String!
-  ms: GraphQLObjectTypeExampleInputType!
+  ms: Test!
 }
 
 interface GraphQLInterfaceTypePO0RequiredTest {
@@ -85,7 +85,7 @@ type GraphQLObjectTypeExampleInputType2 {
 
 type GraphQLObjectTypeExampleInterfaceType {
   hello3: String!
-  ms: GraphQLObjectTypeExampleInputType!
+  ms: Test!
 }
 
 type GraphQLObjectTypePO0_ {
@@ -108,17 +108,21 @@ type Mutation {
   helloWorldMutation: MyInterface!
 }
 
+enum MyClassEnum {
+  yop
+}
+
 interface MyInterface {
   myInterfaceField: String!
 }
 
 type MyInterfaceObj1 implements MyInterface {
   myInterfaceField: String!
+  yo: String!
 }
 
 type MyInterfaceObj2 implements MyInterface {
   myInterfaceField: String!
-  yo: String!
 }
 
 type Query {
