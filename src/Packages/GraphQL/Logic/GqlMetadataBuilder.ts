@@ -49,8 +49,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   private _fieldDefSetters: IDecorator<SetterType<IField>>[] = [];
   private _mutationTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
   private _queryTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
+  private _subscriptionTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
   private _params: Map<Function, IDecorator<IParam>> = new Map();
   private _schema: GraphQLSchema;
+  private _pubSub = new PubSub();
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
@@ -61,9 +63,11 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
     this._queryTypeDef = this.createGqlTypeDef("Query", GraphQLObjectType);
     this._mutationTypeDef = this.createGqlTypeDef("Mutation", GraphQLObjectType);
+    this._subscriptionTypeDef = this.createGqlTypeDef("Subscription", GraphQLObjectType);
 
     this.AddType(this._queryTypeDef);
     this.AddType(this._mutationTypeDef);
+    this.AddType(this._subscriptionTypeDef);
   }
 
   get Schema() {
@@ -125,6 +129,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
     const query = objectTypes.find((gqlType) => gqlType.name === "Query");
     const mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
+    const subscription = objectTypes.find((gqlType) => gqlType.name === "Subscription");
 
     const types = [
       ...interfaceTypes,
@@ -137,7 +142,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     const schemaParams = {
       query,
       mutation,
-      types
+      types,
+      subscription
     };
 
     if (this.getObjectTypeFieldsLength(query) <= 0) {
@@ -607,6 +613,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       case "Query":
         fieldDef.class = this._queryTypeDef.class;
         break;
+      case "Subscription":
+        fieldDef.class = this._subscriptionTypeDef.class;
+        break;
     }
   }
 
@@ -671,15 +680,12 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
           };
-          // if (fieldDef.params.subscribe) {
-          //   const pubSub = new PubSub();
-          //   gqlField.subscribe = () => {
-          //     return pubSub.asyncIterator(fieldDef.params.subscribe);
-          //   };
-          // }
-          if (
-            ![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)
-          ) {
+          if (fieldDef.params.subscriptionTopics) {
+            gqlField.subscribe = (a, b, c) => {
+              return this._pubSub.asyncIterator(fieldDef.params.subscriptionTopics);
+            };
+          }
+          if (![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)) {
             this.applyResolveToField(gqlField, fieldDef);
           }
           prev[fieldDef.params.name] = gqlField;
@@ -812,7 +818,14 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           fieldDef.params.function
         );
         const argsList = gqlContext.gql.args ? Array.from(Object.values(gqlContext.gql.args)) : [];
-        return await bindedFn(...argsList, gqlContext, next);
+        if (gqlContext.gql.queryType === "Subscription") {
+          argsList.push(gqlContext.gql.root);
+        }
+        return await bindedFn(
+          ...argsList,
+          gqlContext,
+          next
+        );
       };
       gqlField.resolve = this.createResolveFn(
         fieldDef,
@@ -856,7 +869,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           info,
           response: baseResponse,
           root,
-          queryType: fieldDef.params.resolveType
+          queryType: fieldDef.params.resolveType,
+          pubSub: this._pubSub
         },
         apiType: "gql",
         ...context
@@ -871,6 +885,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           );
           if (returnedResponse) {
             gqlContext.gql.response = returnedResponse;
+          }
+          if (!gqlContext.gql.response) {
+            gqlContext.gql.response = gqlContext.response.body;
           }
         }
       };

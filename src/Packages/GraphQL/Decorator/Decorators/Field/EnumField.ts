@@ -1,6 +1,5 @@
 import {
   MetadataStorage,
-  TypeFn,
   IEnumFieldParams,
   DecoratorHelper
 } from "../../../../..";

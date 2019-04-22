@@ -2,18 +2,15 @@ import { DecoratorHelper } from "../../../Helpers/DecoratorHelper";
 import {
   TypeFn
 } from "../../../../..";
-import { MetadataStorage } from "../../../../../Logic";
 
-export function Subscription(topic: string);
-export function Subscription(topic: string) {
-  return (target: Object, key: string, desciptor: PropertyDescriptor) => {
-    // return MetadataStorage.Instance.Gql.AddField({
-    //   category: "gql",
-    //   class: target.constructor,
-    //   key,
-    //   originalClass: target.constructor,
-    //   params: {
-    //   }
-    // });
-  };
+export function Subscription(topics: string[]);
+export function Subscription(type: TypeFn, ...topics: string[]);
+export function Subscription(typeOrTopics?: TypeFn | string[], ...topics: string[]) {
+  const isType = typeof typeOrTopics === "function";
+  return DecoratorHelper.getAddResolveDecorator(
+    isType ? typeOrTopics as TypeFn : undefined,
+    undefined,
+    isType ? topics : typeOrTopics as string[],
+    "Subscription"
+  );
 }

@@ -75,6 +75,7 @@ export class DecoratorHelper {
   static getAddResolveDecorator(
     typeOrName?: string | TypeFn,
     name?: string,
+    subscriptionTopics?: string[],
     resolveType: GqlResolveType = "Query"
   ) {
     const isType = typeof typeOrName === "function";
@@ -88,6 +89,7 @@ export class DecoratorHelper {
         key,
         category: "gql",
         params: {
+          subscriptionTopics,
           resolveType,
           name: definedName,
           args: [],

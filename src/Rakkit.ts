@@ -38,6 +38,10 @@ export class Rakkit extends AppLoader {
     return this._koaApp;
   }
 
+  get HttpServer() {
+    return this._httpServer;
+  }
+
   private constructor(config?: IAppConfig) {
     super();
     this._config = config || {};

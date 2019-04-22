@@ -8,7 +8,8 @@ import {
   UseMiddleware,
   NextFunction,
   Mutation,
-  TypeCreator
+  TypeCreator,
+  Subscription
 } from "../../../../src";
 import {
   getItems,
@@ -77,10 +78,24 @@ export class ExampleResolver {
   helloWorldMutation(
     context: IContext<MyInterfaceObj1>
   ) {
+    context.gql.pubSub.publish("yo", undefined);
     const res: MyInterfaceObj1 = {
       myInterfaceField: "aa",
       yo: "aa"
     };
     context.gql.response = res;
+  }
+
+  @Subscription(["yo"])
+  sub(
+    @Arg({ name: "topic" })
+    topic: String,
+    payload: any,
+    context: IContext,
+    next: NextFunction
+  ): Boolean {
+    console.log(payload, context);
+    next();
+    return true;
   }
 }

@@ -142,6 +142,10 @@ type Response {
   hello6: GraphQLObjectTypeExampleInputType
 }
 
+type Subscription {
+  sub(topic: String!): Boolean!
+}
+
 union test = GraphQLObjectTypeExampleInputType | GraphQLObjectTypeExampleInputType2
 
 interface Test {

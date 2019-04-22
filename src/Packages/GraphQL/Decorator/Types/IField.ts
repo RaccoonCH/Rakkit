@@ -13,7 +13,7 @@ IDeprecation,
 IQuery,
 INamed,
 Partial<IDescription> {
-  subscribe?: Function;
+  subscriptionTopics?: string[];
   enumValue?: any;
   compiled?: GraphQLFieldConfig<any, any>;
 }
