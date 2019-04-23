@@ -1,10 +1,9 @@
 import {
-  IHasType,
-  INamed,
-  IFlat
+  IHasType
 } from "../..";
 
-export interface IArg extends IHasType, INamed, IFlat {
+export interface IArg extends IHasType {
+  name: string;
   flat: boolean;
   index: number;
 }

@@ -1,5 +1,5 @@
-export interface IGqlTypeParams {
-  description?: string;
+import { IGqlObjectParams } from "../..";
+
+export interface IGqlTypeParams extends Partial<IGqlObjectParams> {
   extends?: Function;
-  deprecationReason?: string;
 }

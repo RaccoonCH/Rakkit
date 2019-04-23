@@ -21,14 +21,13 @@ export function Field(typeOrParams?: IFieldParams | TypeFn, params?: IFieldParam
       definedParams.function = descriptor.value;
       reflectType = () => Reflect.getMetadata("design:returntype", target, key);
     }
+    definedParams.isArray = DecoratorHelper.returnAnArray(reflectType);
     const finalType = definedType || reflectType;
-    const isArray = Array.isArray(reflectType().prototype);
     MetadataStorage.Instance.Gql.AddField(
       DecoratorHelper.getAddFieldParams(
         target.constructor,
         key,
         finalType,
-        isArray,
         definedParams
       )
     );

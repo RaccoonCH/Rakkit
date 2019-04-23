@@ -13,11 +13,15 @@ export function NameFrom(...types: Function[]): Function {
       category: "gql",
       params: (type: IDecorator<IGqlType>) => ({
         name: type.params.name + types.reduce((prev, classType) => {
-          const gqlTypeDef = MetadataStorage.Instance.Gql.GetOneGqlTypeDef(classType, type.params.gqlType);
+          types;
+          const gqlTypeDef = MetadataStorage.Instance.Gql.GetOneGqlTypeDef(
+            classType,
+            type.params.gqlType
+          );
           if (gqlTypeDef) {
             return prev + gqlTypeDef.params.name;
           }
-          return "_";
+          return "_TYPE_NAME_NOT_FOUND";
         }, "")
       })
     });

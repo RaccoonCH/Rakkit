@@ -1,19 +1,19 @@
 import { GraphQLFieldConfig } from "graphql";
 import {
-  IDeprecation,
-  IQuery,
   IHasType,
-  INamed,
-  IDescription
+  GqlResolveType,
+  IArg,
+  Topic
 } from "../..";
 
-export interface IField extends
-IHasType,
-IDeprecation,
-IQuery,
-INamed,
-Partial<IDescription> {
-  subscriptionTopics?: string[];
-  enumValue?: any;
+export interface IField extends IHasType {
+  name: string;
   compiled?: GraphQLFieldConfig<any, any>;
+  topics?: Topic;
+  resolveType?: GqlResolveType;
+  deprecationReason?: string;
+  description?: string;
+  function?: Function;
+  enumValue?: any;
+  args?: IArg[];
 }

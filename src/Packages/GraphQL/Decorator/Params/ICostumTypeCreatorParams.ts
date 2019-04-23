@@ -1,8 +1,5 @@
-import { GqlType } from "../..";
+import { GqlType, IGqlObject } from "../..";
 
-export interface ICustomTypeCreatorParams {
+export interface ICustomTypeCreatorParams extends Partial<IGqlObject> {
   gqlType?: GqlType;
-  description?: string;
-  deprecationReason?: string;
-  name?: string;
 }

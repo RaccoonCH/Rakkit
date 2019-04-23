@@ -1,11 +1,7 @@
 import {
-  IGqlTypeParams,
-  IInterface
+  IGqlTypeParams
 } from "../..";
 
-export interface IObjectTypeParams extends
-IGqlTypeParams,
-Partial<IInterface> {
-  description?: string;
-  deprecationReason?: string;
+export interface IObjectTypeParams extends IGqlTypeParams {
+  implements?: Function[];
 }

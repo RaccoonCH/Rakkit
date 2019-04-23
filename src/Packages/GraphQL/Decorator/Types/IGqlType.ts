@@ -1,18 +1,12 @@
 import { GraphQLEnumValueConfigMap } from "graphql";
 import {
   GqlType,
-  INamed,
-  IInterface,
   ITypeTransformation,
-  IDeprecation,
-  IDescription
+  IGqlObject
 } from "../../../..";
 
-export interface IGqlType<Type extends GqlType = any> extends
-INamed,
-IInterface,
-IDescription,
-IDeprecation {
+export interface IGqlType<Type extends GqlType = any> extends IGqlObject {
+  implements?: Function[];
   gqlType?: Type;
   extends?: Function;
   enumValues?: GraphQLEnumValueConfigMap;

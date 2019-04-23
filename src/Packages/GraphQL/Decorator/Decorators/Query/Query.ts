@@ -1,12 +1,13 @@
 import { DecoratorHelper } from "../../../Helpers/DecoratorHelper";
 import {
-  TypeFn
+  TypeFn,
+  IFieldParams
 } from "../../../../..";
 
 export function Query();
 export function Query(type: TypeFn);
-export function Query(name: string);
-export function Query(type: TypeFn, name: string);
-export function Query(typeOrName?: TypeFn | string, name?: string) {
-  return DecoratorHelper.getAddResolveDecorator(typeOrName, name);
+export function Query(params: IFieldParams);
+export function Query(type: TypeFn, params: IFieldParams);
+export function Query(typeOrParams?: TypeFn | IFieldParams, params?: IFieldParams) {
+  return DecoratorHelper.getAddResolveDecorator(typeOrParams, params);
 }

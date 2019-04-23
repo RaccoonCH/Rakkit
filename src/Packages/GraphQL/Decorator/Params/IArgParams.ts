@@ -1,11 +1,4 @@
-import {
-  INullable,
-  INamed,
-  IFlat
-} from "../..";
+import { IArg } from "../..";
 
-export interface IArgParams extends
-Partial<INullable>,
-Partial<INamed>,
-Partial<IFlat> {
+export interface IArgParams extends Partial<Pick<IArg, "name" | "nullable" | "flat">>{
 }

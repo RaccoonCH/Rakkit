@@ -1,5 +1,5 @@
 import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator, EnumType, EnumField } from "../../../../src";
-import { GraphQLInterfaceType } from "graphql";
+import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
 export enum TestEnum {
   a = "a",
@@ -8,14 +8,21 @@ export enum TestEnum {
 
 const enumType = TypeCreator.CreateEnum(TestEnum, { name: "testenum" });
 
-@EnumType()
+export class ScalarMapTest {
+}
+
+@EnumType("asaasldk", {
+  description: "a"
+})
 export class MyClassEnum {
   @EnumField("jafsd")
   yop: string;
 }
 
 @InputType()
-@ObjectType()
+@ObjectType({
+  description: "aasjdasjd"
+})
 @InterfaceType("Test")
 export class ExampleInputType {
   @Field()
@@ -30,9 +37,12 @@ export class ExampleInputType {
   }
 }
 
-const PartialA = TypeCreator.CreateRequired(ExampleInputType);
+const RequiredExampleInputType = TypeCreator.CreateRequired(ExampleInputType, {
+  name: "RequiredExampleInputType",
+  gqlType: GraphQLObjectType
+});
 
-@NameFrom(PartialA)
+@NameFrom(RequiredExampleInputType)
 @InputType()
 @InterfaceType()
 @ObjectType()
@@ -80,8 +90,8 @@ export class ExampleInputType2 {
 
 @ObjectType()
 export class ExampleObjectType0 {
-  @Field()
-  hello0: string;
+  @Field(type => String)
+  hello0: string[];
 }
 
 @InterfaceType()
@@ -130,7 +140,7 @@ export class ExampleInterfaceType {
 @InterfaceType()
 export class ExampleInterfaceType2 {
   @Field()
-  hello4: string;
+  hello4: ScalarMapTest;
 }
 
 @ObjectType()
@@ -174,7 +184,7 @@ export function getItems<Type, Type2>(
 
 @ObjectType({
   implements: [ExampleInterfaceType, ExampleInterfaceType2],
-  extends: PartialA
+  extends: RequiredExampleInputType
 })
 export class ExampleObjectType2 implements ExampleInterfaceType, ExampleInterfaceType2 {
   @Field()

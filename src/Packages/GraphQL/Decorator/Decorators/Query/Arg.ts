@@ -2,7 +2,9 @@ import {
   TypeFn,
   IArg,
   IArgParams,
-  MetadataStorage
+  MetadataStorage,
+  IDecorator,
+  IField
 } from "../../../../..";
 
 /**
@@ -23,7 +25,7 @@ export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
       class: target.constructor,
       originalClass: target.constructor,
       key,
-      params: (field) => {
+      params: (field: IDecorator<IField>) => {
         const newArg: IArg = {
           type: definedType,
           index,
@@ -33,12 +35,14 @@ export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
           nullable: false,
           ...definedParams
         };
-        return {
-          args: [
-            newArg,
-            ...field.params.args
-          ]
-        };
+        if (field.params.args) {
+          return {
+            args: [
+              newArg,
+              ...field.params.args
+            ]
+          };
+        }
       }
     });
   };

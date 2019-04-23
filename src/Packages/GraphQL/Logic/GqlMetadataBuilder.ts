@@ -1,5 +1,5 @@
 import { writeFile } from "fs";
-import { PubSub } from "graphql-subscriptions";
+import { PubSub, PubSubEngine } from "graphql-subscriptions";
 import {
   GraphQLFieldConfigMap,
   GraphQLString,
@@ -22,6 +22,7 @@ import {
   GraphQLEnumValueConfigMap
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
+import { Rakkit } from "../../../Rakkit";
 import {
   IDecorator,
   IField,
@@ -38,7 +39,8 @@ import {
   TypeFn,
   DecoratorHelper,
   SetterType,
-  ITypeTransformation
+  ITypeTransformation,
+  GraphQLTimestamp
 } from "../../..";
 
 export class GqlMetadataBuilder extends MetadataBuilder {
@@ -52,10 +54,14 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   private _subscriptionTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
   private _params: Map<Function, IDecorator<IParam>> = new Map();
   private _schema: GraphQLSchema;
-  private _pubSub = new PubSub();
+  private _pubSub: PubSubEngine = new PubSub();
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
+  }
+
+  private get _config() {
+    return Rakkit.Instance.Config.gql;
   }
 
   constructor() {
@@ -114,6 +120,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   }
 
   Build() {
+    if (this._config.pubSub) {
+      this._pubSub = this._config.pubSub;
+    }
+
     this.applyTransformationTypes();
     this.renameWithTypeName();
     this.applyObjectTypeSetters();
@@ -151,6 +161,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     }
     if (this.getObjectTypeFieldsLength(mutation) <= 0) {
       delete schemaParams.mutation;
+    }
+    if (this.getObjectTypeFieldsLength(subscription) <= 0) {
+      delete schemaParams.subscription;
     }
 
     this._schema = new GraphQLSchema(schemaParams);
@@ -422,7 +435,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       if (gqlTypeDef.params.extends) {
         superClass = gqlTypeDef.params.extends;
       }
-      const superTypeDef = this.GetOneGqlTypeDef(superClass, gqlTypeDef.params.gqlType);
+      const superTypeDef = this.GetGqlTypeDefs(superClass)[0];
       // gqlTypeDef -> ihneriter
       // superTypeDef -> ihnerited
       if (superTypeDef) {
@@ -625,17 +638,16 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * @param typeFn The field type
    * @param isArray Is the fieldType an array
    */
-  // TODO: isNullable
   private createFieldDef(
     name: string,
     typeFn: Function,
-    isArray: boolean
+    extraParams: Partial<IField>
   ): IDecorator<IField> {
     return DecoratorHelper.getAddFieldParams(
       () => name,
       name,
       () => typeFn,
-      isArray
+      extraParams
     );
   }
 
@@ -680,9 +692,18 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
           };
-          if (fieldDef.params.subscriptionTopics) {
-            gqlField.subscribe = (a, b, c) => {
-              return this._pubSub.asyncIterator(fieldDef.params.subscriptionTopics);
+          if (fieldDef.params.topics) {
+            gqlField.subscribe = async (_, args) => {
+              let topics: string[] | string;
+              if (typeof fieldDef.params.topics === "function") {
+                topics = await this.bindContext(
+                  fieldDef,
+                  fieldDef.params.topics
+                )(args);
+              } else {
+                topics = fieldDef.params.topics;
+              }
+              return this._pubSub.asyncIterator(topics);
             };
           }
           if (![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)) {
@@ -705,6 +726,14 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     gqlTypeDef?: IDecorator<IGqlType>,
     fromInterface: boolean = false
   ): GraphQLOutputType {
+    if (typed.nullable === undefined) {
+      if (this._config.nullableByDefault !== undefined) {
+        typed.nullable = this._config.nullableByDefault;
+      } else {
+        typed.nullable = false;
+      }
+    }
+
     let finalType: GraphQLOutputType = undefined;
     const baseType = typed.type();
     if (gqlTypeDef) {
@@ -763,14 +792,22 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         finalType = GraphQLFloat;
         break;
       case Date:
-        finalType = GraphQLISODateTime;
+        finalType = this._config.dateMode === "iso" ? GraphQLISODateTime : GraphQLTimestamp;
         break;
-    }
-    if (!typed.nullable) {
-      finalType = GraphQLNonNull(finalType);
+      default:
+        const foundType = this._config.scalarMap.find((association) =>
+          association[0] === baseType
+        );
+        if (foundType) {
+          finalType = foundType[1];
+        }
+        break;
     }
     if (typed.isArray) {
       finalType = GraphQLList(finalType);
+    }
+    if (!typed.nullable) {
+      finalType = GraphQLNonNull(finalType);
     }
     return finalType;
   }
@@ -807,10 +844,17 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         gqlField.args = argMap;
       }
 
+      const globalMiddlewares = this._config.globalMiddlewares;
       const usedMiddlewares = this._routingStorage.GetUsedMiddlewares(fieldDef);
       const usedMiddlewaresFn = this._routingStorage.ExtractMiddlewares(usedMiddlewares);
-      const beforeMiddlewares = this._routingStorage.GetBeforeMiddlewares(usedMiddlewaresFn);
-      const afterMiddlewares = this._routingStorage.GetAfterMiddlewares(usedMiddlewaresFn);
+      const beforeMiddlewares = this._routingStorage.GetBeforeMiddlewares([
+        ...globalMiddlewares,
+        ...usedMiddlewaresFn
+      ]);
+      const afterMiddlewares = this._routingStorage.GetAfterMiddlewares([
+        ...usedMiddlewaresFn,
+        ...globalMiddlewares
+      ]);
 
       const mainFn = async (gqlContext: IContext, next: NextFunction) => {
         const bindedFn: Function = this.bindContext(
@@ -968,17 +1012,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * Write the schema to a file
    */
   private async writeSchemaFile() {
-    const alert = "# DO NOT EDIT THIS FILE, IT'S GENERATED AT EACH APP STARTUP #";
-    const data = `${alert}\n\n${printSchema(this._schema)}`;
-    return new Promise((resolve, reject) => {
-      writeFile(`${__dirname}/schema.gql`, data, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
+    if (this._config.exportSchemaFileTo) {
+      const alert = "# DO NOT EDIT THIS FILE, IT'S GENERATED AT EACH APP STARTUP #";
+      const data = `${alert}\n\n${printSchema(this._schema)}`;
+      return new Promise((resolve, reject) => {
+        writeFile(this._config.exportSchemaFileTo, data, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
       });
-    });
+    }
   }
 
   private prefix(...strings: string[]) {

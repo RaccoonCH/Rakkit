@@ -1,13 +1,11 @@
 import {
-  INullable,
-  IIsArray,
   TypeFn,
   GqlType
 } from "../../../..";
 
-export interface IHasType extends
-INullable,
-IIsArray {
+export interface IHasType {
+  isArray?: boolean;
+  nullable?: boolean;
   type: TypeFn;
   gqlType?: GqlType;
 }

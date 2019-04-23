@@ -1,15 +1,9 @@
 import {
-  INullable,
-  IDeprecation,
-  IDescription,
-  INamed,
-  GqlType
+  GqlType,
+  IGqlObject
 } from "../..";
 
-export interface IFieldParams extends
-Partial<INullable>,
-Partial<INamed>,
-IDescription,
-IDeprecation {
+export interface IFieldParams extends Partial<IGqlObject> {
+  nullable?: boolean;
   gqlType?: GqlType;
 }

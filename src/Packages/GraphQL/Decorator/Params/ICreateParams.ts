@@ -1,9 +1,4 @@
-import {
-  INamed,
-  IDescription
-} from "../..";
+import { IGqlObject } from "../..";
 
-export interface ICreateParams extends
-Partial<INamed>,
-Partial<IDescription> {
+export interface ICreateParams extends Partial<IGqlObject> {
 }

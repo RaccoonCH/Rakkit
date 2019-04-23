@@ -18,8 +18,7 @@ import {
   ExampleInputType2,
   TestEnum,
   MyInterface,
-  MyInterfaceObj1,
-  MyInterfaceObj2
+  MyInterfaceObj1
 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
@@ -59,7 +58,6 @@ export class ExampleResolver3 {
 }
 
 @Resolver()
-@UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
 export class ExampleResolver {
   @Query(type => union)
   async helloWorld(
@@ -75,18 +73,22 @@ export class ExampleResolver {
   }
 
   @Mutation(type => MyInterface)
-  helloWorldMutation(
-    context: IContext<MyInterfaceObj1>
+  async helloWorldMutation(
+    context: IContext<MyInterfaceObj1>,
+    next: NextFunction
   ) {
-    context.gql.pubSub.publish("yo", undefined);
+    context.gql.pubSub.publish("yo", { payload: "yes" });
     const res: MyInterfaceObj1 = {
       myInterfaceField: "aa",
       yo: "aa"
     };
     context.gql.response = res;
+    await next();
   }
 
-  @Subscription(["yo"])
+  @Subscription({
+    topics: "yo"
+  })
   sub(
     @Arg({ name: "topic" })
     topic: String,

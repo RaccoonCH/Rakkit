@@ -5,18 +5,22 @@ import {
   IGqlType,
   TypeFn,
   GqlResolveType,
-  IField
+  IField,
+  IFieldParams,
+  ISubscriptionParams,
+  IGqlObjectParams,
+  Rakkit
 } from "../../..";
 
 export class DecoratorHelper {
-  static getAddTypeDecorator<ParamType extends object>(
+  static getAddTypeDecorator(
     gqlType: GqlType,
-    nameOrParams?: string | ParamType,
-    params?: ParamType
+    nameOrParams?: string | IGqlObjectParams,
+    params?: IGqlObjectParams
   ) {
     const isName = typeof nameOrParams === "string";
     const definedName = isName ? nameOrParams as string : undefined;
-    const definedParams = (isName ? params : nameOrParams) || {};
+    const definedParams: Partial<IGqlObjectParams> = (isName ? params : nameOrParams as IGqlObjectParams) || {};
     return (target: Function): void => {
       MetadataStorage.Instance.Gql.AddType(
         DecoratorHelper.getAddTypeParams(target, gqlType, definedName, definedParams)
@@ -28,7 +32,6 @@ export class DecoratorHelper {
     target: Function,
     key: string,
     typeFn: TypeFn,
-    isArray: boolean,
     extraParams?: Partial<IField>
   ): IDecorator<IField> {
     const definedParams = extraParams || {};
@@ -44,8 +47,7 @@ export class DecoratorHelper {
         function: undefined,
         type: typeFn,
         deprecationReason: undefined,
-        nullable: false,
-        isArray,
+        isArray: this.returnAnArray(typeFn),
         ...definedParams
       }
     };
@@ -73,33 +75,32 @@ export class DecoratorHelper {
   }
 
   static getAddResolveDecorator(
-    typeOrName?: string | TypeFn,
-    name?: string,
-    subscriptionTopics?: string[],
+    typeOrParams?: ISubscriptionParams | IFieldParams | TypeFn,
+    params?: ISubscriptionParams | IFieldParams,
     resolveType: GqlResolveType = "Query"
   ) {
-    const isType = typeof typeOrName === "function";
+    const isType = typeof typeOrParams === "function";
     return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
       const baseType = () => Reflect.getMetadata("design:returntype", target, key);
-      const definedName = (isType ? name : typeOrName as string) || key;
-      const definedType = isType ? typeOrName as TypeFn : baseType;
-      MetadataStorage.Instance.Gql.AddField({
-        originalClass: target.constructor,
-        class: target.constructor,
+      const definedParams: Partial<ISubscriptionParams> = (isType ? params : typeOrParams as ISubscriptionParams) || {};
+      const definedType = isType ? typeOrParams as TypeFn : baseType;
+      const fieldDef = this.getAddFieldParams(
+        target.constructor,
         key,
-        category: "gql",
-        params: {
-          subscriptionTopics,
+        definedType,
+        {
+          ...definedParams,
           resolveType,
-          name: definedName,
-          args: [],
           function: descriptor.value,
-          deprecationReason: undefined,
-          type: definedType,
-          isArray: false,
-          nullable: false
+          name: typeOrParams.name || key,
+          args: []
         }
-      });
+      );
+      MetadataStorage.Instance.Gql.AddField(fieldDef);
     };
+  }
+
+  static returnAnArray(type: TypeFn) {
+    return Array.isArray(type().prototype);
   }
 }

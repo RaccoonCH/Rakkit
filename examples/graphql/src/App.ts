@@ -1,8 +1,8 @@
-import { SubscriptionServer } from "subscriptions-transport-ws";
 import { ApolloServer } from "apollo-server-koa";
-import { execute, subscribe } from "graphql";
-import { createServer } from "http";
-import { Rakkit, MetadataStorage } from "../../../src";
+import { Rakkit, MetadataStorage, GraphQLISODateTime } from "../../../src";
+import { ScalarMapTest } from "./objects/ExampleObjectType";
+import { HelloMiddleware } from "../../basic/src/middlewares/HelloMiddleware";
+import { GoodbyeMiddleware } from "../../basic/src/middlewares/GoodbyeMiddleware";
 
 export class App {
   private _resolvers = [`${__dirname}/resolvers/*`];
@@ -10,7 +10,15 @@ export class App {
   async start() {
     await Rakkit.start({
       gql: {
-        resolvers: this._resolvers
+        resolvers: this._resolvers,
+        scalarMap: [
+          [ScalarMapTest, GraphQLISODateTime]
+        ],
+        exportSchemaFileTo: `${__dirname}/schema.gql`,
+        globalMiddlewares: [
+          HelloMiddleware,
+          GoodbyeMiddleware
+        ]
       }
     });
 
