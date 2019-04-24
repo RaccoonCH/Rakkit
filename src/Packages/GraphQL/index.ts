@@ -10,7 +10,7 @@ export * from "./Decorator/Decorators/Type/InputType";
 export * from "./Decorator/Decorators/Type/ObjectType";
 export * from "./Decorator/Decorators/Type/InterfaceType";
 export * from "./Decorator/Decorators/Type/EnumType";
-export * from "./Decorator/Decorators/Type/NameFrom";
+export * from "./Decorator/Decorators/Type/ConcatName";
 
 export * from "./Decorator/Types/IField";
 export * from "./Decorator/Types/IGqlType";

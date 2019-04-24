@@ -1,4 +1,4 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, NameFrom, TypeCreator, EnumType, EnumField } from "../../../../src";
+import { ObjectType, Field, InputType, InterfaceType, IClassType, ConcatName, TypeCreator, EnumType, EnumField } from "../../../../src";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
 export enum TestEnum {
@@ -6,22 +6,22 @@ export enum TestEnum {
   b = "b"
 }
 
-const enumType = TypeCreator.CreateEnum(TestEnum, { name: "testenum" });
+const enumType = TypeCreator.CreateEnum(TestEnum, { name: "testEnum" });
 
 export class ScalarMapTest {
 }
 
-@EnumType("asaasldk", {
-  description: "a"
+@EnumType("MyEnumClassType", {
+  description: "An enum type generated from a class"
 })
 export class MyClassEnum {
-  @EnumField("jafsd")
+  @EnumField("SuperValue")
   yop: string;
 }
 
 @InputType()
 @ObjectType({
-  description: "aasjdasjd"
+  description: "My example InputType"
 })
 @InterfaceType("Test")
 export class ExampleInputType {
@@ -42,7 +42,6 @@ const RequiredExampleInputType = TypeCreator.CreateRequired(ExampleInputType, {
   gqlType: GraphQLObjectType
 });
 
-@NameFrom(RequiredExampleInputType)
 @InputType()
 @InterfaceType()
 @ObjectType()
@@ -80,6 +79,7 @@ export class PO2 implements PO1 {
 
 @InputType()
 @ObjectType()
+@ConcatName(RequiredExampleInputType)
 export class ExampleInputType2 {
   @Field()
   hello3: string;
@@ -88,7 +88,10 @@ export class ExampleInputType2 {
   hello12: string;
 }
 
-@ObjectType()
+@ConcatName(RequiredExampleInputType)
+@ObjectType({
+  description: "ObjectType named from required ExampleInputType"
+})
 export class ExampleObjectType0 {
   @Field(type => String)
   hello0: string[];
@@ -160,7 +163,7 @@ export function getItems<Type, Type2>(
   itemsType: IClassType<Type>,
   itemsType2: IClassType<Type2>
 ): IClassType<Response<Type, Type2>> {
-  @NameFrom(itemsType, itemsType2)
+  @ConcatName(itemsType, itemsType2)
   @InputType()
   class GenericResponse extends Response<Type, Type2> {
     get A() {

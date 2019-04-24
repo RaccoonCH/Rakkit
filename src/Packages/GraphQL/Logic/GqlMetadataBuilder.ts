@@ -1,3 +1,4 @@
+// #region Imports
 import { writeFile } from "fs";
 import { PubSub, PubSubEngine } from "graphql-subscriptions";
 import {
@@ -42,6 +43,7 @@ import {
   ITypeTransformation,
   GraphQLTimestamp
 } from "../../..";
+// #endregion
 
 export class GqlMetadataBuilder extends MetadataBuilder {
   private _gqlTypeDefs: IDecorator<IGqlType>[] = [];
