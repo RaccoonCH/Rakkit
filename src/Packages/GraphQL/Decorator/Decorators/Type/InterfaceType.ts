@@ -9,7 +9,7 @@ export function InterfaceType(params: IGqlTypeParams);
 export function InterfaceType(name: string);
 export function InterfaceType(name: string, params: IGqlTypeParams);
 export function InterfaceType(nameOrParams?: string | IGqlTypeParams, params?: IGqlTypeParams): Function {
-  return DecoratorHelper.getAddTypeDecorator<IGqlTypeParams>(
+  return DecoratorHelper.getAddTypeDecorator(
     GraphQLInterfaceType,
     nameOrParams,
     params

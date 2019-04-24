@@ -132,9 +132,6 @@ export class DiMetadataBuilder extends MetadataBuilder {
     const superClass: Function = Object.getPrototypeOf(classType);
     if (superClass) {
       this.extendsSuperclass(superClass);
-      if (superClass.name === "ConstructorInjection") {
-        console.log("a");
-      }
       const classInjections = this._injections.filter((injection) =>
         injection.originalClass === (superClass as Function)
       );

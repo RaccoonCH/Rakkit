@@ -13,7 +13,6 @@ export function EnumField(value: any, params?: IEnumFieldParams) {
         target.constructor,
         key,
         () => Reflect.getMetadata("design:type", target, key),
-        false,
         {
           ...(params || {}),
           enumValue: value

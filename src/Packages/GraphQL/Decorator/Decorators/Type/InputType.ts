@@ -9,7 +9,7 @@ export function InputType(params: IGqlTypeParams);
 export function InputType(name: string);
 export function InputType(name: string, params: IGqlTypeParams);
 export function InputType(nameOrParams?: string | IGqlTypeParams, params?: IGqlTypeParams): Function {
-  return DecoratorHelper.getAddTypeDecorator<IGqlTypeParams>(
+  return DecoratorHelper.getAddTypeDecorator(
     GraphQLInputObjectType,
     nameOrParams,
     params
