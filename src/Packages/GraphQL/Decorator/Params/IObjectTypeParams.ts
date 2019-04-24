@@ -3,5 +3,5 @@ import {
 } from "../..";
 
 export interface IObjectTypeParams extends IGqlTypeParams {
-  implements?: Function[];
+  implements?: Function | Function[];
 }

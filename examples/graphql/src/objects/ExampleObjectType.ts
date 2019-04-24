@@ -63,7 +63,7 @@ export class PO1 implements PO0 {
 }
 
 @InputType()
-@ObjectType({ implements: [PO1] })
+@ObjectType({ implements: PO1 })
 export class PO2 implements PO1 {
   @Field()
   str: string;
@@ -101,7 +101,7 @@ export class MyInterface {
 }
 
 @ObjectType({
-  implements: [MyInterface]
+  implements: MyInterface
 })
 export class MyInterfaceObj1 implements MyInterface {
   @Field()
@@ -112,7 +112,7 @@ export class MyInterfaceObj1 implements MyInterface {
 }
 
 @ObjectType({
-  implements: [MyInterface]
+  implements: MyInterface
 })
 export class MyInterfaceObj2 implements MyInterface {
   @Field()

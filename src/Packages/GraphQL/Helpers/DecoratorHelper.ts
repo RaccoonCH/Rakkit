@@ -60,6 +60,9 @@ export class DecoratorHelper {
     params: Partial<IGqlType> = {}
   ): IDecorator<IGqlType<Type>> {
     const definedName = name || target.name;
+    if (params.implements && !Array.isArray(params.implements)) {
+      params.implements = [params.implements];
+    }
     return {
       originalClass: target,
       class: target,
