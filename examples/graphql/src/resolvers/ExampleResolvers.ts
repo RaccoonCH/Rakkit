@@ -42,7 +42,7 @@ export class ExampleResolver3 {
     str: Response<ExampleInputType, ExampleInputType2>,
     @Arg({ nullable: true, name: "zzz", flat: true })
     stra: ExampleInputType2,
-    @Arg({ name: "aa" })
+    @Arg({ name: "aa", defaultValue: 123, description: "yo" })
     aaa: number,
     context: IContext<ExampleInputType | ExampleInputType2>,
     next: NextFunction

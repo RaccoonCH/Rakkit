@@ -827,18 +827,25 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         const argMap = fieldDef.params.args.reduce<GraphQLFieldConfigArgumentMap>((prev, arg) => {
           const argType = arg.type();
           let gqlTypeDef = this.GetOneGqlTypeDef(argType);
+          const baseParams = {
+            description: arg.description,
+            baseParams: arg.defaultValue
+          };
+
           if (arg.flat) {
             this._fieldDefs.map((field) => {
               if (field.class === gqlTypeDef.class) {
                 prev[field.params.name] = {
-                  type: this.parseTypeToGql(field.params, gqlTypeDef) as GraphQLInputType
+                  type: this.parseTypeToGql(field.params, gqlTypeDef) as GraphQLInputType,
+                  ...baseParams
                 };
               }
             });
           } else {
             gqlTypeDef = this.GetOneGqlTypeDef(argType, GraphQLInputObjectType);
             prev[arg.name] = {
-              type: this.parseTypeToGql(arg, gqlTypeDef) as GraphQLInputType
+              type: this.parseTypeToGql(arg, gqlTypeDef) as GraphQLInputType,
+              ...baseParams
             };
           }
           return prev;
