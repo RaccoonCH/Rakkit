@@ -134,7 +134,17 @@ type MyInterfaceObj2 implements MyInterface {
 }
 
 type Query {
-  a(items: GraphQLInputObjectTypeExampleInputType, items2: GraphQLInputObjectTypeExampleInputType2!, hello3: String!, hello4: String!, hello6: GraphQLInputObjectTypeExampleInputType, hello12: String, aa: Float!): test!
+  a(
+    items: GraphQLInputObjectTypeExampleInputType
+    items2: GraphQLInputObjectTypeExampleInputType2!
+    hello3: String!
+    hello4: String!
+    hello6: GraphQLInputObjectTypeExampleInputType
+    hello12: String
+
+    """yo"""
+    aa: Float! = 123
+  ): test!
   helloWorld: test!
 }
 

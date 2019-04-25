@@ -829,7 +829,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           let gqlTypeDef = this.GetOneGqlTypeDef(argType);
           const baseParams = {
             description: arg.description,
-            baseParams: arg.defaultValue
+            defaultValue: arg.defaultValue
           };
 
           if (arg.flat) {
