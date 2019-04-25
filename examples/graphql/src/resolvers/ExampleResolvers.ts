@@ -100,4 +100,9 @@ export class ExampleResolver {
     next();
     return true;
   }
+
+  @Query()
+  b(): String {
+    return "a";
+  }
 }

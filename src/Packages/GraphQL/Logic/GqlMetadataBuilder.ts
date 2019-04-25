@@ -20,7 +20,8 @@ import {
   GraphQLInputType,
   GraphQLEnumType,
   GraphQLUnionType,
-  GraphQLEnumValueConfigMap
+  GraphQLEnumValueConfigMap,
+  GraphQLSchemaConfig
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
 import { Rakkit } from "../../../Rakkit";
@@ -158,15 +159,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       subscription
     };
 
-    if (this.getObjectTypeFieldsLength(query) <= 0) {
-      delete schemaParams.query;
-    }
-    if (this.getObjectTypeFieldsLength(mutation) <= 0) {
-      delete schemaParams.mutation;
-    }
-    if (this.getObjectTypeFieldsLength(subscription) <= 0) {
-      delete schemaParams.subscription;
-    }
+    this.removeUnsedTypeFromSchema(schemaParams, query);
+    this.removeUnsedTypeFromSchema(schemaParams, mutation);
+    this.removeUnsedTypeFromSchema(schemaParams, subscription);
 
     this._schema = new GraphQLSchema(schemaParams);
 
@@ -220,6 +215,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   //#endregion
 
   //#region Build utils
+  /**
+   * Remove unsed schema params to avoid error
+   * @param schemaParams The schema params
+   * @param schemaType The schema type to remove
+   */
+  removeUnsedTypeFromSchema(schemaParams: GraphQLSchemaConfig, schemaType: GraphQLObjectType) {
+    if (this.getObjectTypeFieldsLength(schemaType) <= 0) {
+      const queryIndex = schemaParams.types.findIndex((schemaParamsType) => schemaParamsType === schemaType);
+      schemaParams.types.splice(queryIndex, 1);
+      delete schemaParams[schemaType.name.toLowerCase()];
+    }
+  }
+
   /**
    * Build a GraphQL type (type, interface, input, ...)
    * @param gqlObjectTypeName The gql type to build

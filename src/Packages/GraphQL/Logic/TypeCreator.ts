@@ -10,7 +10,8 @@ import {
   GqlType,
   MetadataStorage,
   IField,
-  ICustomTypeCreatorParams
+  ICustomTypeCreatorParams,
+  IGqlType
 } from "../../..";
 
 export class TypeCreator {
@@ -34,7 +35,8 @@ export class TypeCreator {
     const definedName = definedParams.name || generatedName;
     const gqlTypeDef = this.createGqlTypeDef(
       definedName,
-      GraphQLEnumType
+      GraphQLEnumType,
+      params
     );
     gqlTypeDef.params.enumValues = values;
 
@@ -146,13 +148,14 @@ export class TypeCreator {
    */
   private static createGqlTypeDef<Type extends GqlType>(
     name: string,
-    gqlType: Type
+    gqlType: Type,
+    extraParams: Partial<IGqlType> = {}
   ) {
     return DecoratorHelper.getAddTypeParams<Type>(
       () => name,
       gqlType,
       name,
-      {}
+      extraParams
     );
   }
 }

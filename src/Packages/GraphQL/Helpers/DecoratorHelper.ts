@@ -87,19 +87,23 @@ export class DecoratorHelper {
       const baseType = () => Reflect.getMetadata("design:returntype", target, key);
       const definedParams: Partial<ISubscriptionParams> = (isType ? params : typeOrParams as ISubscriptionParams) || {};
       const definedType = isType ? typeOrParams as TypeFn : baseType;
-      const fieldDef = this.getAddFieldParams(
-        target.constructor,
-        key,
-        definedType,
-        {
-          ...definedParams,
-          resolveType,
-          function: descriptor.value,
-          name: typeOrParams.name || key,
-          args: []
-        }
-      );
-      MetadataStorage.Instance.Gql.AddField(fieldDef);
+      if (definedType()) {
+        const fieldDef = this.getAddFieldParams(
+          target.constructor,
+          key,
+          definedType,
+          {
+            ...definedParams,
+            resolveType,
+            function: descriptor.value,
+            name: definedParams.name || key,
+            args: []
+          }
+        );
+        MetadataStorage.Instance.Gql.AddField(fieldDef);
+      } else {
+        throw new Error(`You must define a return type for query: ${target.constructor.name}.${definedParams.name || key}`);
+      }
     };
   }
 
