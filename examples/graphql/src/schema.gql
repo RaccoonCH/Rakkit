@@ -146,6 +146,7 @@ type Query {
     aa: Float! = 123
   ): test!
   helloWorld: test!
+  b: String!
 }
 
 type RequiredExampleInputType {
