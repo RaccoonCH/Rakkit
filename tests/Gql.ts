@@ -155,6 +155,21 @@ describe("GraphQL", () => {
       expect(simpleType.description).toBe("a simple enum from TypeCreator");
       expect(simpleType.enumValues[0].name).toBe("a");
     });
+
+    it("Should create a PartialType of ObjectType", async () => {
+      const partialType = TypeCreator.CreatePartial(SimpleObjectType, {
+        name: "MyPartialSimpleObjectType",
+        description: "a partial type"
+      });
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "MyPartialSimpleObjectType") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+      expect(simpleType.description).toBe("a partial type");
+      expect(simpleType.fields[0].type.kind).not.toBe("NON_NULL");
+      expect(simpleType.fields[1].type.kind).not.toBe("NON_NULL");
+    });
   });
 
   describe("Ihneritance", () => {
@@ -292,6 +307,48 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
       expect(simpleType.fields.map((field) => field.name)).toEqual(["ihnField", "field", "interfaceField"]);
+    });
+
+    it("InterfaceType should extends from TypeCreator", async () => {
+      const partial = TypeCreator.CreatePartial(SimpleObjectType, {
+        gqlType: GraphQLObjectType
+      });
+
+      @InterfaceType({
+        extends: partial
+      })
+      class InterfaceTypeTypeCreatorIhneritance {
+        @Field()
+        ihnField: String;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InterfaceTypeTypeCreatorIhneritance") as IntrospectionInterfaceType;
+
+      expect(simpleType.kind).toBe(TypeKind.INTERFACE);
+      expect(simpleType.fields.map((field) => field.name)).toEqual(["ihnField", "field", "interfaceField"]);
+    });
+
+    it("InputType should extends from TypeCreator", async () => {
+      const partial = TypeCreator.CreatePartial(SimpleObjectType, {
+        gqlType: GraphQLObjectType
+      });
+
+      @InputType({
+        extends: partial
+      })
+      class InputTypeTypeCreatorIhneritance {
+        @Field()
+        ihnField: String;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeTypeCreatorIhneritance") as IntrospectionInputObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
+      expect(simpleType.inputFields.map((field) => field.name)).toEqual(["ihnField", "field", "interfaceField"]);
     });
   });
 });

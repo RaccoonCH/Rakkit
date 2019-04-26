@@ -98,7 +98,8 @@ export class TypeCreator {
       "Required",
       { nullable: false },
       definedParams.gqlType,
-      definedParams.name
+      definedParams.name,
+      { description: params.description }
     );
   }
 
@@ -119,7 +120,8 @@ export class TypeCreator {
       "Partial",
       { nullable: true },
       definedParams.gqlType,
-      definedParams.name
+      definedParams.name,
+      { description: params.description }
     );
   }
 
@@ -131,7 +133,8 @@ export class TypeCreator {
     prefix: string,
     fieldsTransformation: Partial<IField>,
     gqlType?: Type,
-    name?: string
+    name?: string,
+    rootTransformation?: Partial<IGqlType>
   ): Function {
     const gqlTypeDef = this.createGqlTypeDef(
       name || target.name,
@@ -140,7 +143,7 @@ export class TypeCreator {
     gqlTypeDef.params.transformation = {
       prefix: name ? undefined : prefix,
       target,
-      rootTransformation: {},
+      rootTransformation,
       fieldsTransformation: {
         params: fieldsTransformation
       }

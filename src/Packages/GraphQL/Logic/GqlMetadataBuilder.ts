@@ -424,6 +424,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         const originalTypeDef = this.GetOneGqlTypeDef(transformation.target, ...searchGqlType);
         if (originalTypeDef) {
           gqlTypeDef.params.gqlType = originalTypeDef.params.gqlType;
+          gqlTypeDef.params = {
+            ...gqlTypeDef.params,
+            ...transformation.rootTransformation
+          };
           if (transformation.prefix) {
             gqlTypeDef.params.name = transformation.prefix + originalTypeDef.params.name;
           }
