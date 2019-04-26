@@ -20,7 +20,9 @@ import {
   IntrospectionInterfaceType,
   IntrospectionObjectType,
   IntrospectionInputObjectType,
-  IntrospectionEnumType
+  IntrospectionEnumType,
+  printSchema,
+  GraphQLObjectType
 } from "graphql";
 // #endregion
 
@@ -112,12 +114,12 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
       expect(simpleType.description).toBe("a simple type");
-      expect(simpleType.fields.map((field) => field.name)).toEqual(["interfaceField", "field"]);
+      expect(simpleType.fields.map((field) => field.name)).toEqual(["field", "interfaceField"]);
       expect(simpleType.interfaces[0].name).toBe("SimpleInterface");
       expect(simpleType.fields[0].deprecationReason).toBe("deprecated");
-      expect(simpleType.fields[0].description).toBe("an interface field");
+      expect(simpleType.fields[0].description).toBe("an object field");
       expect(simpleType.fields[1].deprecationReason).toBe("deprecated");
-      expect(simpleType.fields[1].description).toBe("an object field");
+      expect(simpleType.fields[1].description).toBe("an interface field");
     });
 
     it("Should create an input type", async () => {
@@ -168,7 +170,7 @@ describe("GraphQL", () => {
       const simpleType = schema.types.find((schemaType) => schemaType.name === "ObjectTypeIhneritance") as IntrospectionObjectType;
 
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
-      expect(simpleType.fields.map((field) => field.name)).toEqual(["interfaceField", "ihnField", "field"]);
+      expect(simpleType.fields.map((field) => field.name)).toEqual(["ihnField", "interfaceField", "field"]);
     });
 
     it("InputType should extends", async () => {
@@ -183,7 +185,7 @@ describe("GraphQL", () => {
       const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeIhneritance") as IntrospectionInputObjectType;
 
       expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
-      expect(simpleType.inputFields.map((field) => field.name)).toEqual(["interfaceField", "ihnField", "field"]);
+      expect(simpleType.inputFields.map((field) => field.name)).toEqual(["ihnField", "interfaceField", "field"]);
     });
 
     it("InterfaceType should extends", async () => {
@@ -198,7 +200,7 @@ describe("GraphQL", () => {
       const simpleType = schema.types.find((schemaType) => schemaType.name === "InterfaceTypeIhneritance") as IntrospectionInterfaceType;
 
       expect(simpleType.kind).toBe(TypeKind.INTERFACE);
-      expect(simpleType.fields.map((field) => field.name)).toEqual(["interfaceField", "ihnField", "field"]);
+      expect(simpleType.fields.map((field) => field.name)).toEqual(["ihnField", "interfaceField", "field"]);
     });
 
     it("class EnumType should extends from class", async () => {
@@ -269,6 +271,27 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.ENUM);
       expect(simpleType.enumValues.map((field) => field.name)).toEqual(["a", "enumField"]);
+    });
+
+    it("ObjectType should extends from TypeCreator", async () => {
+      const partial = TypeCreator.CreatePartial(SimpleObjectType, {
+        gqlType: GraphQLObjectType
+      });
+
+      @ObjectType({
+        extends: partial
+      })
+      class ObjectTypeTypeCreatorIhneritance {
+        @Field()
+        ihnField: String;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "ObjectTypeTypeCreatorIhneritance") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+      expect(simpleType.fields.map((field) => field.name)).toEqual(["ihnField", "field", "interfaceField"]);
     });
   });
 });

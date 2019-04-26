@@ -460,31 +460,34 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             gqlTypeDef.params.implements.push(toImplement);
           }
         });
-
-        // Copy the fields of the superclass to the ihnerited class
-        this._fieldDefs.reduce<IDecorator<IField>[]>((prev, field) => {
-          // Overrided
-          const alreadyExists = prev.find((existing) => existing.key === field.key);
-          if (
-            field.class === superClass &&
-            !alreadyExists
-          ) {
-            const newField = this.copyDecoratorType(
-              field,
-              {
-                class: gqlTypeDef.class,
-                originalClass: gqlTypeDef.class
-              }
-            );
-            this._fieldDefs.push(newField);
-            return [
-              ...prev,
-              newField
-            ];
-          }
-          return prev;
-        }, []);
       }
+
+      // Copy the fields of the superclass to the ihnerited class
+      this._fieldDefs.reduce<IDecorator<IField>[]>((prev, fieldDef) => {
+        // Overrided
+        const alreadyExists = prev.find((existing) => existing.key === fieldDef.key);
+        if (
+          (
+            fieldDef.class === superClass ||
+            gqlTypeDef.params.implements.includes(fieldDef.class)
+          ) &&
+          !alreadyExists
+        ) {
+          const newFieldDef = this.copyDecoratorType(
+            fieldDef,
+            {
+              class: gqlTypeDef.class,
+              originalClass: gqlTypeDef.class
+            }
+          );
+          this._fieldDefs.push(newFieldDef);
+          return [
+            ...prev,
+            newFieldDef
+          ];
+        }
+        return prev;
+      }, []);
     });
     return [];
   }
@@ -701,16 +704,11 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   ) {
     return () => {
       const fieldDefs = this._fieldDefs.reduce((prev, fieldDef) => {
-        const implementsField = interfaces.find((interfaceType) => interfaceType.class === fieldDef.class);
-        if (
-          gqlTypeDef.class === fieldDef.class ||
-          implementsField
-        ) {
+        if (gqlTypeDef.class === fieldDef.class) {
           const gqlField: GraphQLFieldConfig<any, any> = {
             type: this.parseTypeToGql(
               fieldDef.params,
-              gqlTypeDef,
-              !!implementsField
+              gqlTypeDef
             ),
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
@@ -749,8 +747,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    */
   private parseTypeToGql(
     typed: IHasType,
-    gqlTypeDef?: IDecorator<IGqlType>,
-    fromInterface: boolean = false
+    gqlTypeDef?: IDecorator<IGqlType>
   ): GraphQLOutputType {
     if (typed.nullable === undefined) {
       if (this._config.nullableByDefault !== undefined) {
