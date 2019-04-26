@@ -40,7 +40,7 @@ export class TypeCreator {
         DecoratorHelper.getAddFieldParams(
           gqlTypeDef.class,
           key,
-          () => String,
+          undefined,
           {
             enumValue: value
           }

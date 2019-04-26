@@ -108,6 +108,12 @@ export class DecoratorHelper {
   }
 
   static returnAnArray(type: TypeFn) {
-    return Array.isArray(type().prototype);
+    if (type) {
+      const definedType = type();
+      if (definedType) {
+        return Array.isArray(definedType.prototype);
+      }
+    }
+    return false;
   }
 }
