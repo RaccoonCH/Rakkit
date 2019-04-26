@@ -59,21 +59,19 @@ export class TypeCreator {
    * @param params The type parameters
    * @param types The types with which you will create the union
    */
-  static CreateUnion(params: ICreateParams, ...types: Function[]);
-  static CreateUnion(types: Function[]);
-  static CreateUnion(paramsOrTypes?: ICreateParams | Function[], ...types: Function[]) {
-    const isTypes = Array.isArray(paramsOrTypes);
-    const definedParams: ICreateParams = isTypes ? {} : paramsOrTypes as ICreateParams;
-    const definedTypes = isTypes ? paramsOrTypes as Function[] : types;
-    const basicName = definedTypes.reduce((prev, classType) =>
+  static CreateUnion(types: Function[], params?: ICreateParams) {
+    const definedParams: ICreateParams = params || {};
+
+    const basicName = types.reduce((prev, classType) =>
       prev + classType.name
     , "");
 
     const gqlTypeDef = this.createGqlTypeDef(
       definedParams.name || `union${basicName}`,
-      GraphQLUnionType
+      GraphQLUnionType,
+      params
     );
-    gqlTypeDef.params.unionTypes = definedTypes;
+    gqlTypeDef.params.unionTypes = types;
 
     MetadataStorage.Instance.Gql.AddType(gqlTypeDef);
 

@@ -24,8 +24,8 @@ import {
 const params = getItems(ExampleInputType, ExampleInputType2);
 
 const union = TypeCreator.CreateUnion(
-  { name: "test" },
-  ExampleInputType, ExampleInputType2
+  [ExampleInputType, ExampleInputType2],
+  { name: "test" }
 );
 
 @Resolver()

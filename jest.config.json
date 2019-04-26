@@ -3,7 +3,7 @@
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "testMatch": ["**/tests/*.ts"],
+  "testMatch": ["**/tests/Gql.ts"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "rootDir": "./",
   "roots": ["<rootDir>/tests"],
