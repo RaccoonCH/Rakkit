@@ -1,14 +1,14 @@
 import { GraphQLEnumType } from "graphql";
 import { DecoratorHelper } from "../../../Helpers/DecoratorHelper";
 import {
-  IGqlObjectParams
+  IGqlTypeParams
 } from "../../../../..";
 
 export function EnumType();
-export function EnumType(params: IGqlObjectParams);
+export function EnumType(params: IGqlTypeParams);
 export function EnumType(name: string);
-export function EnumType(name: string, params: IGqlObjectParams);
-export function EnumType(nameOrParams?: string | IGqlObjectParams, params?: IGqlObjectParams): Function {
+export function EnumType(name: string, params: IGqlTypeParams);
+export function EnumType(nameOrParams?: string | IGqlTypeParams, params?: IGqlTypeParams): Function {
   return DecoratorHelper.getAddTypeDecorator(
     GraphQLEnumType,
     nameOrParams,

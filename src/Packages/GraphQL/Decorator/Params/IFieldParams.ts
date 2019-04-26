@@ -6,4 +6,5 @@ import {
 export interface IFieldParams extends Partial<IGqlObject> {
   nullable?: boolean;
   gqlType?: GqlType;
+  defaultValue?: any;
 }

@@ -16,4 +16,5 @@ export interface IField extends IHasType {
   function?: Function;
   enumValue?: any;
   args?: IArg[];
+  defaultValue?: any;
 }

@@ -171,12 +171,14 @@ export function getItems<Type, Type2>(
     }
 
     @Field(type => itemsType, {
-      nullable: true
+      nullable: true,
+      description: "items",
+      defaultValue: []
     })
-    items;
+    items: Type[];
 
     @Field(type => itemsType2)
-    items2;
+    items2: Type2;
 
     hello() {
       console.log("sss");

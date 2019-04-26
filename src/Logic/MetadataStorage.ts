@@ -42,6 +42,10 @@ export class MetadataStorage {
   }
 
   constructor() {
+    this.Clear();
+  }
+
+  Clear() {
     this._routingMetadata = new RoutingMetadataBuilder();
     this._restMetadata = new RestMetadataBuilder();
     this._diMetadata = new DiMetadataBuilder();

@@ -31,6 +31,7 @@ export * from "./Decorator/Params/IObjectTypeParams";
 export * from "./Decorator/Params/IEnumFieldParams";
 export * from "./Decorator/Params/ISubscriptionParams";
 export * from "./Decorator/Params/IGqlObjectParams";
+export * from "./Decorator/Params/IEnumTypeParams";
 
 export * from "./Types/GqlResolveType";
 export * from "./Types/GqlType";

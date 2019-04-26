@@ -21,7 +21,8 @@ import {
   GraphQLEnumType,
   GraphQLUnionType,
   GraphQLEnumValueConfigMap,
-  GraphQLSchemaConfig
+  GraphQLSchemaConfig,
+  GraphQLInputFieldConfig
 } from "graphql";
 import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
 import { Rakkit } from "../../../Rakkit";
@@ -252,6 +253,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * @param gqlTypeDef the gqlTypeDef to build
    */
   private buildGqlType<Type extends GqlType>(gqlTypeDef: IDecorator<IGqlType<Type>>) {
+    const interfaces = this.getInterfaces(gqlTypeDef);
     const baseParams = {
       name: gqlTypeDef.params.name,
       description: gqlTypeDef.params.description
@@ -262,13 +264,13 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       case GraphQLInputObjectType:
         compiled = new GraphQLInputObjectType({
           ...baseParams,
-          fields: this.getFieldsFunction<GraphQLInputFieldMap>(gqlTypeDef)
+          fields: this.getFieldsFunction<GraphQLInputFieldMap>(gqlTypeDef, interfaces)
         });
         break;
       case GraphQLInterfaceType:
         compiled = new GraphQLInterfaceType({
           ...baseParams,
-          fields: this.getFieldsFunction(gqlTypeDef),
+          fields: this.getFieldsFunction(gqlTypeDef, interfaces),
           resolveType: (value) => {
             const interfaceGqlTypeDef = this._gqlTypeDefs.find((interfaceGqlTypeDef) => {
               try {
@@ -283,7 +285,6 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         });
         break;
       case GraphQLObjectType:
-        const interfaces = this.getInterfaces(gqlTypeDef);
         compiled = new GraphQLObjectType({
           ...baseParams,
           fields: this.getFieldsFunction(gqlTypeDef, interfaces),
@@ -445,12 +446,21 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       if (gqlTypeDef.params.extends) {
         superClass = gqlTypeDef.params.extends;
       }
-      const superTypeDef = this.GetGqlTypeDefs(superClass)[0];
+      let superTypeDef = this.GetOneGqlTypeDef(superClass, gqlTypeDef.params.gqlType);
+      if (!superTypeDef) {
+        superTypeDef = this.GetGqlTypeDefs(superClass)[0];
+      }
       // gqlTypeDef -> ihneriter
       // superTypeDef -> ihnerited
       if (superTypeDef) {
         // Implements the superclass's interfaces to the ihnerited class
-        gqlTypeDef.params.implements = gqlTypeDef.params.implements.concat(superTypeDef.params.implements);
+        superTypeDef.params.implements.map((toImplement) => {
+          // No duplicate
+          if (!gqlTypeDef.params.implements.includes(toImplement)) {
+            gqlTypeDef.params.implements.push(toImplement);
+          }
+        });
+
         // Copy the fields of the superclass to the ihnerited class
         this._fieldDefs.reduce<IDecorator<IField>[]>((prev, field) => {
           // Overrided
@@ -461,7 +471,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           ) {
             const newField = this.copyDecoratorType(
               field,
-              { class: gqlTypeDef.class }
+              {
+                class: gqlTypeDef.class,
+                originalClass: gqlTypeDef.class
+              }
             );
             this._fieldDefs.push(newField);
             return [
@@ -718,6 +731,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           }
           if (![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)) {
             this.applyResolveToField(gqlField, fieldDef);
+          }
+          if (gqlTypeDef.params.gqlType === GraphQLInputObjectType && fieldDef.params.defaultValue) {
+            (gqlField as any as GraphQLInputFieldConfig).defaultValue = fieldDef.params.defaultValue;
           }
           prev[fieldDef.params.name] = gqlField;
         }

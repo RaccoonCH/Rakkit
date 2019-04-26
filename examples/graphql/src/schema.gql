@@ -30,7 +30,8 @@ type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & Ex
 }
 
 input GenericResponseGraphQLInputObjectTypeExampleInputTypeGraphQLInputObjectTypeExampleInputType2 {
-  items: GraphQLInputObjectTypeExampleInputType
+  """items"""
+  items: [GraphQLInputObjectTypeExampleInputType] = []
   items2: GraphQLInputObjectTypeExampleInputType2!
   hello3: String
   hello4: String!
@@ -135,7 +136,7 @@ type MyInterfaceObj2 implements MyInterface {
 
 type Query {
   a(
-    items: GraphQLInputObjectTypeExampleInputType
+    items: [GraphQLInputObjectTypeExampleInputType]
     items2: GraphQLInputObjectTypeExampleInputType2!
     hello3: String!
     hello4: String!

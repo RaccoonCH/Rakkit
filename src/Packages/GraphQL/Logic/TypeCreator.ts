@@ -1,5 +1,4 @@
 import {
-  GraphQLEnumValueConfigMap,
   GraphQLEnumType,
   GraphQLUnionType,
   GraphQLObjectType
@@ -11,7 +10,8 @@ import {
   MetadataStorage,
   IField,
   ICustomTypeCreatorParams,
-  IGqlType
+  IGqlType,
+  IEnumTypeParams
 } from "../../..";
 
 export class TypeCreator {
@@ -22,13 +22,9 @@ export class TypeCreator {
    */
   static CreateEnum<EnumType extends Object>(
     enumType: EnumType,
-    params?: ICreateParams
+    params?: IEnumTypeParams
   ) {
-    const values: GraphQLEnumValueConfigMap = {};
     const generatedName = Object.entries(enumType).reduce((prev, [key, value]) => {
-      values[key] = {
-        value
-      };
       return prev + key;
     }, "");
     const definedParams = params || {};
@@ -38,7 +34,19 @@ export class TypeCreator {
       GraphQLEnumType,
       params
     );
-    gqlTypeDef.params.enumValues = values;
+
+    Object.entries(enumType).map(([key, value]) => {
+      MetadataStorage.Instance.Gql.AddField(
+        DecoratorHelper.getAddFieldParams(
+          gqlTypeDef.class,
+          key,
+          () => String,
+          {
+            enumValue: value
+          }
+        )
+      );
+    });
 
     MetadataStorage.Instance.Gql.AddType(gqlTypeDef);
 
