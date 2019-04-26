@@ -20,11 +20,11 @@ type ExampleObjectType0RequiredExampleInputType {
 }
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
+  date: Timestamp!
+  hello2: ExampleObjectType
   hello3: String!
   ms: Test!
   hello4: DateTime!
-  date: Timestamp!
-  hello2: ExampleObjectType
   enumz: testEnum!
   resolveMe: String!
 }
@@ -106,10 +106,10 @@ type GraphQLObjectTypePO1 {
 }
 
 type GraphQLObjectTypePO2 implements GraphQLInterfaceTypePO1 {
-  po: String!
-  po0: GraphQLObjectTypePO0!
   str: String!
+  po: String!
   po02: GraphQLObjectTypePO0!
+  po0: GraphQLObjectTypePO0!
 }
 
 type Mutation {

@@ -22,7 +22,7 @@ export function ConcatName(...types: Function[]): Function {
           if (gqlTypeDef) {
             return prev + gqlTypeDef.params.name;
           } else {
-            const getName = (classType: Function) => classType.name || "'anonymous class'";
+            const getName = (classType: Function) => classType.name || classType();
             console.log(
               // tslint:disable-next-line:prefer-template
               "\n" +
