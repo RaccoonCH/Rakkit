@@ -21,11 +21,8 @@ import {
   IntrospectionObjectType,
   IntrospectionInputObjectType,
   IntrospectionEnumType,
-  printSchema,
   GraphQLObjectType,
-  IntrospectionInputType,
   IntrospectionUnionType,
-  IntrospectionScalarType,
   IntrospectionNamedTypeRef,
   GraphQLID,
   IntrospectionListTypeRef
@@ -105,6 +102,14 @@ const unionType = TypeCreator.CreateUnion(
   [SimpleObjectType, ObjectTypeForUnion],
   { name: "UnionType", description: "an union type" }
 );
+
+@InputType()
+@InterfaceType()
+@ObjectType()
+class ThreeTypes {
+  @Field()
+  threeField: String;
+}
 
 describe("GraphQL", () => {
   afterEach(async () => {
@@ -279,6 +284,37 @@ describe("GraphQL", () => {
       expect(simpleType.kind).toBe(TypeKind.INTERFACE);
       expect(simpleType.description).toBe("an interface required type");
       expect(simpleType.fields[0].type.kind).toBe("NON_NULL");
+    });
+
+    it("Should create multiple version of a class with different gqlType", async () => {
+      @InputType("InputThreeTypes", {
+        description: "input"
+      })
+      @InterfaceType("InterfaceThreeTypes", {
+        description: "interface"
+      })
+      @ObjectType("ObjectThreeTypes", {
+        description: "object"
+      })
+      class ThreeTypesCustom {
+        @Field()
+        threeField: String;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const ObjectThreeTypes = schema.types.find((schemaType) => schemaType.name === "ObjectThreeTypes") as IntrospectionObjectType;
+      const InputThreeTypes = schema.types.find((schemaType) => schemaType.name === "InputThreeTypes") as IntrospectionInputObjectType;
+      const InterfaceThreeTypes = schema.types.find((schemaType) => schemaType.name === "InterfaceThreeTypes") as IntrospectionInterfaceType;
+
+      expect(ObjectThreeTypes.kind).toBe(TypeKind.OBJECT);
+      expect(ObjectThreeTypes.description).toBe("object");
+
+      expect(InputThreeTypes.kind).toBe(TypeKind.INPUT_OBJECT);
+      expect(InputThreeTypes.description).toBe("input");
+
+      expect(InterfaceThreeTypes.kind).toBe(TypeKind.INTERFACE);
+      expect(InterfaceThreeTypes.description).toBe("interface");
     });
   });
 
@@ -774,6 +810,30 @@ describe("GraphQL", () => {
 
       expect(simpleType.inputFields[2].name).toBe("toEnumClass");
       expect((simpleType.inputFields[2].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumClass");
+    });
+
+    it("Should make a relationship to multiple type", async () => {
+      @InputType()
+      class InputTypeRelationship {
+        @Field({
+          nullable: true
+        })
+        toInput: SimpleInputType;
+
+        @Field(type => enumFromTypeCreator, {
+          nullable: true
+        })
+        toEnumTypeCreator: enumType;
+
+        @Field({
+          nullable: true
+        })
+        toEnumClass: SimpleEnumClassType;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeRelationship") as IntrospectionInputObjectType;
     });
   });
 });
