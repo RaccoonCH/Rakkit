@@ -24,7 +24,11 @@ import {
   printSchema,
   GraphQLObjectType,
   IntrospectionInputType,
-  IntrospectionUnionType
+  IntrospectionUnionType,
+  IntrospectionScalarType,
+  IntrospectionNamedTypeRef,
+  GraphQLID,
+  IntrospectionListTypeRef
 } from "graphql";
 // #endregion
 
@@ -90,6 +94,17 @@ const enumFromTypeCreator = TypeCreator.CreateEnum(enumType, {
   name: "SimpleEnumTypeCreator",
   description: "a simple enum from TypeCreator"
 });
+
+@ObjectType()
+class ObjectTypeForUnion {
+  @Field()
+  unionField: String;
+}
+
+const unionType = TypeCreator.CreateUnion(
+  [SimpleObjectType, ObjectTypeForUnion],
+  { name: "UnionType", description: "an union type" }
+);
 
 describe("GraphQL", () => {
   afterEach(async () => {
@@ -159,17 +174,6 @@ describe("GraphQL", () => {
     });
 
     it("Should create an union type", async () => {
-      @ObjectType()
-      class ObjectTypeForUnion {
-        @Field()
-        unionField: String;
-      }
-
-      const unionType = TypeCreator.CreateUnion(
-        [SimpleObjectType, ObjectTypeForUnion],
-        { name: "UnionType", description: "an union type" }
-      );
-
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "UnionType") as IntrospectionUnionType;
@@ -455,6 +459,321 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
       expect(simpleType.inputFields.map((field) => field.name)).toEqual(["ihnField", "field", "interfaceField"]);
+    });
+  });
+
+  describe("Field", () => {
+    it("Should apply timestamp date mode", async () => {
+      @ObjectType()
+      class TimestampMode {
+        @Field({
+          nullable: true
+        })
+        date: Date;
+      }
+
+      await Rakkit.start({
+        gql: {
+          dateMode: "timestamp"
+        }
+      });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "TimestampMode") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("date");
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("Timestamp");
+    });
+
+    it("Should create nullable fields", async () => {
+      @ObjectType()
+      class Nullable {
+        @Field({
+          nullable: true
+        })
+        a: String;
+
+        @Field()
+        b: Number;
+
+        @Field({
+          nullable: true
+        })
+        c: Number;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "Nullable") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("a");
+      expect(simpleType.fields[0].type.kind).not.toBe("NON_NULL");
+
+      expect(simpleType.fields[1].name).toBe("b");
+      expect(simpleType.fields[1].type.kind).toBe("NON_NULL");
+
+      expect(simpleType.fields[2].name).toBe("c");
+      expect(simpleType.fields[2].type.kind).not.toBe("NON_NULL");
+    });
+
+    it("Should create nullable fields with nullableByDefault", async () => {
+      @ObjectType()
+      class NullableWithNullableByDefault {
+        @Field({
+          nullable: false
+        })
+        a: String;
+
+        @Field()
+        b: Number;
+
+        @Field({
+          nullable: false
+        })
+        c: Number;
+      }
+
+      await Rakkit.start({
+        gql: {
+          nullableByDefault: true
+        }
+      });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "NullableWithNullableByDefault") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("a");
+      expect(simpleType.fields[0].type.kind).toBe("NON_NULL");
+
+      expect(simpleType.fields[1].name).toBe("b");
+      expect(simpleType.fields[1].type.kind).not.toBe("NON_NULL");
+
+      expect(simpleType.fields[2].name).toBe("c");
+      expect(simpleType.fields[2].type.kind).toBe("NON_NULL");
+    });
+
+    it("Should convert primitive type and scalarMap to GraphQL Type and apply params", async () => {
+      class ScalarMap {}
+
+      @ObjectType()
+      class PrimitiveType {
+        @Field({
+          description: "a str type",
+          nullable: true
+        })
+        str: String;
+
+        @Field({
+          deprecationReason: "deprecated",
+          description: "an int type",
+          nullable: true
+        })
+        int: Number;
+
+        @Field({
+          nullable: true,
+          name: "boolValue",
+          description: "a bool type"
+        })
+        bool: Boolean;
+
+        @Field({
+          nullable: true,
+          description: "a date type"
+        })
+        date: Date;
+
+        @Field(type => String, {
+          nullable: true,
+          description: "an array of string type"
+        })
+        arrStr: String[];
+
+        @Field({
+          nullable: true,
+          description: "a scalar type"
+        })
+        scalarMap: ScalarMap;
+      }
+
+      await Rakkit.start({
+        gql: {
+          scalarMap: [
+            [ScalarMap, GraphQLID]
+          ]
+        }
+      });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "PrimitiveType") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("str");
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("String");
+      expect(simpleType.fields[0].description).toBe("a str type");
+
+      expect(simpleType.fields[1].name).toBe("int");
+      expect((simpleType.fields[1].type as IntrospectionNamedTypeRef).name).toBe("Float");
+      expect(simpleType.fields[1].description).toBe("an int type");
+      expect(simpleType.fields[1].deprecationReason).toBe("deprecated");
+
+      expect(simpleType.fields[2].name).toBe("boolValue");
+      expect((simpleType.fields[2].type as IntrospectionNamedTypeRef).name).toBe("Boolean");
+      expect(simpleType.fields[2].description).toBe("a bool type");
+
+      expect(simpleType.fields[3].name).toBe("date");
+      expect((simpleType.fields[3].type as IntrospectionNamedTypeRef).name).toBe("DateTime");
+      expect(simpleType.fields[3].description).toBe("a date type");
+
+      expect(simpleType.fields[4].name).toBe("arrStr");
+      expect(((simpleType.fields[4].type as IntrospectionListTypeRef).ofType as IntrospectionNamedTypeRef).name).toBe("String");
+      expect((simpleType.fields[4].type as IntrospectionListTypeRef).kind).toBe("LIST");
+      expect(simpleType.fields[4].description).toBe("an array of string type");
+
+      expect(simpleType.fields[5].name).toBe("scalarMap");
+      expect((simpleType.fields[5].type as IntrospectionNamedTypeRef).name).toBe("ID");
+      expect(simpleType.fields[5].description).toBe("a scalar type");
+    });
+
+    it("ObjectType should make a relationship", async () => {
+      @ObjectType()
+      class ObjectTypeRelationship {
+        @Field({
+          nullable: true
+        })
+        toType: SimpleObjectType;
+
+        @Field({
+          nullable: true
+        })
+        toInterface: SimpleInterfaceType;
+
+        @Field(type => enumFromTypeCreator, {
+          nullable: true
+        })
+        toEnumTypeCreator: enumType;
+
+        @Field({
+          nullable: true
+        })
+        toEnumClass: SimpleEnumClassType;
+
+        @Field(type => unionType, {
+          nullable: true
+        })
+        toUnion: SimpleObjectType | ObjectTypeForUnion;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "ObjectTypeRelationship") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("toType");
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("SimpleType");
+
+      expect(simpleType.fields[1].name).toBe("toInterface");
+      expect((simpleType.fields[1].type as IntrospectionNamedTypeRef).name).toBe("SimpleInterface");
+
+      expect(simpleType.fields[2].name).toBe("toEnumTypeCreator");
+      expect((simpleType.fields[2].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumTypeCreator");
+
+      expect(simpleType.fields[3].name).toBe("toEnumClass");
+      expect((simpleType.fields[3].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumClass");
+
+      expect(simpleType.fields[4].name).toBe("toUnion");
+      expect((simpleType.fields[4].type as IntrospectionNamedTypeRef).name).toBe("UnionType");
+    });
+
+    it("InterfaceType should make a relationship", async () => {
+      @InterfaceType()
+      class InterfaceTypeRelationship {
+        @Field({
+          nullable: true
+        })
+        toType: SimpleObjectType;
+
+        @Field({
+          nullable: true
+        })
+        toInterface: SimpleInterfaceType;
+
+        @Field(type => enumFromTypeCreator, {
+          nullable: true
+        })
+        toEnumTypeCreator: enumType;
+
+        @Field({
+          nullable: true
+        })
+        toEnumClass: SimpleEnumClassType;
+
+        @Field(type => unionType, {
+          nullable: true
+        })
+        toUnion: SimpleObjectType | ObjectTypeForUnion;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InterfaceTypeRelationship") as IntrospectionInterfaceType;
+
+      expect(simpleType.kind).toBe(TypeKind.INTERFACE);
+
+      expect(simpleType.fields[0].name).toBe("toType");
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("SimpleType");
+
+      expect(simpleType.fields[1].name).toBe("toInterface");
+      expect((simpleType.fields[1].type as IntrospectionNamedTypeRef).name).toBe("SimpleInterface");
+
+      expect(simpleType.fields[2].name).toBe("toEnumTypeCreator");
+      expect((simpleType.fields[2].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumTypeCreator");
+
+      expect(simpleType.fields[3].name).toBe("toEnumClass");
+      expect((simpleType.fields[3].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumClass");
+
+      expect(simpleType.fields[4].name).toBe("toUnion");
+      expect((simpleType.fields[4].type as IntrospectionNamedTypeRef).name).toBe("UnionType");
+    });
+
+    it("InputType should make a relationship", async () => {
+      @InputType()
+      class InputTypeRelationship {
+        @Field({
+          nullable: true
+        })
+        toInput: SimpleInputType;
+
+        @Field(type => enumFromTypeCreator, {
+          nullable: true
+        })
+        toEnumTypeCreator: enumType;
+
+        @Field({
+          nullable: true
+        })
+        toEnumClass: SimpleEnumClassType;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeRelationship") as IntrospectionInputObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
+
+      expect(simpleType.inputFields[0].name).toBe("toInput");
+      expect((simpleType.inputFields[0].type as IntrospectionNamedTypeRef).name).toBe("SimpleInput");
+
+      expect(simpleType.inputFields[1].name).toBe("toEnumTypeCreator");
+      expect((simpleType.inputFields[1].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumTypeCreator");
+
+      expect(simpleType.inputFields[2].name).toBe("toEnumClass");
+      expect((simpleType.inputFields[2].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumClass");
     });
   });
 });

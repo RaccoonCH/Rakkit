@@ -65,6 +65,7 @@ export class Rakkit extends AppLoader {
       gql: {
         globalMiddlewares: [],
         resolvers: [],
+        dateMode: "iso",
         ...(this._config.gql || {})
       },
       routing: {
