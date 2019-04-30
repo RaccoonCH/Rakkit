@@ -10,7 +10,9 @@ import {
   InputType,
   EnumType,
   EnumField,
-  TypeCreator
+  TypeCreator,
+  IContext,
+  Arg
 } from "../src";
 import {
   graphql,
@@ -25,7 +27,8 @@ import {
   IntrospectionUnionType,
   IntrospectionNamedTypeRef,
   GraphQLID,
-  IntrospectionListTypeRef
+  IntrospectionListTypeRef,
+  GraphQLInterfaceType
 } from "graphql";
 // #endregion
 
@@ -812,28 +815,133 @@ describe("GraphQL", () => {
       expect((simpleType.inputFields[2].type as IntrospectionNamedTypeRef).name).toBe("SimpleEnumClass");
     });
 
-    it("Should make a relationship to multiple type", async () => {
+    it("InputType should make a relationship to InputType with a class with multiple gqlType", async () => {
       @InputType()
-      class InputTypeRelationship {
+      class InputTypeRelationshipMultiple {
         @Field({
           nullable: true
         })
-        toInput: SimpleInputType;
-
-        @Field(type => enumFromTypeCreator, {
-          nullable: true
-        })
-        toEnumTypeCreator: enumType;
-
-        @Field({
-          nullable: true
-        })
-        toEnumClass: SimpleEnumClassType;
+        toInput: ThreeTypes;
       }
 
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
-      const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeRelationship") as IntrospectionInputObjectType;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeRelationshipMultiple") as IntrospectionInputObjectType;
+
+      expect((simpleType.inputFields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLInputObjectTypeThreeTypes");
+    });
+
+    it("ObjectType should make a relationship to ObjectType with a class with multiple gqlType", async () => {
+      @ObjectType()
+      class ObjectTypeRelationshipMultiple {
+        @Field({
+          nullable: true
+        })
+        toType: ThreeTypes;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "ObjectTypeRelationshipMultiple") as IntrospectionObjectType;
+
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLObjectTypeThreeTypes");
+    });
+
+    it("InterfaceType should make a relationship to ObjectType with a class with multiple gqlType", async () => {
+      @InterfaceType()
+      class InterfaceTypeRelationshipMultiple {
+        @Field({
+          nullable: true
+        })
+        toInterface: ThreeTypes;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InterfaceTypeRelationshipMultiple") as IntrospectionInterfaceType;
+
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLObjectTypeThreeTypes");
+    });
+
+    it("InterfaceType should make a relationship to InterfaceType (by forcing it) with a class with multiple gqlType", async () => {
+      @InterfaceType()
+      class InterfaceTypeRelationshipMultipleForced {
+        @Field({
+          nullable: true,
+          gqlType: GraphQLInterfaceType
+        })
+        toInterface: ThreeTypes;
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      // tslint:disable-next-line:max-line-length
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "InterfaceTypeRelationshipMultipleForced") as IntrospectionInterfaceType;
+
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLInterfaceTypeThreeTypes");
+    });
+
+    // it("InterfaceType shouldn't make a relationship to InputType (by forcing it) with a class with multiple gqlType", async () => {
+    //   @InterfaceType()
+    //   class InterfaceTypeRelationshipMultipleForcedNot {
+    //     @Field({
+    //       nullable: true,
+    //       gqlType: GraphQLInputObjectType
+    //     })
+    //     toInterface: ThreeTypes;
+    //   }
+
+    //   await Rakkit.start();
+    //   expect((await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).errors).toHaveLength(1);
+    // });
+  });
+
+  describe("Query", () => {
+    it("Should create a field resolver with args", async () => {
+      @ObjectType()
+      class Fieldresolver {
+        @Field(type => String, {
+          nullable: true
+        })
+        async resolve(
+          @Arg({
+            defaultValue: "abc",
+            description: "arg a",
+            name: "first",
+            nullable: true
+          })
+          a: String,
+          @Arg({
+            defaultValue: 123,
+            description: "arg b",
+            name: "second",
+            nullable: true
+          })
+          b: Number,
+          context: IContext
+        ): Promise<String> {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return "resolved";
+        }
+      }
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "Fieldresolver") as IntrospectionObjectType;
+
+      expect(simpleType.fields[0].args).toHaveLength(2);
+      expect(simpleType.fields[0].name).toBe("resolve");
+      expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("String");
+
+      expect(simpleType.fields[0].args[0].defaultValue).toBe("\"abc\"");
+      expect(simpleType.fields[0].args[0].description).toBe("arg a");
+      expect(simpleType.fields[0].args[0].name).toBe("first");
+      expect((simpleType.fields[0].args[0].type as IntrospectionNamedTypeRef).name).toBe("String");
+
+      expect(simpleType.fields[0].args[1].defaultValue).toBe("123");
+      expect(simpleType.fields[0].args[1].description).toBe("arg b");
+      expect(simpleType.fields[0].args[1].name).toBe("second");
+      expect((simpleType.fields[0].args[1].type as IntrospectionNamedTypeRef).name).toBe("Float");
     });
   });
 });
