@@ -20,7 +20,7 @@ type ExampleObjectType0RequiredExampleInputType {
 }
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
-  date: Timestamp!
+  date: DateTime!
   hello2: ExampleObjectType
   hello3: String!
   ms: Test!
@@ -178,8 +178,3 @@ enum testEnum {
   a
   b
 }
-
-"""
-The javascript `Date` as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
-"""
-scalar Timestamp

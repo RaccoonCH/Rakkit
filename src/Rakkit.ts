@@ -66,12 +66,14 @@ export class Rakkit extends AppLoader {
         globalMiddlewares: [],
         resolvers: [],
         dateMode: "iso",
+        scalarMap: [],
         ...(this._config.gql || {})
       },
       routing: {
         globalMiddlewares: [],
         ...(this._config.routing || {})
       },
+      forceStart: this._config.forceStart || [],
       host: this._config.host || "localhost",
       port: this._config.port || 4000,
       silent: this._config.silent || false
@@ -84,7 +86,11 @@ export class Rakkit extends AppLoader {
 
   static async start(config?: IAppConfig) {
     if (!this._instance || config) {
-      this._instance = new Rakkit(config);
+      const configObj: Partial<IAppConfig> = {
+        ...(this.Instance ? this.Instance.Config : {}),
+        ...config
+      };
+      this._instance = new Rakkit(configObj);
     }
     return this._instance.start();
   }
@@ -124,11 +130,11 @@ export class Rakkit extends AppLoader {
   }
 
   private async startAllServices() {
-    const startGql = this._config.gql.resolvers.length > 0;
-    const startRest = this._config.rest.routers.length > 0;
-    const startWs = this._config.ws.websockets.length > 0;
+    const startGql = this._config.gql.resolvers.length > 0 || this._config.forceStart.includes("gql");
+    const startRest = this._config.rest.routers.length > 0 || this._config.forceStart.includes("rest");
+    const startWs = this._config.ws.websockets.length > 0 || this._config.forceStart.includes("ws");
 
-    if (startRest || startWs || startGql) {
+    if (startRest || startWs || startGql || this._config.forceStart.includes("http")) {
       this._httpServer.listen(this._config.port, this._config.host);
       this.startMessage("HTTP    ", "/");
     }

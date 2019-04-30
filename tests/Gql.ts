@@ -1,19 +1,6 @@
 // #region Imports
-import {
-  Rakkit,
-  ObjectType,
-  Field,
-  MetadataStorage,
-  Resolver,
-  Query,
-  InterfaceType,
-  InputType,
-  EnumType,
-  EnumField,
-  TypeCreator,
-  IContext,
-  Arg
-} from "../src";
+import { ApolloServer } from "apollo-server-koa";
+import Axios from "axios";
 import {
   graphql,
   IntrospectionQuery,
@@ -30,6 +17,21 @@ import {
   IntrospectionListTypeRef,
   GraphQLInterfaceType
 } from "graphql";
+import {
+  Rakkit,
+  ObjectType,
+  Field,
+  MetadataStorage,
+  Resolver,
+  Query,
+  InterfaceType,
+  InputType,
+  EnumType,
+  EnumField,
+  TypeCreator,
+  IContext,
+  Arg
+} from "../src";
 // #endregion
 
 @Resolver()
@@ -880,20 +882,6 @@ describe("GraphQL", () => {
 
       expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLInterfaceTypeThreeTypes");
     });
-
-    // it("InterfaceType shouldn't make a relationship to InputType (by forcing it) with a class with multiple gqlType", async () => {
-    //   @InterfaceType()
-    //   class InterfaceTypeRelationshipMultipleForcedNot {
-    //     @Field({
-    //       nullable: true,
-    //       gqlType: GraphQLInputObjectType
-    //     })
-    //     toInterface: ThreeTypes;
-    //   }
-
-    //   await Rakkit.start();
-    //   expect((await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).errors).toHaveLength(1);
-    // });
   });
 
   describe("Query", () => {
@@ -903,7 +891,7 @@ describe("GraphQL", () => {
         @Field(type => String, {
           nullable: true
         })
-        async resolve(
+        resolve(
           @Arg({
             defaultValue: "abc",
             description: "arg a",
@@ -919,9 +907,8 @@ describe("GraphQL", () => {
           })
           b: Number,
           context: IContext
-        ): Promise<String> {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return "resolved";
+        ): String {
+          return a + b.toString();
         }
       }
 
@@ -942,6 +929,68 @@ describe("GraphQL", () => {
       expect(simpleType.fields[0].args[1].description).toBe("arg b");
       expect(simpleType.fields[0].args[1].name).toBe("second");
       expect((simpleType.fields[0].args[1].type as IntrospectionNamedTypeRef).name).toBe("Float");
+    });
+
+    it("Should get correct response from resolver", async () => {
+      @Resolver()
+      class ResolverA {
+        @Query({
+          nullable: true
+        })
+        resolveA(
+          @Arg({
+            name: "first",
+            nullable: true
+          })
+          a: string
+        ): String {
+          return a;
+        }
+      }
+
+      @Resolver()
+      class ResolverB {
+        @Query(type => String, {
+          nullable: true,
+          name: "resolveB"
+        })
+        async resolve(
+          @Arg({ name: "second" })
+          b: string,
+          context: IContext<String>
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          context.gql.response = `hello ${b}`;
+        }
+      }
+
+      await Rakkit.start({
+        forceStart: ["rest", "gql"]
+      });
+
+      const server = new ApolloServer({
+        schema: MetadataStorage.Instance.Gql.Schema,
+        context: ({ctx}) => ({
+          ...ctx
+        })
+      });
+      server.applyMiddleware({
+        app: Rakkit.Instance.KoaApp
+      });
+
+      const resA = await Axios.post("http://localhost:4000/graphql", {
+        query: 'query { resolveA(first: "hello world") }'
+      });
+      const resB = await Axios.post("http://localhost:4000/graphql", {
+        query: 'query { resolveB(second: "world") }'
+      });
+
+      expect(resA.data.data).toEqual({
+        resolveA: "hello world"
+      });
+      expect(resB.data.data).toEqual({
+        resolveB: "hello world"
+      });
     });
   });
 });
