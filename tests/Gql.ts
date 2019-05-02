@@ -964,6 +964,22 @@ describe("GraphQL", () => {
         }
       }
 
+      @Resolver()
+      class ResolverC {
+        @Query(type => String, {
+          nullable: true,
+          name: "resolveC"
+        })
+        async resolve(
+          @Arg({ name: "second" })
+          c: string,
+          context: IContext<String>
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          context.response.body = `${c} world`;
+        }
+      }
+
       await Rakkit.start({
         forceStart: ["rest", "gql"]
       });
@@ -984,12 +1000,18 @@ describe("GraphQL", () => {
       const resB = await Axios.post("http://localhost:4000/graphql", {
         query: 'query { resolveB(second: "world") }'
       });
+      const resC = await Axios.post("http://localhost:4000/graphql", {
+        query: 'query { resolveC(second: "hello") }'
+      });
 
       expect(resA.data.data).toEqual({
         resolveA: "hello world"
       });
       expect(resB.data.data).toEqual({
         resolveB: "hello world"
+      });
+      expect(resC.data.data).toEqual({
+        resolveC: "hello world"
       });
     });
   });
