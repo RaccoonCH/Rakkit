@@ -3,10 +3,10 @@
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "testMatch": ["**/tests/*.ts"],
+  "testMatch": ["<rootDir>/src/Packages/**/Tests/*.ts"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "rootDir": "./",
-  "roots": ["<rootDir>/tests"],
+  "roots": ["<rootDir>/src"],
   "collectCoverage": true,
   "collectCoverageFrom": [
     "<rootDir>/src/**/*.ts",

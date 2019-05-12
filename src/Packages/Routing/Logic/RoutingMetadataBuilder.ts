@@ -1,7 +1,7 @@
 import * as KoaCompose from "koa-compose";
 import * as Router from "koa-router";
 import * as Koa from "koa";
-import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
+import { MetadataBuilder } from "../../../Packages/Core/Logic/MetadataBuilder";
 import {
   IDecorator,
   IMiddleware,

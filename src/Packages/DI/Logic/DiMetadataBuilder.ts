@@ -1,4 +1,4 @@
-import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
+import { MetadataBuilder } from "../../../Packages/Core/Logic/MetadataBuilder";
 import {
   IDecorator,
   IService,

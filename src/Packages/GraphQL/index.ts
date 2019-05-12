@@ -11,6 +11,7 @@ export * from "./Decorator/Decorators/Type/ObjectType";
 export * from "./Decorator/Decorators/Type/InterfaceType";
 export * from "./Decorator/Decorators/Type/EnumType";
 export * from "./Decorator/Decorators/Type/ConcatName";
+export * from "./Helpers/DecoratorHelper";
 
 export * from "./Decorator/Types/IField";
 export * from "./Decorator/Types/IGqlType";

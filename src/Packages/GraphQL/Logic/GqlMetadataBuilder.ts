@@ -24,9 +24,10 @@ import {
   GraphQLSchemaConfig,
   GraphQLInputFieldConfig
 } from "graphql";
-import { MetadataBuilder } from "../../../Logic/MetadataBuilder";
-import { Rakkit } from "../../../Rakkit";
+import { MetadataBuilder } from "../../../Packages/Core/Logic/MetadataBuilder";
+import { DecoratorHelper } from "..";
 import {
+  Rakkit,
   IDecorator,
   IField,
   IGqlType,
@@ -40,7 +41,6 @@ import {
   IClassType,
   NextFunction,
   TypeFn,
-  DecoratorHelper,
   SetterType,
   ITypeTransformation,
   GraphQLTimestamp
