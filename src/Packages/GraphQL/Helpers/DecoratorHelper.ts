@@ -43,7 +43,7 @@ export class DecoratorHelper {
       params: {
         resolveType: undefined,
         name: definedParams.name || key,
-        args: undefined,
+        args: [],
         function: undefined,
         type: typeFn,
         deprecationReason: undefined,

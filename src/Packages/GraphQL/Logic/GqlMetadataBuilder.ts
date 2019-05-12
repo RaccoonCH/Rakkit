@@ -961,11 +961,11 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             gqlContext,
             next
           );
+          if (gqlContext.response.body) {
+            gqlContext.gql.response = gqlContext.response.body;
+          }
           if (returnedResponse) {
             gqlContext.gql.response = returnedResponse;
-          }
-          if (!gqlContext.gql.response) {
-            gqlContext.gql.response = gqlContext.response.body;
           }
         }
       };
