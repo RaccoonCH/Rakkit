@@ -136,18 +136,18 @@ export class Rakkit extends AppLoader {
 
     if (startRest || startWs || startGql || this._config.forceStart.includes("http")) {
       this._httpServer.listen(this._config.port, this._config.host);
-      this.startMessage("HTTP    ", "/");
+      this.startMessage("HTTP", "/");
     }
     if (startRest) {
       await this.startRest();
-      this.startMessage("REST    ", this._config.rest.endpoint);
+      this.startMessage("REST", this._config.rest.endpoint);
     }
     if (startWs) {
       await this.startWs();
-      this.startMessage("WS      ", this._config.ws.options.path);
+      this.startMessage("WS", this._config.ws.options.path);
     }
     if (startGql) {
-      this.startMessage("GraphQL ", "Started at the URL that you specified to your GraphQL server provider", true);
+      this.startMessage("GraphQL", "Started at the URL that you specified to your GraphQL server provider", true);
     }
     if (startRest && !this._config.silent) {
       const routers = Array.from(MetadataStorage.Instance.Rest.Routers.values());
@@ -156,7 +156,15 @@ export class Rakkit extends AppLoader {
           Color("\nRouters:", "cmd.underscore")
         );
         routers.map((router) => {
-          console.log(`✅  ${this.Url}${this._config.rest.endpoint}${Color(router.params.path, "fg.blue", "cmd.dim")}`);
+          const routerUrl = this.Url + this._config.rest.endpoint + Color(router.params.path, "fg.blue", "cmd.dim");
+          console.log(routerUrl);
+          router.params.endpoints.map((endpoint) => {
+            const endpointParams = endpoint.params;
+            console.log(
+              `\t${endpointParams.method.toUpperCase()}:`.padEnd(8),
+              `${routerUrl}${Color(endpointParams.endpoint, "fg.green", "cmd.dim")}`
+            );
+          });
         });
       }
     }
@@ -209,10 +217,14 @@ export class Rakkit extends AppLoader {
     );
   }
 
-  private startMessage(type: string, suffix: string, noUrl: boolean = false) {
+  private startMessage(
+    type: string,
+    suffix: string,
+    noUrl: boolean = false
+  ) {
     if (!this._config.silent) {
       console.log(Color(
-        `${type}: ${noUrl ? "" : this.Url}${suffix}`,
+        `${type.padEnd(7)}: ${noUrl ? "" : this.Url}${suffix}`,
         "fg.black", "bg.green"
       ));
     }
