@@ -830,6 +830,11 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         }
         break;
     }
+    if (!finalType) {
+      typed.nullable = true;
+      typed.isArray = false;
+      finalType = GraphQLBoolean;
+    }
     if (typed.isArray) {
       finalType = GraphQLList(finalType);
     }
@@ -963,6 +968,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           );
           if (gqlContext.response.body) {
             gqlContext.gql.response = gqlContext.response.body;
+          }
+          if (gqlContext.body) {
+            gqlContext.gql.response = gqlContext.body;
           }
           if (returnedResponse) {
             gqlContext.gql.response = returnedResponse;
