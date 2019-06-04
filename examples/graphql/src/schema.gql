@@ -16,7 +16,7 @@ type ExampleObjectType {
 
 """ObjectType named from required ExampleInputType"""
 type ExampleObjectType0RequiredExampleInputType {
-  hello0: [String]!
+  hello0: [String!]
 }
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
@@ -146,7 +146,7 @@ type Query {
     """yo"""
     aa: Float! = 123
   ): test!
-  helloWorld: test!
+  helloWorld: [[test!]]
   b: String!
 }
 

@@ -59,16 +59,16 @@ export class ExampleResolver3 {
 
 @Resolver()
 export class ExampleResolver {
-  @Query(type => union)
+  @Query(type => [[union]])
   async helloWorld(
-    context: IContext<ExampleInputType>,
+    context: IContext<ExampleInputType[][]>,
     next: NextFunction
   ) {
     console.log("hello world");
-    context.gql.response = {
+    context.gql.response = [[{
       enumz: TestEnum.a,
       hello3: "aa"
-    };
+    }]];
     await next();
   }
 

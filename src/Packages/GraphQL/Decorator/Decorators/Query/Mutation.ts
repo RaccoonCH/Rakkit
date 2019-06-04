@@ -9,5 +9,5 @@ export function Mutation(type: TypeFn);
 export function Mutation(params: IFieldParams);
 export function Mutation(type: TypeFn, params?: IFieldParams);
 export function Mutation(typeOrParams?: TypeFn | IFieldParams, params?: IFieldParams) {
-  return DecoratorHelper.getAddResolveDecorator(typeOrParams, params, "Mutation");
+  return DecoratorHelper.getAddFieldDecorator(typeOrParams, params, "Mutation");
 }

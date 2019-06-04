@@ -9,5 +9,5 @@ export function Query(type: TypeFn);
 export function Query(params: IFieldParams);
 export function Query(type: TypeFn, params: IFieldParams);
 export function Query(typeOrParams?: TypeFn | IFieldParams, params?: IFieldParams) {
-  return DecoratorHelper.getAddResolveDecorator(typeOrParams, params);
+  return DecoratorHelper.getAddFieldDecorator(typeOrParams, params, "Query");
 }

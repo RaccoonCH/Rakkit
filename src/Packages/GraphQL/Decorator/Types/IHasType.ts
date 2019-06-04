@@ -4,7 +4,7 @@ import {
 } from "../../../..";
 
 export interface IHasType {
-  isArray?: boolean;
+  arrayDepth?: number;
   nullable?: boolean;
   type: TypeFn;
   gqlType?: GqlType;

@@ -12,8 +12,9 @@ export function ConcatName(...types: Function[]): Function {
       class: target,
       key: target.name,
       category: "gql",
-      params: (type: IDecorator<IGqlType>) => ({
-        name: type.params.name + types.reduce((prev, classType) => {
+      params: (type: IDecorator<IGqlType>) => {
+        target.name;
+        const suffix = types.reduce((prev, classType) => {
           types;
           const gqlTypeDef = MetadataStorage.Instance.Gql.GetOneGqlTypeDef(
             classType,
@@ -34,8 +35,12 @@ export function ConcatName(...types: Function[]): Function {
             );
           }
           return "";
-        }, "")
-      })
+        }, "");
+
+        return {
+          name: type.params.name + suffix
+        };
+      }
     });
   };
 }

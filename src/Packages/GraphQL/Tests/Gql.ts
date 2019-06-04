@@ -1,4 +1,5 @@
 // #region Imports
+import "reflect-metadata";
 import { ApolloServer, gql } from "apollo-server-koa";
 import Axios from "axios";
 import {
@@ -15,8 +16,7 @@ import {
   IntrospectionNamedTypeRef,
   GraphQLID,
   IntrospectionListTypeRef,
-  GraphQLInterfaceType,
-  subscribe
+  GraphQLInterfaceType
 } from "graphql";
 import {
   Rakkit,
@@ -33,7 +33,9 @@ import {
   IContext,
   Arg,
   Mutation,
-  NextFunction
+  NextFunction,
+  IClassType,
+  ConcatName
 } from "../../..";
 import { wait } from "../../Core/Tests/Utils/Waiter";
 import { UseMiddleware } from "../../Routing";
@@ -50,6 +52,13 @@ import { GlobalSecondBeforeMiddleware } from "../../Core/Tests/ClassesForTesting
 import { GlobalFirstAfterMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/After/GlobalFirstAfterMiddleware";
 import { GlobalSecondAfterMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/After/GlobalSecondAfterMiddleware";
 import { Subscription } from "../Decorator/Decorators/Query/Subscription";
+import ApolloClient from "apollo-client";
+import { WebSocketLink } from "apollo-link-ws";
+import { HttpLink } from "apollo-link-http";
+import { split } from "apollo-link";
+import { getMainDefinition } from "apollo-utilities";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import * as ws from "ws";
 // #endregion
 
 class ScalarMap {}
@@ -94,6 +103,7 @@ class SimpleObjectType implements SimpleInterfaceType {
     description: "an object field"
   })
   field: string;
+
   interfaceField: number;
 }
 
@@ -142,19 +152,20 @@ describe("GraphQL", () => {
   });
 
   describe("Simple type definition", () => {
-    it("Should create an interface type", async () => {
+    it("Should create an InterfaceType", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "SimpleInterface") as IntrospectionInterfaceType;
 
       expect(simpleType.kind).toBe(TypeKind.INTERFACE);
       expect(simpleType.description).toBe("a simple interface");
+
       expect(simpleType.fields[0].name).toBe("interfaceField");
       expect(simpleType.fields[0].deprecationReason).toBe("deprecated");
       expect(simpleType.fields[0].description).toBe("an interface field");
     });
 
-    it("Should create an object type", async () => {
+    it("Should create an ObjectType", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "SimpleType") as IntrospectionObjectType;
@@ -163,47 +174,52 @@ describe("GraphQL", () => {
       expect(simpleType.description).toBe("a simple type");
       expect(simpleType.fields.map((field) => field.name)).toEqual(["field", "interfaceField"]);
       expect(simpleType.interfaces[0].name).toBe("SimpleInterface");
+
       expect(simpleType.fields[0].deprecationReason).toBe("deprecated");
       expect(simpleType.fields[0].description).toBe("an object field");
+
       expect(simpleType.fields[1].deprecationReason).toBe("deprecated");
       expect(simpleType.fields[1].description).toBe("an interface field");
     });
 
-    it("Should create an input type", async () => {
+    it("Should create an InputType", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "SimpleInput") as IntrospectionInputObjectType;
 
       expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
       expect(simpleType.description).toBe("a simple input");
+
       expect(simpleType.inputFields[0].name).toBe("inputField");
       expect(simpleType.inputFields[0].defaultValue).toBe("\"123\"");
       expect(simpleType.inputFields[0].description).toBe("an input field");
     });
 
-    it("Should create an enum type from class", async () => {
+    it("Should create an EnumType from class", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "SimpleEnumClass") as IntrospectionEnumType;
 
       expect(simpleType.kind).toBe(TypeKind.ENUM);
       expect(simpleType.description).toBe("a simple enum from class");
+
       expect(simpleType.enumValues[0].name).toBe("enumField");
       expect(simpleType.enumValues[0].deprecationReason).toBe("deprecated");
       expect(simpleType.enumValues[0].description).toBe("enum field description");
     });
 
-    it("Should create an enum type from TypeCreator", async () => {
+    it("Should create an EnumType from TypeCreator", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "SimpleEnumTypeCreator") as IntrospectionEnumType;
 
       expect(simpleType.kind).toBe(TypeKind.ENUM);
       expect(simpleType.description).toBe("a simple enum from TypeCreator");
+
       expect(simpleType.enumValues[0].name).toBe("a");
     });
 
-    it("Should create an union type", async () => {
+    it("Should create an UnionType", async () => {
       await Rakkit.start();
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "UnionType") as IntrospectionUnionType;
@@ -224,6 +240,7 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
       expect(simpleType.description).toBe("an object partial type");
+
       expect(simpleType.fields[0].type.kind).not.toBe("NON_NULL");
       expect(simpleType.fields[1].type.kind).not.toBe("NON_NULL");
     });
@@ -617,6 +634,53 @@ describe("GraphQL", () => {
       expect(simpleType.fields[2].type.kind).toBe("NON_NULL");
     });
 
+    it("Should create a field with array type", async () => {
+      @ObjectType()
+      class ArrayDepthType {
+        @Field(type => Number)
+        simpleArrayField: number[];
+
+        @Field(type => [Number])
+        depthArrayField1: number[];
+
+        @Field(type => [[Number]])
+        depthArrayField2: number[][];
+
+        @Field(type => [[Number]])
+        depthArrayFieldResolver(): Number[][] {
+          return [[1]];
+        }
+      }
+
+      await Rakkit.start({
+        gql: {
+          nullableByDefault: true
+        }
+      });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "ArrayDepthType") as IntrospectionObjectType;
+
+      expect(simpleType.kind).toBe(TypeKind.OBJECT);
+
+      expect(simpleType.fields[0].name).toBe("simpleArrayField");
+      expect(simpleType.fields[0].type.kind).toBe("LIST");
+      expect((simpleType.fields[0].type as any).ofType.name).toBe("Float");
+
+      expect(simpleType.fields[1].name).toBe("depthArrayField1");
+      expect(simpleType.fields[1].type.kind).toBe("LIST");
+      expect((simpleType.fields[1].type as any).ofType.name).toBe("Float");
+
+      expect(simpleType.fields[2].name).toBe("depthArrayField2");
+      expect(simpleType.fields[2].type.kind).toBe("LIST");
+      expect((simpleType.fields[2].type as any).ofType.kind).toBe("LIST");
+      expect((simpleType.fields[2].type as any).ofType.ofType.name).toBe("Float");
+
+      expect(simpleType.fields[3].name).toBe("depthArrayFieldResolver");
+      expect(simpleType.fields[3].type.kind).toBe("LIST");
+      expect((simpleType.fields[3].type as any).ofType.kind).toBe("LIST");
+      expect((simpleType.fields[3].type as any).ofType.ofType.name).toBe("Float");
+    });
+
     it("Should convert primitive type and scalarMap to GraphQL Type and apply params", async () => {
       @ObjectType()
       class PrimitiveType {
@@ -900,6 +964,57 @@ describe("GraphQL", () => {
 
       expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLInterfaceTypeThreeTypes");
     });
+
+    it("Should create a generic type", async () => {
+      @ObjectType()
+      class GenericElement {
+        @Field()
+        hello: string;
+      }
+
+      @ObjectType()
+      class Response<Type, Type2> implements SimpleInterfaceType {
+        @Field()
+        interfaceField: number;
+        items?: Type[];
+        items2: Type2;
+      }
+
+      function getItems<Type, Type2>(
+        itemsType: IClassType<Type>,
+        itemsType2: IClassType<Type2>
+      ): IClassType<Response<Type, Type2>> {
+        @ConcatName(itemsType)
+        @ObjectType()
+        class GenericResponse extends Response<Type, Type2> {
+          @Field(type => itemsType, {
+            nullable: true,
+            description: "items"
+          })
+          items: Type[];
+
+          @Field(type => itemsType2)
+          items2: Type2;
+        }
+        return GenericResponse as any;
+      }
+
+      getItems(SimpleObjectType, SimpleObjectType);
+      getItems(GenericElement, SimpleObjectType);
+
+      await Rakkit.start();
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const simpleType = schema.types.find((schemaType) => schemaType.name === "GenericResponseSimpleType") as IntrospectionObjectType;
+      const simpleType2 = schema.types.find((schemaType) => schemaType.name === "GenericResponseGenericElement") as IntrospectionObjectType;
+
+      expect((simpleType.fields[0].type as any).kind).toBe("LIST");
+      expect((simpleType.fields[0].type as any).ofType.name).toBe("SimpleType");
+      expect((simpleType.fields[1].type as any).ofType.name).toBe("SimpleType");
+
+      expect((simpleType2.fields[0].type as any).kind).toBe("LIST");
+      expect((simpleType2.fields[0].type as any).ofType.name).toBe("GenericElement");
+      expect((simpleType2.fields[1].type as any).ofType.name).toBe("SimpleType");
+    });
   });
 
   describe("Query", () => {
@@ -952,7 +1067,7 @@ describe("GraphQL", () => {
     it("Should get correct response from resolver (mutation and query)", async () => {
       @Resolver()
       class ResolverA {
-        @Query({
+        @Query(type => String, {
           nullable: true
         })
         resolveA(
@@ -1110,8 +1225,8 @@ describe("GraphQL", () => {
         class ArgsParsingResolver {
           @Query()
           parseArgs(
-            @Arg({ name: "arg" })
-            arg: InputArgs,
+            @Arg(type => [[InputArgs]], { name: "arg" })
+            arg: [[InputArgs]],
             @Arg({ name: "arg2" })
             arg2: string,
             @Arg({ name: "arg3", nullable: true })
@@ -1120,7 +1235,7 @@ describe("GraphQL", () => {
             next: NextFunction
           ): string {
             responses.push({
-              arg,
+              arg: arg[0][0],
               arg2,
               arg3,
               ctx,
@@ -1166,7 +1281,7 @@ describe("GraphQL", () => {
         });
 
         await Axios.post("http://localhost:4000/graphql", {
-          query: 'query { parseArgs(arg: {name: "hello"}, arg2: "hello2") }'
+          query: 'query { parseArgs(arg: [[{name: "hello"}]], arg2: "hello2") }'
         });
 
         await Axios.post("http://localhost:4000/graphql", {
@@ -1385,93 +1500,97 @@ describe("GraphQL", () => {
     });
   });
 
-  // TODO: Subcribe client
   describe("Subscriptions", () => {
     it("Should create a subscription", async () => {
-      const subRes: {
-        payload: any,
-        ctx: IContext,
-        next: NextFunction
-      }[] = [];
+    //   const subRes: string[] = [];
 
-      @Resolver()
-      class SubscriptionResolver {
-        @Query(type => String, { nullable: true })
-        async activeSub(
-          @Arg({ name: "topic" })
-          topic: string,
-          context: IContext
-        ) {
-          context.gql.pubSub.publish(topic, "test");
-        }
+    //   @Resolver()
+    //   class SubscriptionResolver {
+    //     @Query({ nullable: true })
+    //     activeSub(
+    //       @Arg({ name: "topic" })
+    //       topic: string,
+    //       context: IContext
+    //     ): string {
+    //       context.gql.pubSub.publish(topic, "test");
+    //       return "okay";
+    //     }
 
-        @Subscription({ topics: "hello" })
-        async sub(
-          payload: { myValue: string },
-          ctx: IContext,
-          next: NextFunction
-        ) {
-          if (payload) {
-            subRes.push({
-              payload,
-              ctx,
-              next
-            });
-          }
-        }
+    //     @Subscription({
+    //       topics: (args) => args.topic
+    //     })
+    //     sub(
+    //       @Arg({ name: "topic" })
+    //       topic: string,
+    //       payload: string,
+    //       ctx: IContext,
+    //       next: NextFunction
+    //     ) {
+    //       subRes.push(topic + payload);
+    //     }
+    //   }
 
-        @Subscription({
-          topics: (args) => args.topic
-        })
-        async subWithTopic(
-          @Arg({ name: "topic" })
-          topic: string,
-          payload: { myValue: string },
-          ctx: IContext,
-          next: NextFunction
-        ) {
-          if (payload) {
-            subRes.push({
-              payload: "hello",
-              ctx,
-              next
-            });
-          }
-        }
-      }
+    //   await Rakkit.start({
+    //     forceStart: ["rest", "gql"]
+    //   });
 
-      await Rakkit.start({
-        forceStart: ["rest", "gql"]
-      });
+    //   const server = new ApolloServer({
+    //     schema: MetadataStorage.Instance.Gql.Schema,
+    //     context: ({ctx}) => ({
+    //       ...ctx
+    //     })
+    //   });
+    //   server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);
+    //   server.applyMiddleware({
+    //     app: Rakkit.Instance.KoaApp
+    //   });
 
-      const server = new ApolloServer({
-        schema: MetadataStorage.Instance.Gql.Schema,
-        context: ({ctx}) => ({
-          ...ctx
-        })
-      });
-      server.applyMiddleware({
-        app: Rakkit.Instance.KoaApp
-      });
+    //   const httpLink = new HttpLink({
+    //     uri: "http://localhost:4000/graphql",
+    //     fetch: Axios
+    //   });
 
-      await Axios.post("http://localhost:4000/graphql", {
-        query: "subscription { sub }"
-      });
-      await Axios.post("http://localhost:4000/graphql", {
-        query: 'subscription { subWithTopic(topic: "hello2") }'
-      });
-      await Axios.post("http://localhost:4000/graphql", {
-        query: 'query { activeSub(topic: "hello") }'
-      });
-      await Axios.post("http://localhost:4000/graphql", {
-        query: 'query { activeSub(topic: "hello2") }'
-      });
+    //   const wsLink = new WebSocketLink({
+    //     uri: "ws://localhost:4000/graphql",
+    //     webSocketImpl: ws
+    //   });
 
-      for (const res of subRes) {
-        expect(res.payload.myValue).toBe("hello");
-        expect(res.ctx.gql).not.toBe(undefined);
-        expect(res.next).not.toBe(undefined);
-      }
+    //   const link = split(
+    //     ({ query }) => {
+    //       const def = getMainDefinition(query);
+    //       return def.kind === "OperationDefinition" && def.operation === "subscription";
+    //     },
+    //     wsLink,
+    //     httpLink
+    //   );
+
+    //   const client = new ApolloClient({
+    //     link,
+    //     cache: new InMemoryCache()
+    //   });
+
+    //   // client.subscribe({
+    //   //   query: gql`subscription {
+    //   //     sub(topic: "hello")
+    //   //   }`,
+    //   //   fetchPolicy: "no-cache"
+    //   // }).subscribe((res) => {
+    //   //   console.log(res);
+    //   // });
+
+    //   try {
+    //     await client.query({
+    //       query: gql`
+    //         query {
+    //           activeSub(topic: "hello")
+    //         }
+    //       `
+    //     });
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+
+    //   expect(subRes).toEqual(["hellotest"]);
     });
   });
 });

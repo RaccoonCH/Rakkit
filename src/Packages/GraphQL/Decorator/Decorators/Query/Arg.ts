@@ -4,7 +4,8 @@ import {
   IArgParams,
   MetadataStorage,
   IDecorator,
-  IField
+  IField,
+  DecoratorHelper
 } from "../../../../..";
 
 /**
@@ -17,9 +18,11 @@ export function Arg(type: TypeFn, params: IArgParams);
 export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
   return (target: Object, key: string, index?: number): void => {
     const isType = typeof typeOrParams === "function";
-    const definedType = isType ? typeOrParams as TypeFn : () => Reflect.getMetadata("design:paramtypes", target, key)[index];
     const definedParams = isType ? params : typeOrParams;
-    const reflectType: Function = Reflect.getMetadata("design:paramtypes", target, key)[index];
+    const definedType = isType ? typeOrParams as TypeFn : undefined;
+    const reflectType = () => Reflect.getMetadata("design:paramtypes", target, key)[index];
+    const typeInfos = DecoratorHelper.getTypeInfos(definedType, reflectType);
+
     MetadataStorage.Instance.Gql.AddFieldSetter({
       category: "gql",
       class: target.constructor,
@@ -27,11 +30,11 @@ export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
       key,
       params: (field: IDecorator<IField>) => {
         const newArg: IArg = {
-          type: definedType,
+          type: typeInfos.type,
           index,
           name: `param${index}`,
           flat: false,
-          isArray: Array.isArray(reflectType.prototype),
+          arrayDepth: typeInfos.arrayDepth,
           nullable: false,
           ...definedParams
         };

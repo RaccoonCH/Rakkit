@@ -9,5 +9,5 @@ export function Subscription(type: TypeFn);
 export function Subscription(params: ISubscriptionParams);
 export function Subscription(type: TypeFn, params: ISubscriptionParams);
 export function Subscription(typeOrParams?: TypeFn | ISubscriptionParams, params?: ISubscriptionParams) {
-  return DecoratorHelper.getAddResolveDecorator(typeOrParams, params, "Subscription");
+  return DecoratorHelper.getAddFieldDecorator(typeOrParams, params, "Subscription");
 }

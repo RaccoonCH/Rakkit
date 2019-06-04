@@ -666,7 +666,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * Create an artificial field on runtime
    * @param name The field name
    * @param typeFn The field type
-   * @param isArray Is the fieldType an array
+   * @param extraParams The field params
    */
   private createFieldDef(
     name: string,
@@ -832,14 +832,14 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     }
     if (!finalType) {
       typed.nullable = true;
-      typed.isArray = false;
+      typed.arrayDepth = 0;
       finalType = GraphQLBoolean;
-    }
-    if (typed.isArray) {
-      finalType = GraphQLList(finalType);
     }
     if (!typed.nullable) {
       finalType = GraphQLNonNull(finalType);
+    }
+    for (let i = 0; i < typed.arrayDepth; i++) {
+      finalType = GraphQLList(finalType);
     }
     return finalType;
   }

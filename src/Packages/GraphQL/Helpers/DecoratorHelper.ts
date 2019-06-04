@@ -8,8 +8,7 @@ import {
   IField,
   IFieldParams,
   ISubscriptionParams,
-  IGqlObjectParams,
-  Rakkit
+  IGqlObjectParams
 } from "../../..";
 
 export class DecoratorHelper {
@@ -25,6 +24,37 @@ export class DecoratorHelper {
       MetadataStorage.Instance.Gql.AddType(
         DecoratorHelper.getAddTypeParams(target, gqlType, definedName, definedParams)
       );
+    };
+  }
+
+  static getTypeInfos(typeFn: TypeFn, reflectTypeFn: TypeFn) {
+    let arrayDepth = 0;
+    let finalTypeFn: TypeFn = undefined;
+
+
+    const countArrayDepth = (prev: Array<Function> | Function) => {
+      if (Array.isArray(prev)) {
+        arrayDepth++;
+        countArrayDepth(prev[0]);
+      } else {
+        finalTypeFn = () => prev;
+      }
+    };
+
+    if (typeFn) {
+      const theType = typeFn();
+      if (theType) {
+        countArrayDepth(theType);
+      }
+    }
+
+    if (this.returnAnArray(reflectTypeFn) && arrayDepth === 0) {
+      arrayDepth = 1;
+    }
+
+    return {
+      arrayDepth,
+      type: finalTypeFn || reflectTypeFn
     };
   }
 
@@ -47,7 +77,6 @@ export class DecoratorHelper {
         function: undefined,
         type: typeFn,
         deprecationReason: undefined,
-        isArray: this.returnAnArray(typeFn),
         ...definedParams
       }
     };
@@ -77,33 +106,34 @@ export class DecoratorHelper {
     };
   }
 
-  static getAddResolveDecorator(
+  static getAddFieldDecorator(
     typeOrParams?: ISubscriptionParams | IFieldParams | TypeFn,
     params?: ISubscriptionParams | IFieldParams,
-    resolveType: GqlResolveType = "Query"
+    resolveType?: GqlResolveType
   ) {
-    const isType = typeof typeOrParams === "function";
-    return (target: Object, key: string, descriptor: PropertyDescriptor): void => {
-      const baseType = () => Reflect.getMetadata("design:returntype", target, key);
-      const definedParams: Partial<ISubscriptionParams> = (isType ? params : typeOrParams as ISubscriptionParams) || {};
-      const definedType = isType ? typeOrParams as TypeFn : baseType;
-      if (definedType()) {
-        const fieldDef = this.getAddFieldParams(
+    return (target: Object, key: string, descriptor?: PropertyDescriptor): void => {
+      const isType = typeof typeOrParams === "function";
+      const definedType = isType ? typeOrParams as TypeFn : undefined;
+      const definedParams: Partial<IField> = (isType ? params : typeOrParams as Partial<IField>) || {};
+      let reflectType: TypeFn = () => Reflect.getMetadata("design:type", target, key);
+
+      if (descriptor) {
+        definedParams.function = descriptor.value;
+        reflectType = () => Reflect.getMetadata("design:returntype", target, key);
+      }
+
+      const typeInfos = DecoratorHelper.getTypeInfos(definedType, reflectType);
+      definedParams.arrayDepth = typeInfos.arrayDepth;
+      definedParams.resolveType = resolveType;
+
+      MetadataStorage.Instance.Gql.AddField(
+        DecoratorHelper.getAddFieldParams(
           target.constructor,
           key,
-          definedType,
-          {
-            ...definedParams,
-            resolveType,
-            function: descriptor.value,
-            name: definedParams.name || key,
-            args: []
-          }
-        );
-        MetadataStorage.Instance.Gql.AddField(fieldDef);
-      } else {
-        throw new Error(`You must define a return type for query: ${target.constructor.name}.${definedParams.name || key}`);
-      }
+          typeInfos.type,
+          definedParams
+        )
+      );
     };
   }
 
