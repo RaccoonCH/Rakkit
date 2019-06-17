@@ -22,6 +22,7 @@ export * from "./Decorator/Types/IHasType";
 export * from "./Decorator/Types/SetterType";
 export * from "./Decorator/Types/ITypeTransformation";
 export * from "./Decorator/Types/IGqlObject";
+export * from "./Decorator/Types/ISubscriptionFnParams";
 
 export * from "./Decorator/Params/ICostumTypeCreatorParams";
 export * from "./Decorator/Params/ICreateParams";
@@ -39,7 +40,6 @@ export * from "./Types/GqlType";
 export * from "./Types/Param";
 export * from "./Types/IGqlConfig";
 export * from "./Types/Topic";
-
 export * from "./Logic/GqlMetadataBuilder";
 export * from "./Logic/TypeCreator";
 

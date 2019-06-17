@@ -2,6 +2,7 @@
 import "reflect-metadata";
 import { ApolloServer, gql } from "apollo-server-koa";
 import Axios from "axios";
+import Fetch from "node-fetch";
 import {
   graphql,
   IntrospectionQuery,
@@ -37,6 +38,7 @@ import {
   IClassType,
   ConcatName
 } from "../../..";
+import * as BodyParser from "koa-bodyparser";
 import { wait } from "../../Core/Tests/Utils/Waiter";
 import { UseMiddleware } from "../../Routing";
 import { RouterFirstBeforeMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Router/Before/RouterFirstBeforeMiddleware";
@@ -1502,95 +1504,338 @@ describe("GraphQL", () => {
 
   describe("Subscriptions", () => {
     it("Should create a subscription", async () => {
-    //   const subRes: string[] = [];
+      const subRes: string[] = [];
+      @Resolver()
+      class SubscriptionResolver {
+        @Query({ nullable: true })
+        activeSub(
+          @Arg({ name: "topic" })
+          topic: string,
+          context: IContext
+        ): string {
+          context.gql.pubSub.publish(topic, "test");
+          return "okay";
+        }
 
-    //   @Resolver()
-    //   class SubscriptionResolver {
-    //     @Query({ nullable: true })
-    //     activeSub(
-    //       @Arg({ name: "topic" })
-    //       topic: string,
-    //       context: IContext
-    //     ): string {
-    //       context.gql.pubSub.publish(topic, "test");
-    //       return "okay";
-    //     }
+        @Subscription({
+          topics: ({ args }) => args.topic
+        })
+        sub(
+          @Arg({ name: "topic" })
+          topic: string,
+          payload: string,
+          ctx: IContext,
+          next: NextFunction
+        ) {
+          subRes.push(topic + payload);
+        }
+      }
 
-    //     @Subscription({
-    //       topics: (args) => args.topic
-    //     })
-    //     sub(
-    //       @Arg({ name: "topic" })
-    //       topic: string,
-    //       payload: string,
-    //       ctx: IContext,
-    //       next: NextFunction
-    //     ) {
-    //       subRes.push(topic + payload);
-    //     }
-    //   }
+      await Rakkit.start({
+        forceStart: ["rest", "gql"],
+        routing: {
+          globalMiddlewares: [
+            BodyParser()
+          ]
+        },
+        gql: {
+          scalarMap: [
+            [ScalarMap, GraphQLID]
+          ],
+          globalMiddlewares: []
+        }
+      });
 
-    //   await Rakkit.start({
-    //     forceStart: ["rest", "gql"]
-    //   });
+      const server = new ApolloServer({
+        schema: MetadataStorage.Instance.Gql.Schema,
+        context: ({ctx}) => ({
+          ...ctx
+        })
+      });
+      server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);
+      server.applyMiddleware({
+        app: Rakkit.Instance.KoaApp
+      });
 
-    //   const server = new ApolloServer({
-    //     schema: MetadataStorage.Instance.Gql.Schema,
-    //     context: ({ctx}) => ({
-    //       ...ctx
-    //     })
-    //   });
-    //   server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);
-    //   server.applyMiddleware({
-    //     app: Rakkit.Instance.KoaApp
-    //   });
+      const httpLink = new HttpLink({
+        uri: "http://localhost:4000/graphql",
+        fetch: Fetch
+      });
 
-    //   const httpLink = new HttpLink({
-    //     uri: "http://localhost:4000/graphql",
-    //     fetch: Axios
-    //   });
+      const getQuery = (topic: string) => {
+        return {
+          query: gql`
+            query {
+              activeSub(topic: "${topic}")
+            }
+          `
+        };
+      };
 
-    //   const wsLink = new WebSocketLink({
-    //     uri: "ws://localhost:4000/graphql",
-    //     webSocketImpl: ws
-    //   });
+      const wsLink = new WebSocketLink({
+        uri: "ws://localhost:4000/graphql",
+        options: {
+          connectionCallback: () => {
+            client.query(getQuery("hello"));
+          }
+        },
+        webSocketImpl: ws
+      });
 
-    //   const link = split(
-    //     ({ query }) => {
-    //       const def = getMainDefinition(query);
-    //       return def.kind === "OperationDefinition" && def.operation === "subscription";
-    //     },
-    //     wsLink,
-    //     httpLink
-    //   );
+      const link = split(
+        ({ query }) => {
+          const def = getMainDefinition(query);
+          return def.kind === "OperationDefinition" && def.operation === "subscription";
+        },
+        wsLink,
+        httpLink
+      );
 
-    //   const client = new ApolloClient({
-    //     link,
-    //     cache: new InMemoryCache()
-    //   });
+      const client = new ApolloClient({
+        link,
+        cache: new InMemoryCache()
+      });
 
-    //   // client.subscribe({
-    //   //   query: gql`subscription {
-    //   //     sub(topic: "hello")
-    //   //   }`,
-    //   //   fetchPolicy: "no-cache"
-    //   // }).subscribe((res) => {
-    //   //   console.log(res);
-    //   // });
+      await new Promise((resolve) => {
+        client.subscribe({
+          query: gql`subscription {
+            sub(topic: "hello")
+          }`
+        }).subscribe(resolve);
+      });
 
-    //   try {
-    //     await client.query({
-    //       query: gql`
-    //         query {
-    //           activeSub(topic: "hello")
-    //         }
-    //       `
-    //     });
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
+      await server.stop();
+      await client.stop();
 
-    //   expect(subRes).toEqual(["hellotest"]);
+      expect(subRes).toEqual(["hellotest"]);
+    });
+
+    it("Should create a subscription with custum subscription", async () => {
+      const subRes: string[] = [];
+      @Resolver()
+      class SubscriptionResolver {
+        @Query({ nullable: true })
+        activeSubCustom(
+          @Arg({ name: "topic" })
+          topic: string,
+          context: IContext
+        ): string {
+          context.gql.pubSub.publish(topic, "test");
+          return "okay";
+        }
+
+        @Subscription({
+          subscribe: ({args, pubSub}) => {
+            return pubSub.asyncIterator("hello2");
+          }
+        })
+        subCustom(
+          payload: string,
+          ctx: IContext,
+          next: NextFunction
+        ) {
+          subRes.push(`hello2${payload}`);
+        }
+      }
+
+      await Rakkit.start({
+        forceStart: ["rest", "gql"],
+        routing: {
+          globalMiddlewares: [
+            BodyParser()
+          ]
+        },
+        gql: {
+          scalarMap: [
+            [ScalarMap, GraphQLID]
+          ],
+          globalMiddlewares: []
+        }
+      });
+
+      const server = new ApolloServer({
+        schema: MetadataStorage.Instance.Gql.Schema,
+        context: ({ctx}) => ({
+          ...ctx
+        })
+      });
+      server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);
+      server.applyMiddleware({
+        app: Rakkit.Instance.KoaApp
+      });
+
+      const httpLink = new HttpLink({
+        uri: "http://localhost:4000/graphql",
+        fetch: Fetch
+      });
+
+      const getQuery = (topic: string) => {
+        return {
+          query: gql`
+            query {
+              activeSub(topic: "${topic}")
+            }
+          `
+        };
+      };
+
+      const wsLink = new WebSocketLink({
+        uri: "ws://localhost:4000/graphql",
+        options: {
+          connectionCallback: () => {
+            client.query(getQuery("hello2"));
+          }
+        },
+        webSocketImpl: ws
+      });
+
+      const link = split(
+        ({ query }) => {
+          const def = getMainDefinition(query);
+          return def.kind === "OperationDefinition" && def.operation === "subscription";
+        },
+        wsLink,
+        httpLink
+      );
+
+      const client = new ApolloClient({
+        link,
+        cache: new InMemoryCache()
+      });
+
+      await new Promise((resolve) => {
+        client.subscribe({
+          query: gql`subscription {
+            subCustom
+          }`
+        }).subscribe(resolve);
+      });
+
+      await server.stop();
+      await client.stop();
+
+      expect(subRes).toEqual(["hello2test"]);
+    });
+
+    it("Should create a subscription with custum subscription", async () => {
+      const subRes: string[] = [];
+      let ok = false;
+
+      @Resolver()
+      class SubscriptionResolver {
+        @Query({ nullable: true })
+        activeSubCustom(
+          @Arg({ name: "topic" })
+          topic: string,
+          context: IContext
+        ): string {
+          context.gql.pubSub.publish(topic, "test");
+          return "okay";
+        }
+
+        @Subscription({
+          topics: ({ args }) => args.topic,
+          withFilter: async ({ args }) => {
+            ok = true;
+            return !["yo"].includes(args.topic);
+          }
+        })
+        subFilter(
+          @Arg({ name: "topic" })
+          topic: string,
+          payload: string,
+          ctx: IContext,
+          next: NextFunction
+        ) {
+          subRes.push(topic + payload);
+        }
+      }
+
+      await Rakkit.start({
+        forceStart: ["rest", "gql"],
+        routing: {
+          globalMiddlewares: [
+            BodyParser()
+          ]
+        },
+        gql: {
+          scalarMap: [
+            [ScalarMap, GraphQLID]
+          ],
+          globalMiddlewares: []
+        }
+      });
+
+      const server = new ApolloServer({
+        schema: MetadataStorage.Instance.Gql.Schema,
+        context: ({ctx}) => ({
+          ...ctx
+        })
+      });
+      server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);
+      server.applyMiddleware({
+        app: Rakkit.Instance.KoaApp
+      });
+
+      const httpLink = new HttpLink({
+        uri: "http://localhost:4000/graphql",
+        fetch: Fetch
+      });
+
+      const getQuery = (topic: string) => {
+        return {
+          query: gql`
+            query {
+              activeSub(topic: "${topic}")
+            }
+          `
+        };
+      };
+
+      const wsLink = new WebSocketLink({
+        uri: "ws://localhost:4000/graphql",
+        options: {
+          connectionCallback: () => {
+            client.query(getQuery("yo"));
+            client.query(getQuery("hello3"));
+          }
+        },
+        webSocketImpl: ws
+      });
+
+      const link = split(
+        ({ query }) => {
+          const def = getMainDefinition(query);
+          return def.kind === "OperationDefinition" && def.operation === "subscription";
+        },
+        wsLink,
+        httpLink
+      );
+
+      const client = new ApolloClient({
+        link,
+        cache: new InMemoryCache()
+      });
+
+      await new Promise((resolve) => {
+        client.subscribe({
+          query: gql`subscription {
+            subFilter(topic: "yo")
+          }`
+        }).subscribe(() => {});
+
+        client.subscribe({
+          query: gql`subscription {
+            subFilter(topic: "hello3")
+          }`
+        }).subscribe(resolve);
+      });
+
+      await server.stop();
+      await client.stop();
+
+      expect(subRes).toEqual(["hello3test"]);
+      expect(ok).toEqual(true);
     });
   });
 });

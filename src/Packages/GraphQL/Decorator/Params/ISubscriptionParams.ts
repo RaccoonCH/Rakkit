@@ -1,8 +1,11 @@
 import {
   IFieldParams,
-  Topic
-} from "../..";
+  Topic,
+  ISubscriptionFnParams
+} from "../../..";
 
 export interface ISubscriptionParams extends IFieldParams {
-  topics: Topic;
+  topics?: Topic;
+  subscribe?: (params: ISubscriptionFnParams) => AsyncIterator<any>;
+  withFilter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
 }

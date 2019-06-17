@@ -8,4 +8,5 @@ export interface IHasType {
   nullable?: boolean;
   type: TypeFn;
   gqlType?: GqlType;
+  noType?: boolean;
 }

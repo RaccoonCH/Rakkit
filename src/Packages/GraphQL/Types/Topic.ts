@@ -1,4 +1,10 @@
+import {
+  KeyValue,
+  IContext,
+  ISubscriptionFnParams
+} from "../../..";
+
 export type Topic =
   string |
   string[] |
-  ((args: any) => (string | string[] | Promise<string[] | string>));
+  ((params: ISubscriptionFnParams) => (string | string[]));

@@ -1,6 +1,6 @@
 // #region Imports
 import { writeFile } from "fs";
-import { PubSub, PubSubEngine } from "graphql-subscriptions";
+import { PubSub, PubSubEngine, withFilter } from "graphql-subscriptions";
 import {
   GraphQLFieldConfigMap,
   GraphQLString,
@@ -717,19 +717,56 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             deprecationReason: fieldDef.params.deprecationReason,
             description: fieldDef.params.description
           };
-          if (fieldDef.params.topics) {
-            gqlField.subscribe = async (_, args) => {
+          if (fieldDef.params.resolveType === "Subscription") {
+            const subFn = (payload, args) => {
               let topics: string[] | string;
               if (typeof fieldDef.params.topics === "function") {
-                topics = await this.bindContext(
+                topics = this.bindContext(
                   fieldDef,
                   fieldDef.params.topics
-                )(args);
+                )({
+                  payload,
+                  args,
+                  pubSub: this._pubSub,
+                  context: undefined
+                });
               } else {
                 topics = fieldDef.params.topics;
               }
               return this._pubSub.asyncIterator(topics);
             };
+            if (fieldDef.params.subscribe) {
+              gqlField.subscribe = async (payload, args) => {
+                return await this.bindContext(
+                  fieldDef,
+                  fieldDef.params.subscribe
+                )({
+                  payload,
+                  args,
+                  pubSub: this._pubSub,
+                  context: undefined
+                });
+              };
+            } else {
+              if (fieldDef.params.withFilter) {
+                gqlField.subscribe = withFilter(
+                  subFn,
+                  async (payload, args) => {
+                    return await this.bindContext(
+                      fieldDef,
+                      fieldDef.params.withFilter
+                    )({
+                      payload,
+                      args,
+                      pubSub: this._pubSub,
+                      context: undefined
+                    });
+                  }
+                );
+              } else {
+                gqlField.subscribe = subFn;
+              }
+            }
           }
           if (![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)) {
             this.applyResolveToField(gqlField, fieldDef);
@@ -831,6 +868,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         break;
     }
     if (!finalType) {
+      typed.noType = true;
       typed.nullable = true;
       typed.arrayDepth = 0;
       finalType = GraphQLBoolean;
@@ -966,7 +1004,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             gqlContext,
             next
           );
-          if (gqlContext.response.body) {
+          fieldDef;
+          if (gqlContext.response && gqlContext.response.body) {
             gqlContext.gql.response = gqlContext.response.body;
           }
           if (gqlContext.body) {
@@ -974,6 +1013,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           }
           if (returnedResponse) {
             gqlContext.gql.response = returnedResponse;
+          }
+          if (fieldDef.params.noType) {
+            gqlContext.gql.response = null;
           }
         }
       };

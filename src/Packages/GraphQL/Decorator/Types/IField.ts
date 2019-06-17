@@ -3,8 +3,9 @@ import {
   IHasType,
   GqlResolveType,
   IArg,
-  Topic
-} from "../..";
+  Topic,
+  ISubscriptionFnParams
+} from "../../..";
 
 export interface IField extends IHasType {
   name: string;
@@ -17,4 +18,6 @@ export interface IField extends IHasType {
   enumValue?: any;
   args?: IArg[];
   defaultValue?: any;
+  subscribe?: (params: ISubscriptionFnParams) => AsyncIterator<any>;
+  withFilter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
 }
