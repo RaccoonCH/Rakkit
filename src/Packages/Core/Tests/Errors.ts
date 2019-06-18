@@ -12,7 +12,9 @@ describe("Error", () => {
         @Websocket()
         class WsD {
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done.fail("Error not throwed");
       } catch (err) {
         done();
@@ -25,7 +27,9 @@ describe("Error", () => {
         @Websocket()
         class WsE {
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done();
       } catch (err) {
         done.fail(err);
@@ -43,7 +47,9 @@ describe("Error", () => {
           @Inject(type => ServiceA, 2, "1")
           private _services: ServiceA; // Not declared as an Array
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done.fail("Error not throwed");
       } catch (err) {
         done();
@@ -61,7 +67,9 @@ describe("Error", () => {
           @Inject(2)
           private _services: ServiceB[];
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done.fail("Error not throwed");
       } catch (err) {
         done();
@@ -79,7 +87,9 @@ describe("Error", () => {
           private _services: ServiceB[]
         ) {}
       }
-      expect(Rakkit.start()).rejects.toThrowError(ArrayDiError);
+      expect(Rakkit.start({
+        silent: true
+      })).rejects.toThrowError(ArrayDiError);
       await Rakkit.stop();
     });
   });
@@ -93,7 +103,9 @@ describe("Error", () => {
         @Router("router")
         class RouterB {
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done.fail();
       } catch (err) {
         done();
@@ -115,7 +127,9 @@ describe("Error", () => {
           @On("a")
           wsbA() {}
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done.fail("Error not throwed");
       } catch (err) {
         done();

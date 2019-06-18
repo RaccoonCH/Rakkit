@@ -1,4 +1,4 @@
-import { Service } from "../../../..";
+import { Service } from "../../../DI/Decorator/Decorators/Service";
 
 @Service()
 @Service(1)

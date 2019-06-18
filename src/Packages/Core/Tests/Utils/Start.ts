@@ -11,7 +11,7 @@ export const Start = async (config?: IAppConfig) => {
   const routers = [routerGlob];
   const definedConfig = config || {};
   return Rakkit.start({
-    silent: false, // False for codecov
+    silent: true, // False for codecov
     port: 3000,
     ...(definedConfig.rest || {}),
     ws: {

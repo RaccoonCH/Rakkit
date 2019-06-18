@@ -18,7 +18,9 @@ describe("No error", () => {
           @On("a")
           wsbA() {}
         }
-        await Rakkit.start();
+        await Rakkit.start({
+          silent: true
+        });
         done();
       } catch (err) {
         done.fail(err);

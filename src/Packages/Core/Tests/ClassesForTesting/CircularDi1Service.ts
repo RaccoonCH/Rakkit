@@ -1,4 +1,5 @@
-import { Service, Inject } from "../../../..";
+import { Service } from "../../../../Packages/DI/Decorator/Decorators/Service";
+import { Inject } from "../../../../Packages/DI/Decorator/Decorators/Inject";
 import { Circular2 } from "./CircularDi2Service";
 
 @Service()

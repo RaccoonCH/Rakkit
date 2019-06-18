@@ -3,11 +3,14 @@ import * as BodyParser from "koa-bodyparser";
 import Axios, { AxiosInstance } from "axios";
 import { GlobalFirstBeforeMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/Before/GlobalFirstBeforeMiddleware";
 import { Start } from "../../Core/Tests/Utils/Start";
-import { Rakkit, Service, Inject, MetadataStorage } from "../../..";
+import { Rakkit } from "../../..";
+import { Service } from "../../../Packages/DI/Decorator/Decorators/Service";
+import { Inject } from "../../../Packages/DI/Decorator/Decorators/Inject";
 import { Circular1 } from "../../Core/Tests/ClassesForTesting/CircularDi1Service";
 import { Circular2 } from "../../Core/Tests/ClassesForTesting/CircularDi2Service";
 import { CircularConstructorDi1Service } from "../../Core/Tests/ClassesForTesting/CircularConstructorDi1Service";
 import { CircularConstructorDi2Service } from "../../Core/Tests/ClassesForTesting/CircularConstructorDi2Service";
+import { MetadataStorage } from "../../Core/Logic/MetadataStorage";
 
 const basicReturnedObject = {
   testDi: true,
