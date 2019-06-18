@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo.png" width="220" alt="Rakkit logo"/>
+  <img src="docs/.vuepress/public/logo.png" width="220" alt="Rakkit logo"/>
   <br>
   A library written in <b>TypeScript</b> that provides <b>REST/GraphQL API</b> and <b>Websocket</b> tools to build amazing server-side applications
   <p align="center">
