@@ -1,7 +1,7 @@
 # Router
 They are based on the same operation as those of [koa](https://koajs.com/). You can, therefore, if necessary, refer to their documentation.
 
-### Basic notions
+## Basic notions
 **Router decorator**  
 **`@Router(path: string)`**  
 - He decorates a **class**.  
@@ -18,7 +18,7 @@ _All capitalized values vary according to your configuration_
 **The Context**  
 - The decorated class methods of **@Get**, **@Post**, **@Put** or **@Delete** receive in **first parameter** a `Context` which is equivalent to a `Context` of [koa](https://koajs.com/) and works in the same way, so you can refer to their [documentation](https://koajs.com/) to know how to use and handle it.
 
-### Basic router
+## Basic router
 Here is a simple example of a router with Rakkit.
 ```typescript
 import { Router, Get, Post, Put, Delete, Context } from "rakkit";
@@ -47,7 +47,7 @@ export class ExampleRouter {
 }
 ```
 
-### Route merging
+## Route merging
 You can have two **class methods** that have the same **http method** as well as the same **endpoint** in order to chain the executions that are done **in the order of declaration of methods in the class**.  
 _Especially useful when coupled with the use of [middlewares](http://localhost:3000/#/fr/Middleware)_  
 To be able to use this feature you will need to understand how the [next](http://localhost:3000/#/fr/Middleware?id=before-all-function-next) function works.  

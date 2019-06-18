@@ -25,7 +25,7 @@ title: Installation
 
 # Commencer
 
-### Installation
+## Installation
 Vous pouvez simplement installer **Rakkit** avec `npm` ou `yarn`.
 ```
 npm i rakkit
@@ -34,7 +34,7 @@ npm i rakkit
 yarn add rakkit
 ```
 
-### reflect-metadata et décorateur
+## reflect-metadata et décorateur
 Pour utiliser Rakkit, et également pour toute les application en TS utilisant les décorateur vous devrez installer reflect-metadata et l'inclure dans le fichier de démarrage de votre application.
 ```
 npm i reflect-metadata
@@ -67,7 +67,7 @@ Il faut également que déclariez dans le fichier tsconfig.json que vous utilise
 
 ```
 
-### Démarrer l'application
+## Démarrer l'application
 Afin de démarrer l'application vous devrez utiliser la classe `Rakkit` et acceder à la méthode static `start` de celui-ci.  
 Voici un exemple:
 ```typescript
@@ -77,7 +77,7 @@ import { Rakkit } from "rakkit";
 Rakkit.start();
 ```
 
-### Paramètres de démarrage
+## Paramètres de démarrage
 Vous pouvez passer plusieurs paramètres lors du démarrage de l'application dans la méthode `start` afin de la configurer.
 
 | Property | Value | default | Description |

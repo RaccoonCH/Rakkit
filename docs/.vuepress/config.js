@@ -42,94 +42,206 @@ module.exports = {
     locales: {
       "/en/": {
         editLinkText: "Edit this page on GitHub",
-        sidebar: [{
+        sidebar: [
+          {
             title: "Getting started",
             collapsable: false,
             children: [
-              "/en/Start/Installation",
-              "/en/Start/Demos"
+              "/en/start/installation",
+              "/en/start/demos"
             ]
-          }, {
+          },
+          {
+            title: "GraphQL",
+            collapsable: true,
+            children: [
+              {
+                title: "Getting Started",
+                collapsable: false,
+                children: [
+                  "/en/graphql/start/bootstrap",
+                  "/en/graphql/start/installation",
+                  "/en/graphql/start/introduction"
+                ]
+              },
+              {
+                title: "Type definition",
+                collapsable: false,
+                children: [
+                  "/en/graphql/type/type-definition",
+                  "/en/graphql/type/ihneritance",
+                  "/en/graphql/type/generics",
+                  "/en/graphql/type/interfaces",
+                  "/en/graphql/type/unions",
+                  "/en/graphql/type/enums",
+                  "/en/graphql/type/scalars"
+                ]
+              },
+              {
+                title: "Networking & Queries",
+                collapsable: false,
+                children: [
+                  "/en/graphql/query/resolvers",
+                  "/en/graphql/query/middlewares",
+                  "/en/graphql/query/subscriptions"
+                ]
+              },
+              {
+                title: "Misc",
+                collapsable: false,
+                children: [
+                  "/en/graphql/misc/write-schema"
+                ]
+              }
+            ]
+          },
+          {
             title: "REST",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/en/REST/Router",
-              "/en/REST/Middleware",
-              "/en/REST/MiddlewaresKoa",
-              "/en/REST/ServingStaticFiles"
+              "/en/rest/router",
+              "/en/rest/middlewares",
+              "/en/rest/koa-middlewares",
+              "/en/rest/serving-static-files"
             ]
-          }, {
+          },
+          {
             title: "Websocket",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/en/WS/Websocket"
+              "/en/ws/introduction",
+              "/en/ws/server-side",
+              "/en/ws/client-side"
             ]
-          }, {
+          },
+          {
             title: "DI",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/en/DI/DI"
+              "/en/di/introduction",
+              "/en/di/services-and-injections",
+              "/en/di/ihneritance",
+              "/en/di/api",
+              "/en/di/limitations"
             ]
-          }, {
-            title: "MetadataStorage",
-            collapsable: false,
+          },
+          {
+            title: "API",
+            collapsable: true,
             children: [
-              "/en/API/MetadataStorage",
-              "/en/API/RakkitObject"
+              "/en/api/metadata-storage",
+              "/en/api/rakkit"
             ]
-          }, {
+          },
+          {
             title: "Development",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/en/Dev/Contributing",
-              "/en/Dev/Changelog"
+              "/en/dev/contributing",
+              "/en/dev/changelog"
             ]
           }
         ]
       },
       "/fr/": {
         editLinkText: "Editer cette page sur GitHub",
-        sidebar: [{
+        sidebar: [
+          {
             title: "Commencer",
             collapsable: false,
             children: [
-              "/fr/Start/Installation",
-              "/fr/Start/Demos"
+              "/fr/start/installation",
+              "/fr/start/demos"
             ]
-          }, {
+          },
+          {
+            title: "GraphQL",
+            collapsable: true,
+            children: [
+              {
+                title: "Getting Started",
+                collapsable: false,
+                children: [
+                  "/en/graphql/start/bootstrap",
+                  "/en/graphql/start/installation",
+                  "/en/graphql/start/introduction"
+                ]
+              },
+              {
+                title: "Type definition",
+                collapsable: false,
+                children: [
+                  "/en/graphql/type/type-definition",
+                  "/en/graphql/type/ihneritance",
+                  "/en/graphql/type/generics",
+                  "/en/graphql/type/interfaces",
+                  "/en/graphql/type/unions",
+                  "/en/graphql/type/enums",
+                  "/en/graphql/type/scalars"
+                ]
+              },
+              {
+                title: "Networking & Queries",
+                collapsable: false,
+                children: [
+                  "/en/graphql/query/resolvers",
+                  "/en/graphql/query/middlewares",
+                  "/en/graphql/query/subscriptions"
+                ]
+              },
+              {
+                title: "Misc",
+                collapsable: false,
+                children: [
+                  "/en/graphql/misc/write-schema"
+                ]
+              }
+            ]
+          },
+          {
             title: "REST",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/fr/REST/Router",
-              "/fr/REST/Middleware",
-              "/fr/REST/MiddlewaresKoa",
-              "/fr/REST/ServingStaticFiles"
+              "/fr/rest/router",
+              "/fr/rest/middlewares",
+              "/fr/rest/koa-middlewares",
+              "/fr/rest/serving-static-files"
             ]
-          }, {
+          },
+          {
             title: "Websocket",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/fr/WS/Websocket"
+              "/fr/ws/introduction",
+              "/fr/ws/server-side",
+              "/fr/ws/client-side"
             ]
-          }, {
+          },
+          {
             title: "DI",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/fr/DI/DI"
+              "/fr/di/introduction",
+              "/fr/di/services-and-injections",
+              "/fr/di/ihneritance",
+              "/fr/di/api",
+              "/fr/di/limitations"
             ]
-          }, {
-            title: "MetadataStorage",
-            collapsable: false,
+          },
+          {
+            title: "API",
+            collapsable: true,
             children: [
-              "/fr/API/MetadataStorage",
-              "/fr/API/RakkitObject"
+              "/fr/api/metadata-storage",
+              "/fr/api/rakkit"
             ]
-          }, {
+          },
+          {
             title: "Développement",
-            collapsable: false,
+            collapsable: true,
             children: [
-              "/fr/Dev/Contributing",
-              "/en/Dev/Changelog"
+              "/fr/dev/contributing",
+              "/fr/dev/changelog"
             ]
           }
         ]
