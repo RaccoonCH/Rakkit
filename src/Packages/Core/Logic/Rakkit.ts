@@ -22,6 +22,10 @@ export class Rakkit extends AppLoader {
     return this._instance;
   }
 
+  static get MetadataStorage() {
+    return MetadataStorage.Instance;
+  }
+
   get Config() {
     return this._config as Readonly<IAppConfig>;
   }
