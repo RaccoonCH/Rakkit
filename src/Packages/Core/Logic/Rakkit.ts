@@ -116,7 +116,7 @@ export class Rakkit extends AppLoader {
       ...this._config.routing.globalMiddlewares
     ];
     routing.LoadAnonymousMiddlewares(allMiddlewares);
-    await MetadataStorage.Instance.BuildAll();
+    await MetadataStorage.Instance.Build();
     this.startAllServices();
     return this;
   }
@@ -130,6 +130,7 @@ export class Rakkit extends AppLoader {
     await new Promise((resolve) => {
       this._httpServer.close(resolve);
     });
+
     return this;
   }
 

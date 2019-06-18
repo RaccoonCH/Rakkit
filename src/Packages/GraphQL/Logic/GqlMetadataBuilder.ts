@@ -48,17 +48,17 @@ import {
 // #endregion
 
 export class GqlMetadataBuilder extends MetadataBuilder {
-  private _gqlTypeDefs: IDecorator<IGqlType>[] = [];
-  private _transformationGqlDef: ITypeTransformation[] = [];
-  private _gqlTypeDefSetters: IDecorator<SetterType<IGqlType>>[] = [];
-  private _fieldDefs: IDecorator<IField>[] = [];
-  private _fieldDefSetters: IDecorator<SetterType<IField>>[] = [];
+  private _gqlTypeDefs: IDecorator<IGqlType>[];
+  private _transformationGqlDef: ITypeTransformation[];
+  private _gqlTypeDefSetters: IDecorator<SetterType<IGqlType>>[];
+  private _fieldDefs: IDecorator<IField>[];
+  private _fieldDefSetters: IDecorator<SetterType<IField>>[];
   private _mutationTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
   private _queryTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
   private _subscriptionTypeDef: IDecorator<IGqlType<typeof GraphQLObjectType>>;
-  private _params: Map<Function, IDecorator<IParam>> = new Map();
+  private _params: Map<Function, IDecorator<IParam>>;
   private _schema: GraphQLSchema;
-  private _pubSub: PubSubEngine = new PubSub();
+  private _pubSub: PubSubEngine;
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
@@ -66,18 +66,6 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
   private get _config() {
     return Rakkit.Instance.Config.gql;
-  }
-
-  constructor() {
-    super();
-
-    this._queryTypeDef = this.createGqlTypeDef("Query", GraphQLObjectType);
-    this._mutationTypeDef = this.createGqlTypeDef("Mutation", GraphQLObjectType);
-    this._subscriptionTypeDef = this.createGqlTypeDef("Subscription", GraphQLObjectType);
-
-    this.AddType(this._queryTypeDef);
-    this.AddType(this._mutationTypeDef);
-    this.AddType(this._subscriptionTypeDef);
   }
 
   get Schema() {
@@ -141,14 +129,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     const enumTypes = this.buildGqlTypes(GraphQLEnumType);
     const unionTypes = this.buildGqlTypes(GraphQLUnionType);
 
-    const query = objectTypes.find((gqlType) => gqlType.name === "Query");
-    const mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
-    const subscription = objectTypes.find((gqlType) => gqlType.name === "Subscription");
+    let query = objectTypes.find((gqlType) => gqlType.name === "Query");
+    let mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
+    let subscription = objectTypes.find((gqlType) => gqlType.name === "Subscription");
+    const typeDefs = objectTypes.filter((gqlType) => !["Query", "Mutation", "Subscription"].includes(gqlType.name));
+
+    query = this.isQueryUsed(query);
+    mutation = this.isQueryUsed(mutation);
+    subscription = this.isQueryUsed(subscription);
 
     const types = [
       ...interfaceTypes,
       ...inputTypes,
-      ...objectTypes,
+      ...typeDefs,
       ...enumTypes,
       ...unionTypes
     ];
@@ -160,17 +153,31 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       subscription
     };
 
-    this.removeUnsedTypeFromSchema(schemaParams, query);
-    this.removeUnsedTypeFromSchema(schemaParams, mutation);
-    this.removeUnsedTypeFromSchema(schemaParams, subscription);
-
     this._schema = new GraphQLSchema(schemaParams);
 
     this.writeSchemaFile();
   }
 
+  Clear() {
+    this._gqlTypeDefs = [];
+    this._transformationGqlDef = [];
+    this._gqlTypeDefSetters = [];
+    this._fieldDefs = [];
+    this._fieldDefSetters = [];
+    this._params = new Map();
+    this._pubSub = new PubSub();
+
+    this._queryTypeDef = this.createGqlTypeDef("Query", GraphQLObjectType);
+    this._mutationTypeDef = this.createGqlTypeDef("Mutation", GraphQLObjectType);
+    this._subscriptionTypeDef = this.createGqlTypeDef("Subscription", GraphQLObjectType);
+
+    this.AddType(this._queryTypeDef);
+    this.AddType(this._mutationTypeDef);
+    this.AddType(this._subscriptionTypeDef);
+  }
+
   //#region Getters
-  getObjectTypeFieldsLength(objectType: GraphQLObjectType) {
+  GetObjectTypeFieldsLength(objectType: GraphQLObjectType) {
     return Object.keys(objectType.getFields()).length;
   }
 
@@ -221,12 +228,21 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * @param schemaParams The schema params
    * @param schemaType The schema type to remove
    */
-  removeUnsedTypeFromSchema(schemaParams: GraphQLSchemaConfig, schemaType: GraphQLObjectType) {
-    if (this.getObjectTypeFieldsLength(schemaType) <= 0) {
-      const queryIndex = schemaParams.types.findIndex((schemaParamsType) => schemaParamsType === schemaType);
-      schemaParams.types.splice(queryIndex, 1);
-      delete schemaParams[schemaType.name.toLowerCase()];
+  private isQueryUsed(schemaType: GraphQLObjectType) {
+    if (this.GetObjectTypeFieldsLength(schemaType) <= 0) {
+      if (schemaType.name === "Query") {
+        return new GraphQLObjectType({
+          ...schemaType.toConfig(),
+          fields: {
+            _: {
+              type: GraphQLBoolean
+            }
+          }
+        });
+      }
+      return undefined;
     }
+    return schemaType;
   }
 
   /**

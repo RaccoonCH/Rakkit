@@ -15,10 +15,10 @@ import {
 } from "../../..";
 
 export class RoutingMetadataBuilder extends MetadataBuilder {
-  private _middlewares: Map<Function, IDecorator<IMiddleware>> = new Map();
-  private _beforeMiddlewares: Map<Function, HandlerFunction> = new Map();
-  private _afterMiddlewares: Map<Function, HandlerFunction> = new Map();
-  private _usedMiddlewares: IDecorator<IUsedMiddleware>[] = [];
+  private _middlewares: Map<Function, IDecorator<IMiddleware>>;
+  private _beforeMiddlewares: Map<Function, HandlerFunction>;
+  private _afterMiddlewares: Map<Function, HandlerFunction>;
+  private _usedMiddlewares: IDecorator<IUsedMiddleware>[];
 
   get UsedMiddlewares() {
     return this._usedMiddlewares as ReadonlyArray<IDecorator<IUsedMiddleware>>;
@@ -62,6 +62,13 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
         break;
       }
     });
+  }
+
+  Clear() {
+    this._beforeMiddlewares = new Map();
+    this._afterMiddlewares = new Map();
+    this._middlewares = new Map();
+    this._usedMiddlewares = [];
   }
 
   GetBeforeMiddlewares(middlewares: MiddlewareType[]) {

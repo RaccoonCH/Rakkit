@@ -206,6 +206,7 @@ describe("GraphQL", () => {
       }
 
       await Rakkit.start({ silent: true });
+
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "InputTypeTypeCreatorIhneritance") as IntrospectionInputObjectType;
 

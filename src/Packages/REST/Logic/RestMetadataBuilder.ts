@@ -12,10 +12,10 @@ import {
 } from "../../..";
 
 export class RestMetadataBuilder extends MetadataBuilder {
-  private _routers: Map<Function, IDecorator<IRouter>> = new Map();
-  private _endpoints: IDecorator<IEndpoint>[] = [];
-  private _mainRouter: ApiRouter = new ApiRouter();
-  private _restRouter: ApiRouter = new ApiRouter();
+  private _routers: Map<Function, IDecorator<IRouter>>;
+  private _endpoints: IDecorator<IEndpoint>[];
+  private _mainRouter: ApiRouter;
+  private _restRouter: ApiRouter;
 
   private get _routingStorage() {
     return MetadataStorage.Instance.Routing;
@@ -94,6 +94,13 @@ export class RestMetadataBuilder extends MetadataBuilder {
       rootMiddlewares,
       this._mainRouter
     );
+  }
+
+  Clear() {
+    this._endpoints = [];
+    this._routers = new Map();
+    this._mainRouter = new ApiRouter();
+    this._restRouter = new ApiRouter();
   }
 
   AddRouter(item: IDecorator<IRouter>) {

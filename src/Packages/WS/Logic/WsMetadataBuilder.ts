@@ -7,8 +7,8 @@ import {
 } from "../../..";
 
 export class WsMetadataBuilder extends MetadataBuilder {
-  private _websockets: Map<Function, IDecorator<IWebsocket>> = new Map();
-  private _ons: IDecorator<IOn>[] = [];
+  private _websockets: Map<Function, IDecorator<IWebsocket>>;
+  private _ons: IDecorator<IOn>[];
 
   get Ons() {
     return this._ons as ReadonlyArray<IDecorator<IOn>>;
@@ -44,5 +44,10 @@ export class WsMetadataBuilder extends MetadataBuilder {
       item.params.function = this.bindContext(wsClass, item.params.function);
       wsClass.params.ons.push(item);
     });
+  }
+
+  Clear() {
+    this._websockets = new Map();
+    this._ons = [];
   }
 }

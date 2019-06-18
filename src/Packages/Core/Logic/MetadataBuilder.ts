@@ -4,7 +4,12 @@ import {
 } from "../../..";
 
 export abstract class MetadataBuilder {
+  constructor() {
+    this.Clear();
+  }
+
   abstract Build(): void;
+  abstract Clear(): void;
 
   protected extractParams<DecoratorType = any>(items: IDecorator<DecoratorType>[]) {
     return items.map((item) => item.params);

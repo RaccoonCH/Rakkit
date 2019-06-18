@@ -1,3 +1,4 @@
+import { MetadataBuilder } from "./MetadataBuilder";
 import {
   RestMetadataBuilder,
   DiMetadataBuilder,
@@ -6,7 +7,7 @@ import {
   RoutingMetadataBuilder
 } from "../..";
 
-export class MetadataStorage {
+export class MetadataStorage extends MetadataBuilder {
   private static _instance: MetadataStorage;
   private _restMetadata: RestMetadataBuilder;
   private _diMetadata: DiMetadataBuilder;
@@ -41,8 +42,14 @@ export class MetadataStorage {
     return this._instance;
   }
 
-  constructor() {
-    this.Clear();
+  Build() {
+    return Promise.all([
+      this._routingMetadata.Build(),
+      this._restMetadata.Build(),
+      this._diMetadata.Build(),
+      this._wsMetadata.Build(),
+      this._gqlMetadata.Build()
+    ]);
   }
 
   Clear() {
@@ -51,13 +58,5 @@ export class MetadataStorage {
     this._diMetadata = new DiMetadataBuilder();
     this._wsMetadata = new WsMetadataBuilder();
     this._gqlMetadata = new GqlMetadataBuilder();
-  }
-
-  async BuildAll() {
-    this._routingMetadata.Build();
-    this._restMetadata.Build();
-    this._diMetadata.Build();
-    this._wsMetadata.Build();
-    this._gqlMetadata.Build();
   }
 }

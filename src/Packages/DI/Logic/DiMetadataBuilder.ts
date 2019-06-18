@@ -12,8 +12,8 @@ import {
 } from "../../..";
 
 export class DiMetadataBuilder extends MetadataBuilder {
-  private _services: IDecorator<IService<any>>[] = [];
-  private _injections: IDecorator<IInject>[] = [];
+  private _services: IDecorator<IService<any>>[];
+  private _injections: IDecorator<IInject>[];
 
   get Services() {
     return this._services as ReadonlyArray<IDecorator<IService<any>>>;
@@ -50,6 +50,11 @@ export class DiMetadataBuilder extends MetadataBuilder {
         );
       }
     });
+  }
+
+  Clear() {
+    this._services = [];
+    this._injections = [];
   }
 
   GetService(service: IDecorator<IDiId>): ReturnedService<any>;

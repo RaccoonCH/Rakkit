@@ -122,11 +122,12 @@ describe("GraphQL", () => {
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
       expect(simpleType.description).toBe("an object partial type");
 
+      expect(simpleType.fields.length).toEqual(2);
       expect(simpleType.fields[0].type.kind).not.toBe("NON_NULL");
       expect(simpleType.fields[1].type.kind).not.toBe("NON_NULL");
     });
 
-    it("Should create a PartialType of ObjectType", async () => {
+    it("Should create a PartialType of InputType", async () => {
       const partialType = TypeCreator.CreatePartial(SimpleInputType, {
         name: "MyPartialSimpleInputType",
         description: "an input partial type"
@@ -137,6 +138,8 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
       expect(simpleType.description).toBe("an input partial type");
+
+      expect(simpleType.inputFields.length).toEqual(1);
       expect(simpleType.inputFields[0].type.kind).not.toBe("NON_NULL");
     });
 
@@ -151,6 +154,8 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.INTERFACE);
       expect(simpleType.description).toBe("an interface partial type");
+
+      expect(simpleType.fields.length).toEqual(1);
       expect(simpleType.fields[0].type.kind).not.toBe("NON_NULL");
     });
 
@@ -169,6 +174,8 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.INPUT_OBJECT);
       expect(simpleType.description).toBe("an input required type");
+
+      expect(simpleType.inputFields.length).toEqual(1);
       expect(simpleType.inputFields[0].type.kind).toBe("NON_NULL");
     });
 
@@ -187,6 +194,8 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.OBJECT);
       expect(simpleType.description).toBe("an object required type");
+
+      expect(simpleType.fields.length).toEqual(2);
       expect(simpleType.fields[0].type.kind).toBe("NON_NULL");
       expect(simpleType.fields[1].type.kind).toBe("NON_NULL");
     });
@@ -206,6 +215,8 @@ describe("GraphQL", () => {
 
       expect(simpleType.kind).toBe(TypeKind.INTERFACE);
       expect(simpleType.description).toBe("an interface required type");
+
+      expect(simpleType.fields.length).toEqual(1);
       expect(simpleType.fields[0].type.kind).toBe("NON_NULL");
     });
 

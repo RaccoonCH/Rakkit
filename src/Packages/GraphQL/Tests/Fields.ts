@@ -53,6 +53,7 @@ describe("GraphQL", () => {
       }
 
       await Rakkit.start({
+        silent: true,
         gql: {
           dateMode: "timestamp"
         }
