@@ -2,8 +2,10 @@ module.exports = {
   title: "Rakkit",
   description: "A framework written in TypeScript that provides REST/GraphQL API and Websocket tools to build amazing server-side applications",
   lang: "en",
+  base: "/Rakkit/",
   locales: {
-    "/": {
+    "/en/": {
+      path: "/",
       lang: "en"
     },
     "/fr/": {
@@ -12,6 +14,14 @@ module.exports = {
       description: "Un framework écrit en TypeScript qui permet de créer des API REST/GraphQL pour vos applications backend"
     },
   },
+  plugins: [
+    [ 
+      "@vuepress/google-analytics",
+      {
+        "ga": "UA-128796921-2"
+      }
+    ]  
+  ],
   head: [
     ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "/favicon/apple-touch-icon.png"}],
     ['link', { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon/favicon-96x96.png"}],
@@ -30,49 +40,49 @@ module.exports = {
     docsDir: "docs",
     editLinks: true,
     locales: {
-      "/": {
+      "/en/": {
         editLinkText: "Edit this page on GitHub",
         sidebar: [{
             title: "Getting started",
             collapsable: false,
             children: [
-              "/Installation",
-              "/Demos"
+              "/en/Start/Installation",
+              "/en/Start/Demos"
             ]
           }, {
             title: "REST",
             collapsable: false,
             children: [
-              "/Router",
-              "/Middleware",
-              "/MiddlewaresKoa",
-              "/ServingStaticFiles"
+              "/en/REST/Router",
+              "/en/REST/Middleware",
+              "/en/REST/MiddlewaresKoa",
+              "/en/REST/ServingStaticFiles"
             ]
           }, {
             title: "Websocket",
             collapsable: false,
             children: [
-              "/Websocket"
+              "/en/WS/Websocket"
             ]
           }, {
             title: "DI",
             collapsable: false,
             children: [
-              "/DI"
+              "/en/DI/DI"
             ]
           }, {
             title: "MetadataStorage",
             collapsable: false,
             children: [
-              "/MetadataStorage",
-              "/RakkitObject"
+              "/en/API/MetadataStorage",
+              "/en/API/RakkitObject"
             ]
           }, {
             title: "Development",
             collapsable: false,
             children: [
-              "/Contributing",
-              "/Changelog"
+              "/en/Dev/Contributing",
+              "/en/Dev/Changelog"
             ]
           }
         ]
@@ -83,43 +93,43 @@ module.exports = {
             title: "Commencer",
             collapsable: false,
             children: [
-              "/fr/Installation",
-              "/fr/Demos"
+              "/fr/Start/Installation",
+              "/fr/Start/Demos"
             ]
           }, {
             title: "REST",
             collapsable: false,
             children: [
-              "/fr/Router",
-              "/fr/Middleware",
-              "/fr/MiddlewaresKoa",
-              "/fr/ServingStaticFiles"
+              "/fr/REST/Router",
+              "/fr/REST/Middleware",
+              "/fr/REST/MiddlewaresKoa",
+              "/fr/REST/ServingStaticFiles"
             ]
           }, {
             title: "Websocket",
             collapsable: false,
             children: [
-              "/fr/Websocket"
+              "/fr/WS/Websocket"
             ]
           }, {
             title: "DI",
             collapsable: false,
             children: [
-              "/fr/DI"
+              "/fr/DI/DI"
             ]
           }, {
             title: "MetadataStorage",
             collapsable: false,
             children: [
-              "/fr/MetadataStorage",
-              "/fr/RakkitObject"
+              "/fr/API/MetadataStorage",
+              "/fr/API/RakkitObject"
             ]
           }, {
             title: "Développement",
             collapsable: false,
             children: [
-              "/fr/Contributing",
-              "/en/Changelog"
+              "/fr/Dev/Contributing",
+              "/en/Dev/Changelog"
             ]
           }
         ]

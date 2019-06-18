@@ -67,6 +67,7 @@
     "@types/node-fetch": "^2.3.7",
     "@types/socket.io-client": "^1.4.32",
     "@types/ws": "^6.0.1",
+    "@vuepress/plugin-google-analytics": "^1.0.0-rc.1",
     "apollo-cache-inmemory": "^1.6.0",
     "apollo-client": "^2.6.0",
     "apollo-link": "^1.2.11",
