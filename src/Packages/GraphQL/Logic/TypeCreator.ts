@@ -91,10 +91,10 @@ export class TypeCreator {
    * @param target The target class
    * @param params The creation options
    */
-  static CreateRequired(target: Function);
-  static CreateRequired(target: Function, params: ICustomTypeCreatorParams);
-  static CreateRequired(
-    target: Function,
+  static CreateRequired<Type extends IClassType>(target: Type);
+  static CreateRequired<Type extends IClassType>(target: Type, params: ICustomTypeCreatorParams);
+  static CreateRequired<Type extends IClassType>(
+    target: Type,
     params?: ICustomTypeCreatorParams
   ) {
     const definedParams = params || {};
@@ -113,10 +113,10 @@ export class TypeCreator {
    * @param target The target class
    * @param params The creation options
    */
-  static CreatePartial(target: Function);
-  static CreatePartial(target: Function, params: ICustomTypeCreatorParams);
-  static CreatePartial(
-    target: Function,
+  static CreatePartial<Type extends IClassType>(target: Type);
+  static CreatePartial<Type extends IClassType>(target: Type, params: ICustomTypeCreatorParams);
+  static CreatePartial<Type extends IClassType>(
+    target: Type,
     params?: ICustomTypeCreatorParams
   ) {
     const definedParams = params || {};
