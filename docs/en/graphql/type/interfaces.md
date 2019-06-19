@@ -2,11 +2,13 @@
 title: Interfaces
 ---
 
-The main idea of TypeGraphQL is to create GraphQL types based on TypeScript classes.
+# Interfaces
 
-In object-oriented programming it is common to create interfaces which describe the contract that classes implementing them must adhere to. Hence, TypeGraphQL supports defining GraphQL interfaces.
+The main idea of Rakkit is to create GraphQL types based on TypeScript classes.
 
-Read more about the GraphQL Interface Type in the [official GraphQL docs](https://graphql.org/learn/schema/#interfaces).
+In object-oriented programming it is common to create interfaces which describe the contract that classes implementing them must adhere to. Hence, Rakkit supports defining GraphQL interfaces.
+
+Read more about the GraphQL **Interface Type** in the [official GraphQL docs](https://graphql.org/learn/schema/#interfaces).
 
 ## Usage
 
@@ -41,7 +43,7 @@ class Person implements IPerson {
 }
 ```
 
-The only difference is that we have to let TypeGraphQL know that this `ObjectType` is implementing the `InterfaceType`. We do this by passing the param `({ implements: IPerson })` to the decorator. If we implement multiple interfaces, we pass an array of interfaces like so: `({ implements: [IPerson, IAnimal, IMachine] })`.
+The only difference is that we have to let Rakkit know that this `ObjectType` is implementing the `InterfaceType`. We do this by passing the param `({ implements: IPerson })` to the decorator. If we implement multiple interfaces, we pass an array of interfaces like so: `({ implements: [IPerson, IAnimal, IMachine] })`.
 
 We can also omit the decorators since the GraphQL types will be copied from the interface definition - this way we won't have to maintain two definitions and solely rely on TypeScript type checking for correct interface implementation.
 
@@ -49,24 +51,28 @@ We can also omit the decorators since the GraphQL types will be copied from the 
 
 Be aware that when our object type is implementing a GraphQL interface type, **we have to return an instance of the type class** in our resolvers. Otherwise, `graphql-js` will not be able to detect the underlying GraphQL type correctly.
 
-We can also provide our own `resolveType` function implementation to the `@InterfaceType` options. This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, the same ways [like in unions](./unions.md), e.g.:
+We can also provide our own `resolveType` function implementation to the `@InterfaceType` options (available too for TypeCreator.CreateUnion). This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, the same ways [like in unions](/unions).
+
+But **Rakkit automatically determines** the type using instanceof if you return a class instance. However, if a plain-object is returned it will find the type thanks to the different fields provided.
+
+If you have a special case you can provide the resolveType function like this:
 
 ```typescript
 @InterfaceType({
-  resolveType: value => {
+  resolveType: (value) => {
     if ("grades" in value) {
       return "Student"; // schema name of the type as a string
     }
     return Person; // or the object type class
-  },
+  }
 })
 abstract class IPerson {
   // ...
 }
 ```
 
-However in case of interfaces, it might be a little bit more tricky than with unions, as we might not remember all the object types that implements this particular interface.
-
 ## Examples
 
 For more advanced usage examples of interfaces (and type inheritance), e.g. with query returning an interface type, go to [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/interfaces-inheritance).
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

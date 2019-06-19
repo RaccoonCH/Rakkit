@@ -3,11 +3,15 @@ title: Introduction
 sidebar_label: What & Why
 ---
 
+# Introduction
+
 We all love GraphQL! It's really great and solves many problems that we have with REST APIs, such as overfetching and underfetching. But developing a GraphQL API in Node.js with TypeScript is sometimes a bit of a pain.
+
+Rakkit's GraphQL Package works basically the some way as [TypeGraphQL](https://github.com/19majkel94/type-graphql) does (but it's not the same code base). So this documentation is based on theirs.
 
 ## What?
 
-**TypeGraphQL** is a library that makes this process enjoyable by defining the schema using only classes and a bit of decorator magic.
+**Rakkit** is a library that makes this process enjoyable by defining the schema using only classes and a bit of decorator magic.
 Example object type:
 
 ```typescript
@@ -24,7 +28,7 @@ class Recipe {
 }
 ```
 
-It also has a set of useful features, like validation, authorization and dependency injection, which helps develop GraphQL APIs quickly & easily!
+It also has a set of useful features like middlewares and dependency injection, which helps develop GraphQL APIs quickly & easily!
 
 ## Why?
 
@@ -52,6 +56,11 @@ export const getRecipesResolver: GraphQLFieldResolver<void, Context, GetRecipesA
 };
 ```
 
-The biggest problem is code redundancy which makes it difficult to keep things in sync. To add a new field to our entity, we have to jump through all the files: modify the entity class, then modify the schema, and finally update the interface. The same goes with inputs or arguments: it's easy to forget to update one of them or make a mistake with a type. Also, what if we've made a typo in a field name? The rename feature (F2) won't work correctly.
+The biggest problem is code redundancy (DRY principle) which makes it difficult to keep things in sync. To add a new field to our entity, we have to jump through all the files: modify the entity class, then modify the schema, and finally update the interface. The same goes with inputs or arguments: it's easy to forget to update one of them or make a mistake with a type. Also, what if we've made a typo in a field name? The rename feature (F2) won't work correctly.
 
-**TypeGraphQL** comes to address these issues, based on experience from over a year of developing GraphQL APIs in TypeScript. The main idea is to have only one source of truth by defining the schema using classes and a bit of decorator help. Additional features like dependency injection, validation and auth guards help with common tasks that would normally have to be handled by ourselves.
+**Rakkit** comes to address these issues. The main idea is to have only one source of truth by defining the schema using classes and a bit of decorator help. Additional features like dependency injection and middlewares help with common tasks that would normally have to be handled by ourselves.
+
+## Copyrights
+
+This documentation is based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)** documentation, because our framework works almost the same way. As a result, parts of it will be modified and others added. The name Rakkit will then be replaced by Rakkit.
+*Copyright (c) 2018 Michał Lytek*

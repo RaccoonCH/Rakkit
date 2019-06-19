@@ -2,9 +2,11 @@
 title: Inheritance
 ---
 
-The main idea of TypeGraphQL is to create GraphQL types based on TypeScript classes.
+# Inheritance
 
-In object-oriented programming it is common to compose classes using inheritance. Hence, TypeGraphQL supports composing type definitions by extending classes.
+The main idea of Rakkit is to create GraphQL types based on TypeScript classes.
+
+In object-oriented programming it is common to compose classes using inheritance. Hence, Rakkit supports composing type definitions by extending classes.
 
 ## Types inheritance
 
@@ -13,7 +15,7 @@ One of the most known principles of software development is DRY - Don't Repeat Y
 While creating a GraphQL API, it's a common pattern to have pagination args in resolvers, like `skip` and `take`. So instead of repeating ourselves, we declare it once:
 
 ```typescript
-@ArgsType()
+@InputType()
 class PaginationArgs {
   @Field(type => Int)
   skip: number = 0;
@@ -26,7 +28,7 @@ class PaginationArgs {
 and then reuse it everywhere:
 
 ```typescript
-@ArgsType()
+@InputType()
 class GetTodosArgs extends PaginationArgs {
   @Field()
   onlyCompleted: boolean = false;
@@ -53,7 +55,7 @@ Note that both the subclass and the parent class must be decorated with the same
 
 ## Resolver Inheritance
 
-A special kind of inheritance in TypeGraphQL is resolver class inheritance. This pattern allows us e.g. to create a base CRUD resolver class for our resource/entity, so we don't have to repeat common boilerplate code.
+A special kind of inheritance in Rakkit is resolver class inheritance. This pattern allows us e.g. to create a base CRUD resolver class for our resource/entity, so we don't have to repeat common boilerplate code.
 
 Since we need to generate unique query/mutation names, we have to create a factory function for our base class:
 
@@ -111,7 +113,7 @@ Now we can create a specific resolver class that will extend the base resolver c
 ```typescript
 const PersonBaseResolver = createBaseResolver("person", Person);
 
-@Resolver(of => Person)
+@Resolver()
 export class PersonResolver extends PersonBaseResolver {
   // ...
 }
@@ -122,7 +124,7 @@ We can also add specific queries and mutations in our resolver class, as always:
 ```typescript
 const PersonBaseResolver = createBaseResolver("person", Person);
 
-@Resolver(of => Person)
+@Resolver()
 export class PersonResolver extends PersonBaseResolver {
   @Mutation()
   addPerson(@Arg("input") personInput: PersonInput): Person {
@@ -136,8 +138,4 @@ And that's it! We just need to normally register `PersonResolver` in `buildSchem
 
 We must be aware that if we want to overwrite the query/mutation/subscription from the parent resolver class, we need to generate the same schema name (using the `name` decorator option or the class method name). It will overwrite the implementation along with the GraphQL args and return types. If we only provide a different implementation of the inherited method like `getOne`, it won't work.
 
-## Examples
-
-More advanced usage examples of type inheritance (and interfaces) can be found in [the example folder](https://github.com/19majkel94/type-graphql/tree/master/examples/interfaces-inheritance).
-
-For a more advanced resolver inheritance example, please go to [this example folder](https://github.com/19majkel94/type-graphql/tree/master/examples/resolvers-inheritance).
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

@@ -2,7 +2,7 @@
 title: Resolvers
 ---
 
-Besides [declaring GraphQL's object types](types-and-fields.md), TypeGraphQL allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or TypeScript [`routing-controllers`](https://github.com/typestack/routing-controllers).
+Besides [declaring GraphQL's object types](types-and-fields.md), Rakkit allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or TypeScript [`routing-controllers`](https://github.com/typestack/routing-controllers).
 
 ## Queries and Mutations
 
@@ -56,7 +56,7 @@ class RecipeResolver {
 
 ### Arguments
 
-Usually, queries have some arguments - it might be the id of a resource, a search phrase or pagination settings. TypeGraphQL allows you to define arguments in two ways.
+Usually, queries have some arguments - it might be the id of a resource, a search phrase or pagination settings. Rakkit allows you to define arguments in two ways.
 
 First is the inline method using the `@Arg()` decorator. The drawback is the need to repeating the argument name (due to a limitation of the reflection system) in the decorator parameter. As we can see below, we can also pass a `defaultValue` option that will be reflected in the GraphQL schema.
 
@@ -90,7 +90,7 @@ class GetRecipesArgs {
 }
 ```
 
-We can define default values for optional fields in the `@Field()` decorator using the `defaultValue` option or by using a property initializer - in both cases TypeGraphQL will reflect this in the schema by setting the default value and making the field nullable.
+We can define default values for optional fields in the `@Field()` decorator using the `defaultValue` option or by using a property initializer - in both cases Rakkit will reflect this in the schema by setting the default value and making the field nullable.
 
 Also, this way of declaring arguments allows you to perform validation. You can find more details about this feature in the [validation docs](validation.md). You can also define helper fields and methods for your args or input class.
 
@@ -146,7 +146,7 @@ type Query {
 
 ### Input types
 
-GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence TypeGraphQL allows us to create inputs in the same way as [object types](types-and-fields.md) but by using the `@InputType()` decorator:
+GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence Rakkit allows us to create inputs in the same way as [object types](types-and-fields.md) but by using the `@InputType()` decorator:
 
 ```typescript
 @InputType()
@@ -214,7 +214,7 @@ By using parameter decorators, we can get rid of unnecessary parameters (like `r
 
 Queries and mutations are not the only type of resolvers. We often create object type field resolvers (e.g. when a `user` type has a `posts` field) which we have to resolve by fetching relational data from the database.
 
-Field resolvers in TypeGraphQL are very similar to queries and mutations - we create them as a method on the resolver class but with a few modifications. First we declare which object type fields we are resolving by providing the type to the `@Resolver` decorator:
+Field resolvers in Rakkit are very similar to queries and mutations - we create them as a method on the resolver class but with a few modifications. First we declare which object type fields we are resolving by providing the type to the `@Resolver` decorator:
 
 ```typescript
 @Resolver(of => Recipe)

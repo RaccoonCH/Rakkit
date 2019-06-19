@@ -33,6 +33,8 @@ export * from "./Decorator/Params/IObjectTypeParams";
 export * from "./Decorator/Params/IEnumFieldParams";
 export * from "./Decorator/Params/ISubscriptionParams";
 export * from "./Decorator/Params/IGqlObjectParams";
+export * from "./Decorator/Params/IInterfaceTypeParams";
+export * from "./Decorator/Params/IUnionTypeParams";
 export * from "./Decorator/Params/IEnumTypeParams";
 
 export * from "./Types/GqlResolveType";
@@ -40,8 +42,14 @@ export * from "./Types/GqlType";
 export * from "./Types/Param";
 export * from "./Types/IGqlConfig";
 export * from "./Types/Topic";
+export * from "./Types/IResolveType";
+export * from "./Types/ArrayElements";
+export * from "./Types/UnionFromClasses";
+export * from "./Types/IScalarAssociation";
+
 export * from "./Logic/GqlMetadataBuilder";
 export * from "./Logic/TypeCreator";
 
 export * from "./Scalars/IsoDateTime";
 export * from "./Scalars/TimeStamp";
+export * from "./Scalars/Aliases";

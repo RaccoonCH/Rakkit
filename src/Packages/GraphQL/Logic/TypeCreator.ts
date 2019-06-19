@@ -11,7 +11,11 @@ import {
   IField,
   ICustomTypeCreatorParams,
   IGqlType,
-  IEnumTypeParams
+  IEnumTypeParams,
+  IUnionTypeParams,
+  IClassType,
+  UnionFromClasses,
+  ArrayElements
 } from "../../..";
 
 export class TypeCreator {
@@ -59,7 +63,10 @@ export class TypeCreator {
    * @param params The type parameters
    * @param types The types with which you will create the union
    */
-  static CreateUnion(types: Function[], params?: ICreateParams) {
+  static CreateUnion<Type extends IClassType[]>(
+    types: Type,
+    params?: IUnionTypeParams
+  ): UnionFromClasses<Type> {
     const definedParams: ICreateParams = params || {};
 
     const basicName = types.reduce((prev, classType) =>
@@ -76,7 +83,7 @@ export class TypeCreator {
     MetadataStorage.Instance.Gql.AddType(gqlTypeDef);
 
     // Musts return the class to resolve the type in the app
-    return gqlTypeDef.class;
+    return gqlTypeDef.class as InstanceType<ArrayElements<Type>>;
   }
 
   /**

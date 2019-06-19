@@ -21,7 +21,8 @@ import {
   Arg,
   Mutation,
   NextFunction,
-  MetadataStorage
+  MetadataStorage,
+  IClassType
 } from "../../..";
 import { wait } from "../../Core/Tests/Utils/Waiter";
 import { UseMiddleware } from "../../Routing";
@@ -37,7 +38,7 @@ import { GlobalFirstBeforeMiddleware } from "../../Core/Tests/ClassesForTesting/
 import { GlobalSecondBeforeMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/Before/GlobalSecondBeforeMiddleware";
 import { GlobalFirstAfterMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/After/GlobalFirstAfterMiddleware";
 import { GlobalSecondAfterMiddleware } from "../../Core/Tests/ClassesForTesting/Middlewares/Global/After/GlobalSecondAfterMiddleware";
-import { ScalarMap } from "./Utils/Classes";
+import { ScalarMap, SimpleObjectType } from "./Utils/Classes";
 // #endregion
 
 describe("GraphQL", () => {
@@ -46,6 +47,41 @@ describe("GraphQL", () => {
   });
 
   describe("Query", () => {
+    it("Should create a base resolver with inheritance", async () => {
+      function createBaseResolver<T extends IClassType>(objectTypeClass: T) {
+        @Resolver({ isAbstract: true })
+        abstract class BaseResolver {
+          protected items: T[] = [];
+
+          @Query(type => String, { name: `getAll${Rakkit.MetadataStorage.Gql.GetOneGqlTypeDef(objectTypeClass).params.name}` })
+          getAll() {
+            return "all";
+          }
+        }
+
+        return BaseResolver;
+      }
+
+      const myBaseResolver = createBaseResolver(SimpleObjectType);
+
+      @Resolver()
+      class InheritanceResolver extends myBaseResolver {
+        @Query(type => String)
+        getOneSimpleType() {
+          return "one";
+        }
+      }
+
+      await Rakkit.start({ silent: true });
+
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const baseResolverIndex = schema.types.findIndex((schemaType) => schemaType.name === "BaseResolver");
+      const queryType = (schema.types.find((schemaType) => schemaType.name === "Query") as IntrospectionObjectType);
+
+      expect(baseResolverIndex).toBe(-1);
+      expect(queryType.fields.filter(f => ["getAllSimpleType", "getOneSimpleType"].includes(f.name))).toHaveLength(2);
+    });
+
     it("Should create a field resolver with args", async () => {
       @ObjectType()
       class Fieldresolver {
@@ -203,8 +239,8 @@ describe("GraphQL", () => {
         await Rakkit.start({
           forceStart: ["rest", "gql"],
           gql: {
-            scalarMap: [
-              [ScalarMap, GraphQLID]
+            scalarsMap: [
+              { type: ScalarMap, scalar: GraphQLID }
             ],
             globalMiddlewares: [
               GlobalFirstBeforeMiddleware,

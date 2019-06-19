@@ -7,5 +7,5 @@ import {
 export interface ISubscriptionParams extends IFieldParams {
   topics?: Topic;
   subscribe?: (params: ISubscriptionFnParams) => AsyncIterator<any>;
-  withFilter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
+  filter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
 }

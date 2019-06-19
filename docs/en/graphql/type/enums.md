@@ -2,9 +2,11 @@
 title: Enums
 ---
 
+# Enums
+
 Nowadays almost all typed languages have support for enumerated types, including TypeScript. Enums limit the range of a variable's values to a set of predefined constants, which makes it easier to document intent.
 
-GraphQL also has enum type support, so TypeGraphQL allows us to use TypeScript enums in our GraphQL schema.
+GraphQL also has enum type support, so Rakkit allows us to use TypeScript enums in our GraphQL schema.
 
 ## Usage
 
@@ -26,12 +28,12 @@ enum Direction {
 }
 ```
 
-To tell TypeGraphQL about our enum, we would ideally mark the enums with the `@GraphQLEnumType()` decorator. However, TypeScript decorators only work with classes, so we need to make TypeGraphQL aware of the enums manually by calling the `registerEnumType` function and providing the enum name for GraphQL:
+You must create your enum type by using `TypeCreator.CreateEnum` method e.g.:
 
 ```typescript
-import { registerEnumType } from "type-graphql";
+import { TypeCreator } from "rakkit";
 
-registerEnumType(Direction, {
+TypeCreator.CreateEnum(Direction, {
   name: "Direction", // this one is mandatory
   description: "The basic directions", // this one is optional
 });
@@ -79,3 +81,37 @@ class Resolver {
   }
 }
 ```
+
+## Class based enum
+With the method seen above it's not possible to describe the fields (deprecation, description). Therefore an alternative is provided to solve this problem. By using classes e.g. :
+
+```typescript
+@EnumType()
+abstract class Direction {
+  @EnumField("UP")
+  Up: string
+
+  @EnumField("DOWN")
+  Down: string
+
+  @EnumField("LEFT")
+  Left: string
+
+  @EnumField("RIGHT")
+  Right: string
+}
+```
+
+And use it like this:
+
+```typescript
+@InputType()
+class JourneyInput {
+  @Field()
+  direction: Direction;
+}
+```
+
+The disadvantage is that in our application we cannot use this class as a real enum, for example to access the values associated with the fields.
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

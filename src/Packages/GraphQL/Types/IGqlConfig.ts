@@ -1,16 +1,16 @@
 import { PubSubEngine } from "graphql-subscriptions";
-import { GraphQLScalarType } from "graphql";
 import {
   MiddlewareType,
-  ClassOrString
+  ClassOrString,
+  IScalarAssociation
 } from "../../..";
 
 export interface IGqlConfig {
   resolvers: ClassOrString[];
   globalMiddlewares: MiddlewareType[];
   nullableByDefault: boolean;
-  scalarMap: [Function, GraphQLScalarType][];
-  dateMode: "iso" | "timestamp";
+  scalarsMap: IScalarAssociation[];
+  dateMode: "isoDate" | "timestamp";
   pubSub: PubSubEngine;
   exportSchemaFileTo: string;
 }

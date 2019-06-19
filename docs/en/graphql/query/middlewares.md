@@ -10,7 +10,7 @@ Middleware is a very powerful but somewhat complicated feature. Basically, middl
 - resolver data - the same as resolvers (`root`, `args`, `context`, `info`)
 - the `next` function - used to control the execution of the next middleware and the resolver to which it is attached
 
-We may be familiar with how middleware works in [`express.js`](https://expressjs.com/en/guide/writing-middleware.html) but TypeGraphQL middleware is inspired by [`koa.js`](http://koajs.com/#application). The difference is that the `next` function returns a promise of the value of subsequent middleware and resolver execution from the stack.
+We may be familiar with how middleware works in [`express.js`](https://expressjs.com/en/guide/writing-middleware.html) but Rakkit middleware is inspired by [`koa.js`](http://koajs.com/#application). The difference is that the `next` function returns a promise of the value of subsequent middleware and resolver execution from the stack.
 
 This makes it easy to perform actions before or after resolver execution. So things like measuring execution time are simple to implement:
 
@@ -62,7 +62,7 @@ This way we can create a guard that blocks access to the resolver and prevents e
 ```typescript
 export const CompetitorDetector: MiddlewareFn = async ({ args }, next) => {
   if (args.frameworkName === "type-graphql") {
-    return "TypeGraphQL";
+    return "Rakkit";
   }
   if (args.frameworkName === "typegql") {
     throw new Error("Competitive framework detected!");
@@ -166,7 +166,7 @@ export class Recipe {
 
 However, for common middleware like measuring resolve time or catching errors, it might be annoying to place a `@UseMiddleware(ResolveTime)` decorator on every field/resolver.
 
-Hence, in TypeGraphQL we can also register a global middleware that will be called for each query, mutation, subscription and field resolver. For this, we use the `globalMiddlewares` property of the `buildSchema` configuration object:
+Hence, in Rakkit we can also register a global middleware that will be called for each query, mutation, subscription and field resolver. For this, we use the `globalMiddlewares` property of the `buildSchema` configuration object:
 
 ```typescript
 const schema = await buildSchema({

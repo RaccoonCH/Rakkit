@@ -1,5 +1,16 @@
-import { ObjectType, Field, InputType, InterfaceType, IClassType, ConcatName, TypeCreator, EnumType, EnumField } from "../../../../src";
-import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+import {
+  ObjectType,
+  Field,
+  InputType,
+  InterfaceType,
+  IClassType,
+  ConcatName,
+  TypeCreator,
+  EnumType,
+  EnumField,
+  GQLInterfaceType,
+  GQLObjectType
+} from "../../../../src";
 
 export enum TestEnum {
   a = "a",
@@ -39,7 +50,7 @@ export class ExampleInputType {
 
 const RequiredExampleInputType = TypeCreator.CreateRequired(ExampleInputType, {
   name: "RequiredExampleInputType",
-  gqlType: GraphQLObjectType
+  gqlType: GQLObjectType
 });
 
 @InputType()
@@ -136,7 +147,7 @@ export class ExampleObjectType {
 export class ExampleInterfaceType {
   @Field()
   hello3: string;
-  @Field({ gqlType: GraphQLInterfaceType })
+  @Field({ gqlType: GQLInterfaceType })
   ms: ExampleInputType;
 }
 

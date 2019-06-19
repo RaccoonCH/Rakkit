@@ -1,13 +1,14 @@
 import { GraphQLObjectType } from "graphql";
 import { DecoratorHelper } from "../../../Helpers/DecoratorHelper";
 import {
-  MetadataStorage
+  MetadataStorage,
+  IGqlTypeParams
 } from "../../../../..";
 
-export function Resolver(): Function {
+export function Resolver(params?: IGqlTypeParams): Function {
   return (target: Function): void => {
     MetadataStorage.Instance.Gql.AddResolver(
-      DecoratorHelper.getAddTypeParams(target, GraphQLObjectType, "Query")
+      DecoratorHelper.getAddTypeParams(target, GraphQLObjectType, "Query", params)
     );
   };
 }

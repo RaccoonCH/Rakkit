@@ -59,9 +59,9 @@ module.exports = {
                 title: "Getting Started",
                 collapsable: false,
                 children: [
-                  "/en/graphql/start/bootstrap",
+                  "/en/graphql/start/introduction",
                   "/en/graphql/start/installation",
-                  "/en/graphql/start/introduction"
+                  "/en/graphql/start/bootstrap",
                 ]
               },
               {
@@ -69,12 +69,13 @@ module.exports = {
                 collapsable: false,
                 children: [
                   "/en/graphql/type/type-definition",
-                  "/en/graphql/type/ihneritance",
+                  "/en/graphql/type/inheritance",
                   "/en/graphql/type/generics",
                   "/en/graphql/type/interfaces",
                   "/en/graphql/type/unions",
                   "/en/graphql/type/enums",
-                  "/en/graphql/type/scalars"
+                  "/en/graphql/type/scalars",
+                  "/en/graphql/type/type-creator"
                 ]
               },
               {
@@ -120,7 +121,7 @@ module.exports = {
             children: [
               "/en/di/introduction",
               "/en/di/services-and-injections",
-              "/en/di/ihneritance",
+              "/en/di/inheritance",
               "/en/di/api",
               "/en/di/limitations"
             ]
@@ -162,9 +163,9 @@ module.exports = {
                 title: "Getting Started",
                 collapsable: false,
                 children: [
-                  "/en/graphql/start/bootstrap",
+                  "/en/graphql/start/introduction",
                   "/en/graphql/start/installation",
-                  "/en/graphql/start/introduction"
+                  "/en/graphql/start/bootstrap"
                 ]
               },
               {
@@ -172,7 +173,7 @@ module.exports = {
                 collapsable: false,
                 children: [
                   "/en/graphql/type/type-definition",
-                  "/en/graphql/type/ihneritance",
+                  "/en/graphql/type/inheritance",
                   "/en/graphql/type/generics",
                   "/en/graphql/type/interfaces",
                   "/en/graphql/type/unions",
@@ -223,7 +224,7 @@ module.exports = {
             children: [
               "/fr/di/introduction",
               "/fr/di/services-and-injections",
-              "/fr/di/ihneritance",
+              "/fr/di/inheritance",
               "/fr/di/api",
               "/fr/di/limitations"
             ]

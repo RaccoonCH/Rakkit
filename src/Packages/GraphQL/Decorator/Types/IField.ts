@@ -19,5 +19,5 @@ export interface IField extends IHasType {
   args?: IArg[];
   defaultValue?: any;
   subscribe?: (params: ISubscriptionFnParams) => AsyncIterator<any>;
-  withFilter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
+  filter?: (params: ISubscriptionFnParams) => boolean | Promise<boolean>;
 }

@@ -2,6 +2,8 @@
 title: Unions
 ---
 
+# Unions
+
 Sometimes our API has to be flexible and return a type that is not specific but one from a range of possible types. An example might be a movie site's search functionality: using the provided phrase we search the database for movies but also actors. So the query has to return a list of `Movie` or `Actor` types.
 
 Read more about the GraphQL Union Type in the [official GraphQL docs](http://graphql.org/learn/schema/#union-types).
@@ -35,12 +37,12 @@ class Actor {
 Now let's create a union type from the object types above:
 
 ```typescript
-import { createUnionType } from "type-graphql";
+import { TypeCreator } from "rakkit";
 
-const SearchResultUnion = createUnionType({
-  name: "SearchResult", // the name of the GraphQL union
-  types: [Movie, Actor], // array of object types classes
-});
+const SearchResultUnion = TypeCreator.CreateUnion(
+  [ Movie, Actor ], // array of object types classes
+  { name: "SearchResult" } // union paramaters
+);
 ```
 
 Now we can use the union type in the query.
@@ -62,16 +64,16 @@ class SearchResolver {
 
 ## Resolving Type
 
-Be aware that when the query/mutation return type (or field type) is a union, we have to return a specific instance of the object type class. Otherwise, `graphql-js` will not be able to detect the underlying GraphQL type correctly when we use plain JS objects.
+**Rakkit automatically determines** the type using instanceof if you return a class instance. However, if a plain-object is returned it will find the type thanks to the different fields provided.  
 
-However, we can also provide our own `resolveType` function implementation to the `createUnionType` options. This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, e.g.:
+We can also provide our own `resolveType` function (like [interfaces](/interfaces)) implementation to the `CreateUnion` options. This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, e.g.:
 
 ```typescript
-const SearchResultUnion = createUnionType({
+const SearchResultUnion = TypeCreator.CreateUnion({
   name: "SearchResult",
-  types: [Movie, Actor],
+  types: [ Movie, Actor ],
   // our implementation of detecting returned object type
-  resolveType: value => {
+  resolveType: (value) => {
     if ("rating" in value) {
       return Movie; // we can return object type class (the one with `@ObjectType()`)
     }
@@ -105,3 +107,5 @@ query {
 ## Examples
 
 More advanced usage examples of unions (and enums) are located in [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/enums-and-unions).
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

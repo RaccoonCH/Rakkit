@@ -2,10 +2,11 @@ import { GraphQLEnumValueConfigMap } from "graphql";
 import {
   GqlType,
   ITypeTransformation,
-  IGqlObject
+  IGqlObject,
+  IResolveType
 } from "../../../..";
 
-export interface IGqlType<Type extends GqlType = any> extends IGqlObject {
+export interface IGqlType<Type extends GqlType = any> extends IGqlObject, IResolveType {
   implements?: Function[];
   gqlType?: Type;
   extends?: Function;
@@ -13,4 +14,5 @@ export interface IGqlType<Type extends GqlType = any> extends IGqlObject {
   unionTypes?: Function[];
   transformation?: ITypeTransformation<Type>;
   compiled?: InstanceType<Type>;
+  isAbstract?: boolean;
 }

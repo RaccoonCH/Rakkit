@@ -71,8 +71,8 @@ describe("GraphQL", () => {
           ]
         },
         gql: {
-          scalarMap: [
-            [ScalarMap, GraphQLID]
+          scalarsMap: [
+            { type: ScalarMap, scalar: GraphQLID }
           ],
           globalMiddlewares: []
         }
@@ -179,8 +179,8 @@ describe("GraphQL", () => {
           ]
         },
         gql: {
-          scalarMap: [
-            [ScalarMap, GraphQLID]
+          scalarsMap: [
+            { type: ScalarMap, scalar: GraphQLID }
           ],
           globalMiddlewares: []
         }
@@ -270,7 +270,7 @@ describe("GraphQL", () => {
 
         @Subscription({
           topics: ({ args }) => args.topic,
-          withFilter: async ({ args }) => {
+          filter: async ({ args }) => {
             ok = true;
             return !["yo"].includes(args.topic);
           }
@@ -295,8 +295,8 @@ describe("GraphQL", () => {
           ]
         },
         gql: {
-          scalarMap: [
-            [ScalarMap, GraphQLID]
+          scalarsMap: [
+            { type: ScalarMap, scalar: GraphQLID }
           ],
           globalMiddlewares: []
         }

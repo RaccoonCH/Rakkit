@@ -13,7 +13,7 @@ function parseValue(value: string | null) {
   }
 }
 
-export const GraphQLTimestamp = new GraphQLScalarType({
+export const GQLTimestamp = new GraphQLScalarType({
   name: "Timestamp",
   description:
     "The javascript `Date` as integer. " +

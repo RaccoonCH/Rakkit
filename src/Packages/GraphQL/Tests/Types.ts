@@ -9,7 +9,8 @@ import {
   IntrospectionObjectType,
   IntrospectionInputObjectType,
   IntrospectionEnumType,
-  IntrospectionUnionType
+  IntrospectionUnionType,
+  GraphQLScalarType
 } from "graphql";
 import {
   Rakkit,
@@ -249,6 +250,49 @@ describe("GraphQL", () => {
 
       expect(InterfaceThreeTypes.kind).toBe(TypeKind.INTERFACE);
       expect(InterfaceThreeTypes.description).toBe("interface");
+    });
+
+    it("Shouldn't create an isAbtract type", async () => {
+      @ObjectType({ isAbstract: true })
+      class AbstractType {
+        @Field()
+        abstractField: String;
+      }
+
+      await Rakkit.start({ silent: true });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const index = schema.types.findIndex((schemaType) => schemaType.name === "AbstractType");
+      expect(index).toBe(-1);
+    });
+
+    it("Should create a field with scalar type", async () => {
+      const MyScalar = new GraphQLScalarType({
+        name: "MyScalar",
+        description: "MyScalar",
+        parseValue(value: string) {
+          return "a";
+        },
+        serialize(value: string) {
+          return "a";
+        },
+        parseLiteral(ast) {
+          return "a";
+        }
+      });
+
+      @ObjectType()
+      class ScalarType {
+        @Field(type => MyScalar)
+        abstractField: string;
+      }
+
+      await Rakkit.start({ silent: true });
+      const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
+      const scalarType = schema.types.find((schemaType) => schemaType.name === "ScalarType") as IntrospectionObjectType;
+
+      expect(scalarType.fields.length).toEqual(1);
+      expect(scalarType.fields[0].type.kind).toBe("NON_NULL");
+      expect((scalarType.fields[0].type as any).ofType.name).toBe("MyScalar");
     });
   });
 });

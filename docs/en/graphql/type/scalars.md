@@ -2,9 +2,11 @@
 title: Scalars
 ---
 
+# Scalars
+
 ## Aliases
 
-TypeGraphQL provides aliases for 3 basic scalars:
+Rakkit provides aliases for 3 basic scalars:
 
 - Int --> GraphQLInt;
 - Float --> GraphQLFloat;
@@ -14,7 +16,7 @@ This shorthand allows you to save keystrokes when declaring field types:
 
 ```typescript
 // import the aliases
-import { ID, Float, Int } from "type-graphql";
+import { ID, Float, Int } from "rakkit";
 
 @ObjectType()
 class MysteryObject {
@@ -61,21 +63,23 @@ class SampleObject {
 
 ## Date Scalars
 
-TypeGraphQL provides built-in scalars for the `Date` type. There are two versions of this scalar:
+Rakkit provides built-in scalars for the `Date` type. There are two versions of this scalar:
 
 - timestamp based (`"timestamp"`) - `1518037458374`
 - ISO format (`"isoDate"`) - `"2018-02-07T21:04:39.573Z"`
 
-They are exported from the `type-graphql` package as `GraphQLISODateScalar` and `GraphQLTimestampScalar`.
+They are exported from the `rakkit` package as `GQLISODateScalar` and `GQLTimestampScalar`.
 
-By default, TypeGraphQL uses the ISO date format, however you can change it in the `buildSchema` options:
+By default, Rakkit uses the ISO date format, however you can change it in the `Rakkit.start` options:
 
 ```typescript
 import { buildSchema } from "type-graphql";
 
-const schema = await buildSchema({
-  resolvers,
-  dateScalarMode: "timestamp", // "timestamp" or "isoDate"
+const schema = await Rakkit.start({
+  gql: {
+    dateScalarMode: "timestamp", // "timestamp" or "isoDate"
+    // ...
+  }
 });
 ```
 
@@ -91,7 +95,7 @@ class User {
 
 ## Custom Scalars
 
-TypeGraphQL also supports custom scalar types!
+Rakkit also supports custom scalar types!
 
 First of all, we need to create our own `GraphQLScalarType` instance or import a scalar type from a 3rd-party npm library. For example, Mongo's ObjectId:
 
@@ -146,16 +150,20 @@ class User {
 }
 ```
 
-All we need to do is register the association map in the `buildSchema` options:
+All we need to do is register the association map in the `Rakkit.start` options:
 
 ```typescript
 import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "../my-scalars/ObjectId";
-import { buildSchema } from "type-graphql";
+import { Rakkit } from "rakkit";
 
-const schema = await buildSchema({
-  resolvers,
-  scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+const schema = await Rakkit.start({
+  gql: {
+    scalarsMap: [
+      { type: ObjectId, scalar: ObjectIdScalar }
+    ],
+    // ...
+  }
 });
 ```
 

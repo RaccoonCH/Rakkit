@@ -2,7 +2,7 @@
 
 import { GraphQLScalarType, Kind } from "graphql";
 
-export const GraphQLISODateTime = new GraphQLScalarType({
+export const GQLISODateTime = new GraphQLScalarType({
   name: "DateTime",
   description:
     "The javascript `Date` as string. Type represents date and time as the ISO Date string.",

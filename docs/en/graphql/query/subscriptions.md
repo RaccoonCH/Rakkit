@@ -4,7 +4,7 @@ title: Subscriptions
 
 GraphQL can be used to perform reads with queries and writes with mutations.
 However, oftentimes clients want to get updates pushed to them from the server when data they care about changes.
-To support that, GraphQL has a third operation: subscription. TypeGraphQL of course has great support for subscription, using the [graphql-subscriptions](https://github.com/apollographql/graphql-subscriptions) package created by [Apollo GraphQL](https://www.apollographql.com/).
+To support that, GraphQL has a third operation: subscription. Rakkit of course has great support for subscription, using the [graphql-subscriptions](https://github.com/apollographql/graphql-subscriptions) package created by [Apollo GraphQL](https://www.apollographql.com/).
 
 ## Creating Subscriptions
 
@@ -158,12 +158,12 @@ And that's it! Now all subscriptions attached to the `NOTIFICATIONS` topic will 
 
 ## Using a custom PubSub system
 
-By default, TypeGraphQL uses a simple `PubSub` system from `grapqhl-subscriptions` which is based on EventEmitter.
+By default, Rakkit uses a simple `PubSub` system from `grapqhl-subscriptions` which is based on EventEmitter.
 This solution has a big drawback in that it will work correctly only when we have a single instance (process) of our Node.js app.
 
 For better scalability we'll want to use one of the [`PubSub implementations`](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations) backed by an external store like Redis with the [`graphql-redis-subscriptions`](https://github.com/davidyaha/graphql-redis-subscriptions) package.
 
-All we need to do is create an instance of PubSub according to the package instructions and then provide it to the TypeGraphQL `buildSchema` options:
+All we need to do is create an instance of PubSub according to the package instructions and then provide it to the Rakkit `buildSchema` options:
 
 ```typescript
 const myRedisPubSub = getConfiguredRedisPubSub();

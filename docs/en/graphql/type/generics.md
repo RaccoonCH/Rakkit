@@ -2,13 +2,15 @@
 title: Generic Types
 ---
 
-[Type Inheritance](inheritance.md) is a great way to reduce code duplication by extracting common fields to the base class. But in some cases, the strict set of fields is not enough because we might need to declare the types of some fields in a more flexible way, like a type parameter (e.g. `items: T[]` in case of a pagination).
+# Generic Types
 
-Hence TypeGraphQL also has support for describing generic GraphQL types.
+[Type Inheritance](/inheritance) is a great way to reduce code duplication by extracting common fields to the base class. But in some cases, the strict set of fields is not enough because we might need to declare the types of some fields in a more flexible way, like a type parameter (e.g. `items: T[]` in case of a pagination).
+
+Hence Rakkit also has support for describing generic GraphQL types.
 
 ## How to?
 
-Unfortunately, the limited reflection capabilities of TypeScript don't allow for combining decorators with standard generic classes. To achieve behavior like that of generic types, we use the same class-creator pattern like the one described in the [Resolvers Inheritance](inheritance.md) docs.
+Unfortunately, the limited reflection capabilities of TypeScript don't allow for combining decorators with standard generic classes. To achieve behavior like that of generic types, we use the same class-creator pattern like the one described in the [Resolvers Inheritance](/inheritance) docs.
 
 Start by defining a `PaginatedResponse` function that creates and returns a `PaginatedResponseClass`:
 
@@ -131,4 +133,6 @@ class UserResolver {
 
 ## Examples
 
-A more advanced usage example of the generic types feature can be found in [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/generic-types).
+A more advanced usage example of the generic types feature can be found in [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/generic-types) from TypeGraphQL.
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

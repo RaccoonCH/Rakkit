@@ -10,8 +10,7 @@ import {
   IntrospectionInputObjectType,
   IntrospectionNamedTypeRef,
   GraphQLID,
-  IntrospectionListTypeRef,
-  GraphQLInterfaceType
+  IntrospectionListTypeRef
 } from "graphql";
 import {
   Rakkit,
@@ -21,7 +20,8 @@ import {
   InputType,
   IClassType,
   ConcatName,
-  MetadataStorage
+  MetadataStorage,
+  GQLInterfaceType
 } from "../../..";
 import {
   SimpleObjectType,
@@ -228,8 +228,8 @@ describe("GraphQL", () => {
 
       await Rakkit.start({
         gql: {
-          scalarMap: [
-            [ScalarMap, GraphQLID]
+          scalarsMap: [
+            { type: ScalarMap, scalar: GraphQLID }
           ]
         }
       });
@@ -455,7 +455,7 @@ describe("GraphQL", () => {
       class InterfaceTypeRelationshipMultipleForced {
         @Field({
           nullable: true,
-          gqlType: GraphQLInterfaceType
+          gqlType: GQLInterfaceType
         })
         toInterface: ThreeTypes;
       }
@@ -468,16 +468,15 @@ describe("GraphQL", () => {
       expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("GraphQLInterfaceTypeThreeTypes");
     });
 
-    it("Should create a generic type", async () => {
+    it("Should create a generic type (with interfaces)", async () => {
       @ObjectType()
       class GenericElement {
         @Field()
         hello: string;
       }
 
-      @ObjectType()
+      @ObjectType({ implements: SimpleInterfaceType })
       class Response<Type, Type2> implements SimpleInterfaceType {
-        @Field()
         interfaceField: number;
         items?: Type[];
         items2: Type2;
@@ -513,10 +512,16 @@ describe("GraphQL", () => {
       expect((simpleType.fields[0].type as any).kind).toBe("LIST");
       expect((simpleType.fields[0].type as any).ofType.name).toBe("SimpleType");
       expect((simpleType.fields[1].type as any).ofType.name).toBe("SimpleType");
+      expect(simpleType.fields[0].name).toBe("items");
+      expect(simpleType.fields[1].name).toBe("items2");
+      expect(simpleType.fields[2].name).toBe("interfaceField");
 
       expect((simpleType2.fields[0].type as any).kind).toBe("LIST");
       expect((simpleType2.fields[0].type as any).ofType.name).toBe("GenericElement");
       expect((simpleType2.fields[1].type as any).ofType.name).toBe("SimpleType");
+      expect(simpleType2.fields[0].name).toBe("items");
+      expect(simpleType2.fields[1].name).toBe("items2");
+      expect(simpleType2.fields[2].name).toBe("interfaceField");
     });
   });
 });

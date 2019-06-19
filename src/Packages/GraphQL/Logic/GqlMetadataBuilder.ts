@@ -22,7 +22,8 @@ import {
   GraphQLUnionType,
   GraphQLEnumValueConfigMap,
   GraphQLSchemaConfig,
-  GraphQLInputFieldConfig
+  GraphQLInputFieldConfig,
+  GraphQLScalarType
 } from "graphql";
 import { MetadataBuilder } from "../../../Packages/Core/Logic/MetadataBuilder";
 import { DecoratorHelper } from "..";
@@ -34,7 +35,7 @@ import {
   IResolver,
   MetadataStorage,
   GqlType,
-  GraphQLISODateTime,
+  GQLISODateTime,
   IParam,
   IHasType,
   IContext,
@@ -43,7 +44,7 @@ import {
   TypeFn,
   SetterType,
   ITypeTransformation,
-  GraphQLTimestamp
+  GQLTimestamp
 } from "../../..";
 // #endregion
 
@@ -120,7 +121,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     this.renameWithTypeName();
     this.applyObjectTypeSetters();
     this.applyFieldSetters();
-    this.applyIhneritance();
+    this.applyInheritance();
 
     // TODO?: TypesToBuild list
     const interfaceTypes = this.buildGqlTypes(GraphQLInterfaceType);
@@ -132,7 +133,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     let query = objectTypes.find((gqlType) => gqlType.name === "Query");
     let mutation = objectTypes.find((gqlType) => gqlType.name === "Mutation");
     let subscription = objectTypes.find((gqlType) => gqlType.name === "Subscription");
-    const typeDefs = objectTypes.filter((gqlType) => !["Query", "Mutation", "Subscription"].includes(gqlType.name));
+    const typeDefs = objectTypes.filter((gqlType) =>
+      !["Query", "Mutation", "Subscription"].includes(gqlType.name)
+    );
 
     query = this.isQueryUsed(query);
     mutation = this.isQueryUsed(mutation);
@@ -254,10 +257,12 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     const gqlTypes = this._gqlTypeDefs.reduce<InstanceType<Type>[]>((prev, gqlTypeDef) => {
       if (gqlTypeDef.params.gqlType === gqlType) {
         const compiledGqlType = this.buildGqlType<Type>(gqlTypeDef);
-        return [
-          ...prev,
-          compiledGqlType.params.compiled
-        ];
+        if (!gqlTypeDef.params.isAbstract) {
+          return [
+            ...prev,
+            compiledGqlType.params.compiled
+          ];
+        }
       }
       return prev;
     }, []);
@@ -274,6 +279,19 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       name: gqlTypeDef.params.name,
       description: gqlTypeDef.params.description
     };
+    const resolveWithProvidedFn = async (value: any) => {
+      const type = await gqlTypeDef.params.resolveType(value);
+      if (typeof type === "string") {
+        return type;
+      } else {
+        const gqlType = this.GetOneGqlTypeDef<any>(
+          type as Function,
+          GraphQLInterfaceType,
+          GraphQLObjectType
+        );
+        return gqlType.params.compiled || "__typename not found";
+      }
+    };
 
     let compiled: any;
     switch (gqlTypeDef.params.gqlType) {
@@ -284,10 +302,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         });
         break;
       case GraphQLInterfaceType:
-        compiled = new GraphQLInterfaceType({
-          ...baseParams,
-          fields: this.getFieldsFunction(gqlTypeDef, interfaces),
-          resolveType: (value) => {
+        const resolveInterfaceFn = async (value: any) => {
+          if (!gqlTypeDef.params.resolveType) {
             const interfaceGqlTypeDef = this._gqlTypeDefs.find((interfaceGqlTypeDef) => {
               try {
                 return value instanceof interfaceGqlTypeDef.originalClass;
@@ -297,7 +313,15 @@ export class GqlMetadataBuilder extends MetadataBuilder {
               return interfaceGqlTypeDef.params.compiled;
             }
             return this.unsafeResolveType(value, gqlTypeDef, GraphQLInterfaceType);
+          } else {
+            return await resolveWithProvidedFn(value);
           }
+        };
+
+        compiled = new GraphQLInterfaceType({
+          ...baseParams,
+          fields: this.getFieldsFunction(gqlTypeDef, interfaces),
+          resolveType: resolveInterfaceFn
         });
         break;
       case GraphQLObjectType:
@@ -331,6 +355,18 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         });
         break;
       case GraphQLUnionType:
+        const resolveUnionFn = async (value: any) => {
+          if (!gqlTypeDef.params.resolveType) {
+            const unionGqlClassType = gqlTypeDef.params.unionTypes.find((unionType) => value instanceof unionType);
+            if (unionGqlClassType) {
+              return this.GetOneGqlTypeDef(unionGqlClassType, GraphQLObjectType).params.compiled;
+            }
+            return this.unsafeResolveType(value, gqlTypeDef, GraphQLUnionType);
+          } else {
+            return await resolveWithProvidedFn(value);
+          }
+        };
+
         compiled = new GraphQLUnionType({
           ...baseParams,
           types: gqlTypeDef.params.unionTypes.map((unionClassType) => {
@@ -340,13 +376,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             }
             throw new Error(`No type for the class ${unionClassType.name} was found to create the ${gqlTypeDef.params.name} union type`);
           }),
-          resolveType: (value) => {
-            const unionGqlClassType = gqlTypeDef.params.unionTypes.find((unionType) => value instanceof unionType);
-            if (unionGqlClassType) {
-              return this.GetOneGqlTypeDef(unionGqlClassType, GraphQLObjectType).params.compiled;
-            }
-            return this.unsafeResolveType(value, gqlTypeDef, GraphQLUnionType);
-          }
+          resolveType: resolveUnionFn
         });
         break;
     }
@@ -458,9 +488,9 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   }
 
   /**
-   * Apply the type Ihneritance to GqlTypes
+   * Apply the type Inheritance to GqlTypes
    */
-  private applyIhneritance() {
+  private applyInheritance() {
     this._gqlTypeDefs.map((gqlTypeDef) => {
       let superClass = Object.getPrototypeOf(gqlTypeDef.class);
       if (gqlTypeDef.params.extends) {
@@ -470,10 +500,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       if (!superTypeDef) {
         superTypeDef = this.GetGqlTypeDefs(superClass)[0];
       }
-      // gqlTypeDef -> ihneriter
-      // superTypeDef -> ihnerited
+      // gqlTypeDef -> inheriter
+      // superTypeDef -> inherited
       if (superTypeDef) {
-        // Implements the superclass's interfaces to the ihnerited class
+        // Implements the superclass's interfaces to the inherited class
         superTypeDef.params.implements.map((toImplement) => {
           // No duplicate
           if (!gqlTypeDef.params.implements.includes(toImplement)) {
@@ -482,7 +512,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         });
       }
 
-      // Copy the fields of the superclass to the ihnerited class
+      // Copy the fields of the superclass to the inherited class
       this._fieldDefs.reduce<IDecorator<IField>[]>((prev, fieldDef) => {
         // Overrided
         const alreadyExists = prev.find((existing) => existing.key === fieldDef.key);
@@ -764,13 +794,13 @@ export class GqlMetadataBuilder extends MetadataBuilder {
                 });
               };
             } else {
-              if (fieldDef.params.withFilter) {
+              if (fieldDef.params.filter) {
                 gqlField.subscribe = withFilter(
                   subFn,
                   async (payload, args) => {
                     return await this.bindContext(
                       fieldDef,
-                      fieldDef.params.withFilter
+                      fieldDef.params.filter
                     )({
                       payload,
                       args,
@@ -816,6 +846,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
 
     let finalType: GraphQLOutputType = undefined;
     const baseType = typed.type();
+
     if (gqlTypeDef) {
       let relation;
 
@@ -872,14 +903,18 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         finalType = GraphQLFloat;
         break;
       case Date:
-        finalType = this._config.dateMode === "iso" ? GraphQLISODateTime : GraphQLTimestamp;
+        finalType = this._config.dateMode === "isoDate" ? GQLISODateTime : GQLTimestamp;
         break;
       default:
-        const foundType = this._config.scalarMap.find((association) =>
-          association[0] === baseType
-        );
-        if (foundType) {
-          finalType = foundType[1];
+        if (baseType instanceof GraphQLScalarType) {
+          finalType = baseType;
+        } else {
+          const foundType = this._config.scalarsMap.find((association) =>
+            association.type === baseType
+          );
+          if (foundType) {
+            finalType = foundType.scalar;
+          }
         }
         break;
     }

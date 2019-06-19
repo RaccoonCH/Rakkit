@@ -2,6 +2,8 @@
 title: Bootstrapping
 ---
 
+# Bootstraping
+
 After creating our resolvers, type classes, and other business-related code, we need to make our app run. First we have to build the schema, then we can expose it with an HTTP server, WebSockets or even MQTT.
 
 ## Create Executable Schema
@@ -72,13 +74,13 @@ async function bootstrap() {
 bootstrap();
 ```
 
-Remember to install the `apollo-server` package from npm - it's not bundled with TypeGraphQL.
+Remember to install the `apollo-server` package from npm - it's not bundled with Rakkit.
 
 Of course you can use the `express-graphql` middleware, `graphql-yoga` or whatever you want 😉
 
 ## Create typeDefs and resolvers map
 
-TypeGraphQL provides a second way to generate the GraphQL schema - the `buildTypeDefsAndResolvers` function.
+Rakkit provides a second way to generate the GraphQL schema - the `buildTypeDefsAndResolvers` function.
 
 It accepts the same `BuildSchemaOptions` as the `buildSchema` function but instead of an executable `GraphQLSchema`, it creates a typeDefs and resolversMap pair that you can use e.g. with [`graphql-tools`](https://github.com/apollographql/graphql-tools):
 
@@ -110,4 +112,6 @@ const stateLink = withClientState({
 // ...the rest of `ApolloClient` initialization code
 ```
 
-Be aware that some of the TypeGraphQL features (i.a. [query complexity](complexity.md)) might not work with the `buildTypeDefsAndResolvers` approach because they use some low-level `graphql-js` features.
+Be aware that some of the Rakkit features (i.a. [query complexity](complexity.md)) might not work with the `buildTypeDefsAndResolvers` approach because they use some low-level `graphql-js` features.
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

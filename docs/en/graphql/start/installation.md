@@ -2,7 +2,9 @@
 title: Installation
 ---
 
-Before getting started with TypeGraphQL we need to install some additional dependencies and properly configure the TypeScript configuration for our project.
+# Installation
+
+Before getting started with Rakkit we need to install some additional dependencies and properly configure the TypeScript configuration for our project.
 
 > #### Prerequisites
 >
@@ -10,10 +12,10 @@ Before getting started with TypeGraphQL we need to install some additional depen
 
 ## Packages installation
 
-First, we have to install the main package, as well as [`graphql-js`](https://github.com/graphql/graphql-js) (and it's typings) which is a peer dependency of TypeGraphQL:
+First, we have to install the main package, as well as [`graphql-js`](https://github.com/graphql/graphql-js) (and it's typings) which is a peer dependency of Rakkit:
 
 ```sh
-npm i graphql @types/graphql type-graphql
+npm i graphql @types/graphql rakkit
 ```
 
 Also, the `reflect-metadata` shim is required to make the type reflection work:
@@ -39,7 +41,7 @@ It's important to set these options in the `tsconfig.json` file of our project:
 }
 ```
 
-`TypeGraphQL` is designed to work with Node.js LTS (8, 10) and the latest stable releases. It uses features from ES7 (ES2016) so we should set our `tsconfig.json` file appropriately:
+`Rakkit` is designed to work with Node.js LTS (8, 10) and the latest stable releases. It uses features from ES7 (ES2016) so we should set our `tsconfig.json` file appropriately:
 
 ```js
 {
@@ -68,3 +70,5 @@ All in all, the minimal `tsconfig.json` file example looks like this:
   }
 }
 ```
+
+*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*  

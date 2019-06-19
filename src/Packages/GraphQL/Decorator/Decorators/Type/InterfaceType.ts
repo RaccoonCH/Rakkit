@@ -1,14 +1,14 @@
 import { GraphQLInterfaceType } from "graphql";
 import { DecoratorHelper } from "../../../Helpers/DecoratorHelper";
 import {
-  IGqlTypeParams
+  IInterfaceTypeParams
 } from "../../../../..";
 
 export function InterfaceType();
-export function InterfaceType(params: IGqlTypeParams);
+export function InterfaceType(params: IInterfaceTypeParams);
 export function InterfaceType(name: string);
-export function InterfaceType(name: string, params: IGqlTypeParams);
-export function InterfaceType(nameOrParams?: string | IGqlTypeParams, params?: IGqlTypeParams): Function {
+export function InterfaceType(name: string, params: IInterfaceTypeParams);
+export function InterfaceType(nameOrParams?: string | IInterfaceTypeParams, params?: IInterfaceTypeParams): Function {
   return DecoratorHelper.getAddTypeDecorator(
     GraphQLInterfaceType,
     nameOrParams,
