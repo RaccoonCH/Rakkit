@@ -146,7 +146,7 @@ describe("GraphQL", () => {
         @Field(type => [Number])
         depthArrayField1: number[];
 
-        @Field(type => [[Number]])
+        @Field(type => [[Number]], { arrayNullable: [ true ] })
         depthArrayField2: number[][];
 
         @Field(type => [[Number]])
@@ -167,21 +167,26 @@ describe("GraphQL", () => {
 
       expect(simpleType.fields[0].name).toBe("simpleArrayField");
       expect(simpleType.fields[0].type.kind).toBe("LIST");
-      expect((simpleType.fields[0].type as any).ofType.name).toBe("Float");
+      expect((simpleType.fields[0].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[0].type as any).ofType.ofType.name).toBe("Float");
 
       expect(simpleType.fields[1].name).toBe("depthArrayField1");
       expect(simpleType.fields[1].type.kind).toBe("LIST");
-      expect((simpleType.fields[1].type as any).ofType.name).toBe("Float");
+      expect((simpleType.fields[1].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[1].type as any).ofType.ofType.name).toBe("Float");
 
       expect(simpleType.fields[2].name).toBe("depthArrayField2");
       expect(simpleType.fields[2].type.kind).toBe("LIST");
       expect((simpleType.fields[2].type as any).ofType.kind).toBe("LIST");
-      expect((simpleType.fields[2].type as any).ofType.ofType.name).toBe("Float");
+      expect((simpleType.fields[2].type as any).ofType.ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[2].type as any).ofType.ofType.ofType.name).toBe("Float");
 
       expect(simpleType.fields[3].name).toBe("depthArrayFieldResolver");
       expect(simpleType.fields[3].type.kind).toBe("LIST");
-      expect((simpleType.fields[3].type as any).ofType.kind).toBe("LIST");
-      expect((simpleType.fields[3].type as any).ofType.ofType.name).toBe("Float");
+      expect((simpleType.fields[3].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[3].type as any).ofType.ofType.kind).toBe("LIST");
+      expect((simpleType.fields[3].type as any).ofType.ofType.ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[3].type as any).ofType.ofType.ofType.ofType.name).toBe("Float");
     });
 
     it("Should convert primitive type and scalarMap to GraphQL Type and apply params", async () => {
@@ -256,9 +261,10 @@ describe("GraphQL", () => {
       expect(simpleType.fields[3].description).toBe("a date type");
 
       expect(simpleType.fields[4].name).toBe("arrStr");
-      expect(((simpleType.fields[4].type as IntrospectionListTypeRef).ofType as IntrospectionNamedTypeRef).name).toBe("String");
-      expect((simpleType.fields[4].type as IntrospectionListTypeRef).kind).toBe("LIST");
       expect(simpleType.fields[4].description).toBe("an array of string type");
+      expect((simpleType.fields[4].type as any).kind).toBe("LIST");
+      expect((simpleType.fields[4].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[4].type as any).ofType.ofType.name).toBe("String");
 
       expect(simpleType.fields[5].name).toBe("scalarMap");
       expect((simpleType.fields[5].type as IntrospectionNamedTypeRef).name).toBe("ID");
@@ -510,15 +516,17 @@ describe("GraphQL", () => {
       const simpleType2 = schema.types.find((schemaType) => schemaType.name === "GenericResponseGenericElement") as IntrospectionObjectType;
 
       expect((simpleType.fields[0].type as any).kind).toBe("LIST");
-      expect((simpleType.fields[0].type as any).ofType.name).toBe("SimpleType");
+      expect((simpleType.fields[0].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[0].type as any).ofType.ofType.name).toBe("SimpleType");
       expect((simpleType.fields[1].type as any).ofType.name).toBe("SimpleType");
+
       expect(simpleType.fields[0].name).toBe("items");
       expect(simpleType.fields[1].name).toBe("items2");
       expect(simpleType.fields[2].name).toBe("interfaceField");
 
       expect((simpleType2.fields[0].type as any).kind).toBe("LIST");
-      expect((simpleType2.fields[0].type as any).ofType.name).toBe("GenericElement");
-      expect((simpleType2.fields[1].type as any).ofType.name).toBe("SimpleType");
+      expect((simpleType2.fields[0].type as any).ofType.kind).toBe("NON_NULL");
+      expect((simpleType2.fields[0].type as any).ofType.ofType.name).toBe("GenericElement");
       expect(simpleType2.fields[0].name).toBe("items");
       expect(simpleType2.fields[1].name).toBe("items2");
       expect(simpleType2.fields[2].name).toBe("interfaceField");

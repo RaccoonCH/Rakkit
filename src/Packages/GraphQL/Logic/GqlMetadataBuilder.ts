@@ -21,7 +21,6 @@ import {
   GraphQLEnumType,
   GraphQLUnionType,
   GraphQLEnumValueConfigMap,
-  GraphQLSchemaConfig,
   GraphQLInputFieldConfig,
   GraphQLScalarType
 } from "graphql";
@@ -924,11 +923,17 @@ export class GqlMetadataBuilder extends MetadataBuilder {
       typed.arrayDepth = 0;
       finalType = GraphQLBoolean;
     }
+    for (let i = typed.arrayDepth - 1; i >= 0 ; i--) {
+      if (i < typed.arrayDepth) {
+        const nullable = typed.arrayNullable[i];
+        if (nullable === undefined || !nullable) {
+          finalType = GraphQLNonNull(finalType);
+        }
+      }
+      finalType = GraphQLList(finalType);
+    }
     if (!typed.nullable) {
       finalType = GraphQLNonNull(finalType);
-    }
-    for (let i = 0; i < typed.arrayDepth; i++) {
-      finalType = GraphQLList(finalType);
     }
     return finalType;
   }

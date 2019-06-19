@@ -103,6 +103,14 @@ describe("GraphQL", () => {
             nullable: true
           })
           b: Number,
+          @Arg(type => [[[String]]], {
+            defaultValue: [[[]]],
+            description: "arg c",
+            name: "third",
+            nullable: false,
+            arrayNullable: [false, true, false]
+          })
+          c: string[][][],
           context: IContext
         ): String {
           return a + b.toString();
@@ -113,7 +121,7 @@ describe("GraphQL", () => {
       const schema = (await graphql<IntrospectionQuery>(MetadataStorage.Instance.Gql.Schema, getIntrospectionQuery())).data.__schema;
       const simpleType = schema.types.find((schemaType) => schemaType.name === "Fieldresolver") as IntrospectionObjectType;
 
-      expect(simpleType.fields[0].args).toHaveLength(2);
+      expect(simpleType.fields[0].args).toHaveLength(3);
       expect(simpleType.fields[0].name).toBe("resolve");
       expect((simpleType.fields[0].type as IntrospectionNamedTypeRef).name).toBe("String");
 
@@ -126,6 +134,17 @@ describe("GraphQL", () => {
       expect(simpleType.fields[0].args[1].description).toBe("arg b");
       expect(simpleType.fields[0].args[1].name).toBe("second");
       expect((simpleType.fields[0].args[1].type as IntrospectionNamedTypeRef).name).toBe("Float");
+
+      expect(simpleType.fields[0].args[2].defaultValue).toBe("[[[]]]");
+      expect(simpleType.fields[0].args[2].description).toBe("arg c");
+      expect(simpleType.fields[0].args[2].name).toBe("third");
+      expect((simpleType.fields[0].args[2].type as any).kind).toBe("NON_NULL");
+      expect((simpleType.fields[0].args[2].type as any).ofType.kind).toBe("LIST");
+      expect((simpleType.fields[0].args[2].type as any).ofType.ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[0].args[2].type as any).ofType.ofType.ofType.kind).toBe("LIST");
+      expect((simpleType.fields[0].args[2].type as any).ofType.ofType.ofType.ofType.kind).toBe("LIST");
+      expect((simpleType.fields[0].args[2].type as any).ofType.ofType.ofType.ofType.ofType.kind).toBe("NON_NULL");
+      expect((simpleType.fields[0].args[2].type as any).ofType.ofType.ofType.ofType.ofType.ofType.name).toBe("String");
     });
 
     it("Should get correct response from resolver (mutation and query)", async () => {

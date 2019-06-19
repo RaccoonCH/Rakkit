@@ -90,7 +90,7 @@ export class ExampleResolver {
     topics: "yo"
   })
   sub(
-    @Arg({ name: "topic" })
+    @Arg(type => [[[String]]], { name: "topic" })
     topic: String,
     payload: any,
     context: IContext,

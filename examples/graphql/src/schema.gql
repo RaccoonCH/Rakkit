@@ -16,7 +16,7 @@ type ExampleObjectType {
 
 """ObjectType named from required ExampleInputType"""
 type ExampleObjectType0RequiredExampleInputType {
-  hello0: [String!]
+  hello0: [String!]!
 }
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
@@ -31,7 +31,7 @@ type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & Ex
 
 input GenericResponseGraphQLInputObjectTypeExampleInputTypeGraphQLInputObjectTypeExampleInputType2 {
   """items"""
-  items: [GraphQLInputObjectTypeExampleInputType] = []
+  items: [GraphQLInputObjectTypeExampleInputType!] = []
   items2: GraphQLInputObjectTypeExampleInputType2!
   hello3: String
   hello4: String!
@@ -136,7 +136,7 @@ type MyInterfaceObj2 implements MyInterface {
 
 type Query {
   a(
-    items: [GraphQLInputObjectTypeExampleInputType]
+    items: [GraphQLInputObjectTypeExampleInputType!]
     items2: GraphQLInputObjectTypeExampleInputType2!
     hello3: String!
     hello4: String!
@@ -144,9 +144,9 @@ type Query {
     hello12: String
 
     """yo"""
-    aa: Float! = 123
+    aa: Float = 123
   ): test!
-  helloWorld: [[test!]]
+  helloWorld: [[test!]!]!
   b: String!
 }
 
@@ -163,7 +163,7 @@ type Response {
 }
 
 type Subscription {
-  sub(topic: String!): Boolean!
+  sub(topic: [[[String!]!]!]!): Boolean!
 }
 
 union test = GraphQLObjectTypeExampleInputType | GraphQLObjectTypeExampleInputType2RequiredExampleInputType
@@ -177,4 +177,8 @@ interface Test {
 enum testEnum {
   a
   b
+}
+
+type ZZZ {
+  hello0: [[String!]]!
 }

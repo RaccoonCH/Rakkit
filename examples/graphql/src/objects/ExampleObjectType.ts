@@ -98,6 +98,11 @@ export class ExampleInputType2 {
   @Field({ nullable: true })
   hello12: string;
 }
+@ObjectType()
+export class ZZZ {
+  @Field(type => [[String]], { arrayNullable: [ true ] })
+  hello0: string[];
+}
 
 @ConcatName(RequiredExampleInputType)
 @ObjectType({

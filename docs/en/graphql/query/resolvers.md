@@ -2,7 +2,9 @@
 title: Resolvers
 ---
 
-Besides [declaring GraphQL's object types](types-and-fields.md), Rakkit allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or TypeScript [`routing-controllers`](https://github.com/typestack/routing-controllers).
+# Resolvers
+
+Besides [declaring GraphQL's object types](/graphql/type-definition), Rakkit allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or with **[Rakkit REST](/rest/router)**.
 
 ## Queries and Mutations
 
@@ -15,7 +17,7 @@ First we create the resolver class and annotate it with the `@Resolver()` decora
 class RecipeResolver {}
 ```
 
-We can use a DI framework (as described in the [dependency injection docs](dependency-injection.md)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
+We can use a DI framework (as described in the [dependency injection docs](/di/introduction)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
 
 ```typescript
 @Resolver()
@@ -66,18 +68,23 @@ class RecipeResolver {
   // ...
   @Query(returns => [Recipe])
   async recipes(
-    @Arg("title", { nullable: true }) title?: string,
-    @Arg("servings", { defaultValue: 2 }) servings: number,
+    @Arg({ name: "title", nullable: true }) title?: string,
+    @Arg({ name: "servings", defaultValue: 2 }) servings: number,
   ): Promise<Recipe[]> {
     // ...
   }
 }
 ```
 
-This works well when there are 2 - 3 args. But when you have many more, the resolver's method definitions become bloated. In this case we can use a class definition to describe the arguments. It looks like the object type class but it has the `@ArgsType()` decorator on top.
+### Flat arguments
+
+TypeGraphQL behaviour is different, we have a virtual type that doesn't exists natively with GraphQL: `ArgsType`, basicaly it compiles it into an `InputType` but the difference is that the fields are flatten when you use it as query arguments.
+So with Rakkit we decided to keep the existing type that is provided by GraphQL, to flat it, you can simply pass `{ flat: true }` to the `@Arg()` decorator options.
+(You have only the `@Arg()` decorator, not `Arg`**`s`**)
+e.g.:
 
 ```typescript
-@ArgsType()
+@InputType()
 class GetRecipesArgs {
   @Field(type => Int, { nullable: true })
   skip?: number;
@@ -92,31 +99,6 @@ class GetRecipesArgs {
 
 We can define default values for optional fields in the `@Field()` decorator using the `defaultValue` option or by using a property initializer - in both cases Rakkit will reflect this in the schema by setting the default value and making the field nullable.
 
-Also, this way of declaring arguments allows you to perform validation. You can find more details about this feature in the [validation docs](validation.md). You can also define helper fields and methods for your args or input class.
-
-```typescript
-import { Min, Max } from "class-validator";
-
-@ArgsType()
-class GetRecipesArgs {
-  @Field(type => Int, { defaultValue: 0 })
-  @Min(0)
-  skip: number;
-
-  @Field(type => Int)
-  @Min(1)
-  @Max(50)
-  take = 25;
-
-  @Field({ nullable: true })
-  title?: string;
-
-  // helpers - index calculations
-  startIndex = skip;
-  endIndex = skip + take;
-}
-```
-
 Then all that is left to do is use the args class as the type of the method parameter.
 We can use the destructuring syntax to gain access to single arguments as variables, instead of the reference to the whole args object.
 
@@ -125,10 +107,13 @@ We can use the destructuring syntax to gain access to single arguments as variab
 class RecipeResolver {
   // ...
   @Query(returns => [Recipe])
-  async recipes(@Args() { title, startIndex, endIndex }: GetRecipesArgs) {
+  async recipes(
+    @Arg({ flat: true })
+    recipeArgs: GetRecipesArgs
+  ) {
     // sample implementation
     let recipes = this.recipesCollection;
-    if (title) {
+    if (recipeArgs.title) {
       recipes = recipes.filter(recipe => recipe.title === title);
     }
     return recipes.slice(startIndex, endIndex);

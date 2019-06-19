@@ -77,6 +77,7 @@ export class DecoratorHelper {
         function: undefined,
         type: typeFn,
         deprecationReason: undefined,
+        arrayNullable: [],
         ...definedParams
       }
     };
@@ -125,6 +126,7 @@ export class DecoratorHelper {
       const typeInfos = DecoratorHelper.getTypeInfos(definedType, reflectType);
       definedParams.arrayDepth = typeInfos.arrayDepth;
       definedParams.resolveType = resolveType;
+      definedParams.nullable = !!definedParams.defaultValue || definedParams.nullable;
 
       MetadataStorage.Instance.Gql.AddField(
         DecoratorHelper.getAddFieldParams(
