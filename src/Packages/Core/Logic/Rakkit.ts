@@ -4,7 +4,6 @@ import * as SocketIo from "socket.io";
 import * as Koa from "koa";
 import { AppLoader } from "./AppLoader";
 import {
-  IAppConfig,
   MiddlewareType,
   MiddlewareExecutionTime,
   Color,

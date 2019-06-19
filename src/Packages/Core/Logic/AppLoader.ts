@@ -1,6 +1,5 @@
 import { sync as GlobSync } from "glob";
 import {
-  IAppConfig,
   ClassOrString
 } from "../../..";
 

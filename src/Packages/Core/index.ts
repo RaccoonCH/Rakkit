@@ -7,7 +7,6 @@ export * from "./Misc/Color";
 
 export * from "./Types/ClassOrString";
 export * from "./Types/DecoratorCategory";
-export * from "./Types/IAppConfig";
 export * from "./Types/IClassType";
 export * from "./Types/IDecorator";
 export * from "./Types/InstanceOf";
