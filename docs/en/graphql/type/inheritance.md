@@ -137,5 +137,3 @@ export class PersonResolver extends PersonBaseResolver {
 And that's it! We just need to normally register `PersonResolver` in `buildSchema` and the extended resolver will work correctly.
 
 We must be aware that if we want to overwrite the query/mutation/subscription from the parent resolver class, we need to generate the same schema name (using the `name` decorator option or the class method name). It will overwrite the implementation along with the GraphQL args and return types. If we only provide a different implementation of the inherited method like `getOne`, it won't work.
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

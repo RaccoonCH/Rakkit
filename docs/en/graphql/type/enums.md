@@ -113,5 +113,3 @@ class JourneyInput {
 ```
 
 The disadvantage is that in our application we cannot use this class as a real enum, for example to access the values associated with the fields.
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

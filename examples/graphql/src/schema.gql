@@ -12,6 +12,7 @@ interface ExampleInterfaceType2 {
 type ExampleObjectType {
   hello: String
   test: MyInterface!
+  aa(param0: String!): String!
 }
 
 """ObjectType named from required ExampleInputType"""
@@ -146,6 +147,7 @@ type Query {
     """yo"""
     aa: Float = 123
   ): test!
+  getAll: [ExampleObjectType!]!
   helloWorld: [[test!]!]!
   b: String!
 }

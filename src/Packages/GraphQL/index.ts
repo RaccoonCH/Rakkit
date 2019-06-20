@@ -1,5 +1,6 @@
 export * from "./Decorator/Decorators/Field/Field";
 export * from "./Decorator/Decorators/Field/EnumField";
+export * from "./Decorator/Decorators/Field/FieldResolver";
 export * from "./Decorator/Decorators/Query/Query";
 export * from "./Decorator/Decorators/Query/Mutation";
 export * from "./Decorator/Decorators/Query/Query";

@@ -17,7 +17,7 @@ First we create the resolver class and annotate it with the `@Resolver()` decora
 class RecipeResolver {}
 ```
 
-We can use a DI framework (as described in the [dependency injection docs](/di/introduction)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
+We can use a DI framework (as described in the [dependency injection docs](/en/di/introduction)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
 
 ```typescript
 @Resolver()
@@ -131,7 +131,7 @@ type Query {
 
 ### Input types
 
-GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence Rakkit allows us to create inputs in the same way as [object types](types-and-fields.md) but by using the `@InputType()` decorator:
+GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence Rakkit allows us to create inputs in the same way as [object types](/en/graphql/type/type-definition) but by using the `@InputType()` decorator:
 
 ```typescript
 @InputType()
@@ -158,20 +158,56 @@ class AddRecipeInput implements Partial<Recipe> {
 }
 ```
 
+## Querying, context and next
+
 After that we can use the `AddRecipeInput` type in our mutation. We can do this inline (using the `@Arg()` decorator) or as a field of the args class like in the query example above.
 
-We may also need access to the context. To achieve this we use the `@Ctx()` decorator with the optional user-defined `Context` interface:
+We may also need access to the context. To achieve this there is an extra arguments (after your args) that has the `IContext` type. The GraphQL query information is available with the `context.gql` property.
 
 ```typescript
+import { IContext } from "rakkit";
+
 @Resolver()
 class RecipeResolver {
   // ...
   @Mutation()
-  addRecipe(@Arg("data") newRecipeData: AddRecipeInput, @Ctx() ctx: Context): Recipe {
+  addRecipe(
+    @Arg("data") newRecipeData: AddRecipeInput,
+    context: IContext
+  ): Recipe {
     // sample implementation
     const recipe = RecipesUtils.create(newRecipeData, ctx.user);
     this.recipesCollection.push(recipe);
     return recipe;
+  }
+}
+```
+
+### Different ways send the response
+
+You have multiple ways to return a result for you queries (to have a full compatibility between REST and GraphQL middlewares) :
+- using **`return`**
+- using **`context.gql.response`**
+- using **`context.body`**
+- using **`context.response.body`**
+
+If you don't use the return keyword you might want to type the response by passing the return type to `IContext`, for example:
+
+```typescript
+import { IContext } from "rakkit";
+
+@Resolver()
+class RecipeResolver {
+  // ...
+  @Mutation()
+  addRecipe(
+    @Arg("data") newRecipeData: AddRecipeInput,
+    context: IContext<Recipe>
+  ) {
+    // sample implementation
+    const recipe = RecipesUtils.create(newRecipeData, ctx.user);
+    this.recipesCollection.push(recipe);
+    context.gql.response = recipe;
   }
 }
 ```

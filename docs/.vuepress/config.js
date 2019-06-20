@@ -136,7 +136,7 @@ module.exports = {
           },
           {
             title: "Development",
-            collapsable: true,
+            collapsable: false,
             children: [
               "/en/dev/contributing",
               "/en/dev/changelog"

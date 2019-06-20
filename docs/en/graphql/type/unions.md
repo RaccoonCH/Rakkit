@@ -107,5 +107,3 @@ query {
 ## Examples
 
 More advanced usage examples of unions (and enums) are located in [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/enums-and-unions).
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

@@ -7,7 +7,8 @@ import {
   MiddlewareType,
   MiddlewareExecutionTime,
   Color,
-  MetadataStorage
+  MetadataStorage,
+  IAppConfig
 } from "../../..";
 
 export class Rakkit extends AppLoader {
@@ -70,6 +71,7 @@ export class Rakkit extends AppLoader {
         resolvers: [],
         dateMode: "isoDate",
         scalarsMap: [],
+        globalMiddlewaresExclude: [],
         ...(this._config.gql || {})
       },
       routing: {
@@ -194,11 +196,7 @@ export class Rakkit extends AppLoader {
 
   private async startRest() {
     return new Promise<void>(async (resolve) => {
-      this.loadAppMiddlewares(this._config.routing.globalMiddlewares);
-      this.loadAppMiddlewares(this._config.rest.globalAppMiddlewares);
       this._koaApp.use(MetadataStorage.Instance.Rest.MainRouter.routes());
-      this.loadAppMiddlewares(this._config.rest.globalAppMiddlewares, "AFTER");
-      this.loadAppMiddlewares(this._config.routing.globalMiddlewares, "AFTER");
       resolve();
     });
   }

@@ -14,7 +14,6 @@ import {
   NextFunction,
   MetadataStorage
 } from "../../..";
-import * as BodyParser from "koa-bodyparser";
 import { Subscription } from "../Decorator/Decorators/Query/Subscription";
 import ApolloClient from "apollo-client";
 import { WebSocketLink } from "apollo-link-ws";
@@ -65,11 +64,6 @@ describe("GraphQL", () => {
       await Rakkit.start({
         forceStart: ["rest", "gql"],
         silent: true,
-        routing: {
-          globalMiddlewares: [
-            BodyParser()
-          ]
-        },
         gql: {
           scalarsMap: [
             { type: ScalarMap, scalar: GraphQLID }
@@ -173,11 +167,6 @@ describe("GraphQL", () => {
       await Rakkit.start({
         forceStart: ["rest", "gql"],
         silent: true,
-        routing: {
-          globalMiddlewares: [
-            BodyParser()
-          ]
-        },
         gql: {
           scalarsMap: [
             { type: ScalarMap, scalar: GraphQLID }
@@ -289,11 +278,6 @@ describe("GraphQL", () => {
       await Rakkit.start({
         forceStart: ["rest", "gql"],
         silent: true,
-        routing: {
-          globalMiddlewares: [
-            BodyParser()
-          ]
-        },
         gql: {
           scalarsMap: [
             { type: ScalarMap, scalar: GraphQLID }

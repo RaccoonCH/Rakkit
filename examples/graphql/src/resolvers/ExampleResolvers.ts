@@ -9,7 +9,8 @@ import {
   NextFunction,
   Mutation,
   TypeCreator,
-  Subscription
+  Subscription,
+  FieldResolver
 } from "../../../../src";
 import {
   getItems,
@@ -18,7 +19,8 @@ import {
   ExampleInputType2,
   TestEnum,
   MyInterface,
-  MyInterfaceObj1
+  MyInterfaceObj1,
+  ExampleObjectType
 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
@@ -28,11 +30,11 @@ const union = TypeCreator.CreateUnion(
   { name: "test" }
 );
 
-@Resolver()
+@Resolver(of => ExampleObjectType)
 @UseMiddleware(
-  async (context, next) => { console.log("yo"); await next(); },
-  async (context, next) => { console.log("bye"); await next(); },
-  async (context, next) => { console.log("hi"); await next(); }
+  async (context, next) => { console.log("yop"); await next(); },
+  async (context, next) => { console.log("bip"); await next(); },
+  async (context, next) => { console.log("hip"); await next(); }
 )
 export class ExampleResolver3 {
   @Query(type => union)
@@ -54,6 +56,33 @@ export class ExampleResolver3 {
     res.enumz = TestEnum.a;
     context.gql.response = res;
     console.log(str, stra, aaa);
+  }
+
+  @FieldResolver(type => String)
+  private async aa(
+    @Arg()
+    param: String,
+    context: IContext<String>,
+    next: NextFunction
+  ) {
+    context.gql.response = "a";
+    await next();
+  }
+
+  @Query(type => [ExampleObjectType])
+  private async getAll(
+    context: IContext<ExampleObjectType[]>,
+    next: NextFunction
+   ) {
+    const a = new ExampleObjectType();
+    const b = new ExampleObjectType();
+    a.hello = "a";
+    b.hello = "b";
+    context.gql.response = [
+      a,
+      b
+    ];
+    await next();
   }
 }
 

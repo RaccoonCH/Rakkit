@@ -3,12 +3,17 @@ import {
   IDecorator,
   IOn,
   IWebsocket,
-  MetadataStorage
+  MetadataStorage,
+  Rakkit
 } from "../../..";
 
 export class WsMetadataBuilder extends MetadataBuilder {
   private _websockets: Map<Function, IDecorator<IWebsocket>>;
   private _ons: IDecorator<IOn>[];
+
+  get Config() {
+    return Rakkit.Instance.Config.ws;
+  }
 
   get Ons() {
     return this._ons as ReadonlyArray<IDecorator<IOn>>;

@@ -18,7 +18,7 @@ export function Arg(type: TypeFn, params: IArgParams);
 export function Arg(typeOrParams?: TypeFn | IArgParams, params?: IArgParams) {
   return (target: Object, key: string, index?: number): void => {
     const isType = typeof typeOrParams === "function";
-    const definedParams = isType ? params : typeOrParams as IArgParams;
+    const definedParams = (isType ? params : typeOrParams as IArgParams) || {};
     const definedType = isType ? typeOrParams as TypeFn : undefined;
     const reflectType = () => Reflect.getMetadata("design:paramtypes", target, key)[index];
     const typeInfos = DecoratorHelper.getTypeInfos(definedType, reflectType);

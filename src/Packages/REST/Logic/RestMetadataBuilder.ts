@@ -21,6 +21,10 @@ export class RestMetadataBuilder extends MetadataBuilder {
     return MetadataStorage.Instance.Routing;
   }
 
+  private get Config() {
+    return Rakkit.Instance.Config.rest;
+  }
+
   get MainRouter() {
     return this._mainRouter as Readonly<ApiRouter>;
   }
@@ -83,15 +87,24 @@ export class RestMetadataBuilder extends MetadataBuilder {
       );
     });
 
-    const rootMiddlewares = Rakkit.Instance.Config.rest.globalRootMiddlewares;
-    const restMiddlewares = Rakkit.Instance.Config.rest.globalRestMiddlewares;
-    this._restRouter = this.mountMiddlewaresToRouter(
+    const restMiddlewares = this.Config.globalRestMiddlewares;
+    this._restRouter = this.mountMiddlewaresToRouterAuto(
       restMiddlewares,
       this._restRouter
     );
+
+    // Mount after and before middlewares to the main router
     this._mainRouter.use(this._restRouter.routes());
-    this._mainRouter = this.mountMiddlewaresToRouter(
-      rootMiddlewares,
+    this._mainRouter = this.mountMiddlewaresToRouterAuto(
+      this.Config.globalRootMiddlewares,
+      this._mainRouter
+    );
+    this._mainRouter = this.mountMiddlewaresToRouterAuto(
+      this.Config.globalAppMiddlewares,
+      this._mainRouter
+    );
+    this._mainRouter = this.mountMiddlewaresToRouterAuto(
+      this._routingStorage.Config.globalMiddlewares,
       this._mainRouter
     );
   }
@@ -119,15 +132,20 @@ export class RestMetadataBuilder extends MetadataBuilder {
     this._endpoints.push(item);
   }
 
-  private mountMiddlewaresToRouter(middlewares: MiddlewareType[], router: ApiRouter) {
+  private mountMiddlewaresToRouterAuto(middlewares: MiddlewareType[], router: ApiRouter) {
     const tempRouter = new ApiRouter(router.opts);
     const restBeforeMiddlewares = this._routingStorage.GetBeforeMiddlewares(middlewares);
     const restAfterMiddlewares = this._routingStorage.GetAfterMiddlewares(middlewares);
-    tempRouter.use(...restBeforeMiddlewares as Middleware[]);
+    this.mountMiddlewaresToRouter(restBeforeMiddlewares, tempRouter);
     tempRouter.use(router.prefix("/").routes());
-    tempRouter.use(...restAfterMiddlewares as Middleware[]);
+    this.mountMiddlewaresToRouter(restAfterMiddlewares, tempRouter);
 
     return tempRouter;
+  }
+
+  private mountMiddlewaresToRouter(middlewares: MiddlewareType[], router: ApiRouter) {
+    router.use(...middlewares as Middleware[]);
+    return router;
   }
 
   private mountEndpointsToRouter(router: IDecorator<IRouter>) {
@@ -148,11 +166,10 @@ export class RestMetadataBuilder extends MetadataBuilder {
 
   private getEndpointFunctions(endpoint: IDecorator<IEndpoint>) {
     const endpointUsedMiddlewares = this._routingStorage.GetUsedMiddlewares(endpoint, endpoint.params.functions[0]);
-    const endpointMiddlewares = this._routingStorage.ExtractMiddlewares(endpointUsedMiddlewares);
     const compiledMergedEnpoint: Function[] = [
-      ...this._routingStorage.GetBeforeMiddlewares(endpointMiddlewares),
+      ...this._routingStorage.GetBeforeMiddlewares(endpointUsedMiddlewares),
       ...this.bindContext(endpoint, endpoint.params.functions),
-      ...this._routingStorage.GetAfterMiddlewares(endpointMiddlewares)
+      ...this._routingStorage.GetAfterMiddlewares(endpointUsedMiddlewares)
     ];
     return compiledMergedEnpoint;
   }

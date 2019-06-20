@@ -15,4 +15,5 @@ export interface IGqlType<Type extends GqlType = any> extends IGqlObject, IResol
   transformation?: ITypeTransformation<Type>;
   compiled?: InstanceType<Type>;
   isAbstract?: boolean;
+  ofType?: Function;
 }

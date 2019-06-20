@@ -12,4 +12,5 @@ export * from "./Types/IDecorator";
 export * from "./Types/InstanceOf";
 export * from "./Types/KeyValue";
 export * from "./Types/TypeFn";
-
+export * from "./Types/IAppConfig";
+export * from "./Types/ICoreConfig";

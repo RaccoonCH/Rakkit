@@ -74,5 +74,3 @@ abstract class IPerson {
 ## Examples
 
 For more advanced usage examples of interfaces (and type inheritance), e.g. with query returning an interface type, go to [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/interfaces-inheritance).
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

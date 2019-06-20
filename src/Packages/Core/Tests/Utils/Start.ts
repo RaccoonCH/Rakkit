@@ -1,5 +1,5 @@
 import * as BodyParser from "koa-bodyparser";
-import { Rakkit } from "../../../..";
+import { Rakkit, IAppConfig } from "../../../..";
 
 const getDirName = (path) => {
   return `${__dirname}/../ClassesForTesting/${path}`;

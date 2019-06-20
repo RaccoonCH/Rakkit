@@ -113,5 +113,3 @@ const stateLink = withClientState({
 ```
 
 Be aware that some of the Rakkit features (i.a. [query complexity](complexity.md)) might not work with the `buildTypeDefsAndResolvers` approach because they use some low-level `graphql-js` features.
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*

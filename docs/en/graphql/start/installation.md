@@ -70,5 +70,3 @@ All in all, the minimal `tsconfig.json` file example looks like this:
   }
 }
 ```
-
-*Based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)**'s documentation - Copyright (c) 2018 Michał Lytek*  

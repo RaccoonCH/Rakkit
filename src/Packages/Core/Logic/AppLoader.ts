@@ -1,6 +1,7 @@
 import { sync as GlobSync } from "glob";
 import {
-  ClassOrString
+  ClassOrString,
+  IAppConfig
 } from "../../..";
 
 export class AppLoader {

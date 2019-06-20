@@ -2,7 +2,8 @@ import { PubSubEngine } from "graphql-subscriptions";
 import {
   MiddlewareType,
   ClassOrString,
-  IScalarAssociation
+  IScalarAssociation,
+  GqlResolveType
 } from "../../..";
 
 export interface IGqlConfig {
@@ -12,5 +13,6 @@ export interface IGqlConfig {
   scalarsMap: IScalarAssociation[];
   dateMode: "isoDate" | "timestamp";
   pubSub: PubSubEngine;
-  exportSchemaFileTo: string;
+  emitSchemaFile: string;
+  globalMiddlewaresExclude: GqlResolveType[];
 }

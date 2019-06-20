@@ -22,7 +22,8 @@ import {
   Mutation,
   NextFunction,
   MetadataStorage,
-  IClassType
+  IClassType,
+  FieldResolver
 } from "../../..";
 import { wait } from "../../Core/Tests/Utils/Waiter";
 import { UseMiddleware } from "../../Routing";
@@ -147,8 +148,18 @@ describe("GraphQL", () => {
       expect((simpleType.fields[0].args[2].type as any).ofType.ofType.ofType.ofType.ofType.ofType.name).toBe("String");
     });
 
-    it("Should get correct response from resolver (mutation and query)", async () => {
-      @Resolver()
+    it("Should get correct response from resolver (mutation, query and field resolver)", async () => {
+      @ObjectType()
+      class ResponseItem {
+        @Field()
+        hello: string;
+
+        constructor(hello: string) {
+          this.hello = hello;
+        }
+      }
+
+      @Resolver(of => ResponseItem)
       class ResolverA {
         @Query(type => String, {
           nullable: true
@@ -161,6 +172,23 @@ describe("GraphQL", () => {
           a: string
         ): String {
           return a;
+        }
+
+        @FieldResolver()
+        dynamicField(
+          @Arg()
+          param: string,
+          context: IContext
+        ): string {
+          return param + context.gql.root.hello;
+        }
+
+        @Query(type => [ResponseItem])
+        getAll(): ResponseItem[] {
+          return [
+            new ResponseItem("a"),
+            new ResponseItem("b")
+          ];
         }
       }
 
@@ -219,6 +247,9 @@ describe("GraphQL", () => {
       const resC = await Axios.post("http://localhost:4000/graphql", {
         query: 'mutation { resolveC(second: "hello") }'
       });
+      const resD = await Axios.post("http://localhost:4000/graphql", {
+        query: 'query { getAll { dynamicField(param0: "hello") } }'
+      });
 
       expect(resA.data.data).toEqual({
         resolveA: "hello world"
@@ -229,6 +260,10 @@ describe("GraphQL", () => {
       expect(resC.data.data).toEqual({
         resolveC: "hello world"
       });
+      expect(resD.data.data.getAll).toEqual([
+        { dynamicField: "helloa" },
+        { dynamicField: "hellob" }
+      ]);
     });
 
     describe("Middlewares", () => {
@@ -284,7 +319,7 @@ describe("GraphQL", () => {
           query: "query { queryMiddleware }"
         });
 
-        expect(res.data.data.queryMiddleware).toBe("gb1;gb2;rb1;rb2;eb1;eb2;0;ra1;ra2;ea1;ea2;ga1;ga2;");
+        expect(res.data.data.queryMiddleware).toBe("gb1;gb2;rb1;rb2;eb1;eb2;0;ea1;ea2;ra1;ra2;ga1;ga2;");
       });
     });
 

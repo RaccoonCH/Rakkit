@@ -11,7 +11,8 @@ import {
   MiddlewareType,
   MiddlewareExecutionTime,
   NextFunction,
-  IContext
+  IContext,
+  Rakkit
 } from "../../..";
 
 export class RoutingMetadataBuilder extends MetadataBuilder {
@@ -34,6 +35,10 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
 
   get AfterMiddlewares() {
     return this._afterMiddlewares as Map<Function, HandlerFunction>;
+  }
+
+  get Config () {
+    return Rakkit.Instance.Config.routing;
   }
 
   AddMiddleware(item: IDecorator<IMiddleware>) {
@@ -145,12 +150,13 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
 
   GetUsedMiddlewares(decorator: IDecorator<any>, fn?: Function) {
     // Reverse to have the correct execution time
-    return this._usedMiddlewares.filter((usedMw) => {
+    const mws = this._usedMiddlewares.filter((usedMw) => {
       return (
         usedMw.originalClass === decorator.originalClass &&
         (fn ? fn === usedMw.params.applyOn : true)
       );
     }).reverse();
+    return this.ExtractMiddlewares(mws);
   }
 
   ExtractMiddlewares(arr: IDecorator<IUsedMiddleware>[]): MiddlewareType[] {
