@@ -862,11 +862,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     gqlTypeDef?: IDecorator<IGqlType>
   ): GraphQLOutputType {
     if (typed.nullable === undefined) {
-      if (this.Config.nullableByDefault !== undefined) {
-        typed.nullable = this.Config.nullableByDefault;
-      } else {
-        typed.nullable = false;
-      }
+      typed.nullable = this.Config.nullableByDefault;
     }
 
     let finalType: GraphQLOutputType = undefined;
@@ -952,7 +948,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
     for (let i = typed.arrayDepth - 1; i >= 0 ; i--) {
       if (i < typed.arrayDepth) {
         const nullable = typed.arrayNullable[i];
-        if (nullable === undefined || !nullable) {
+        if (!this.Config.inArrayNullableByDefault && (nullable === undefined || !nullable)) {
           finalType = GraphQLNonNull(finalType);
         }
       }

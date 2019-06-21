@@ -30,6 +30,7 @@ export class App {
       },
       gql: {
         resolvers: this._resolvers,
+        inArrayNullableByDefault: true,
         scalarsMap: [
           { type: ScalarMapTest, scalar: GQLISODateTime }
         ],

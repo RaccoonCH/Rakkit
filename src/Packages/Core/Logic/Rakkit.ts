@@ -3,6 +3,7 @@ import { createServer, Server } from "http";
 import * as SocketIo from "socket.io";
 import * as Koa from "koa";
 import { AppLoader } from "./AppLoader";
+import { PubSub } from "graphql-subscriptions";
 import {
   MiddlewareType,
   MiddlewareExecutionTime,
@@ -71,6 +72,8 @@ export class Rakkit extends AppLoader {
         resolvers: [],
         dateMode: "isoDate",
         scalarsMap: [],
+        nullableByDefault: false,
+        inArrayNullableByDefault: false,
         globalMiddlewaresExclude: [],
         ...(this._config.gql || {})
       },
