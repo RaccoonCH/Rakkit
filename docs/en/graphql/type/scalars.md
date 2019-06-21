@@ -8,9 +8,9 @@ title: Scalars
 
 Rakkit provides aliases for 3 basic scalars:
 
-- Int --> GraphQLInt;
-- Float --> GraphQLFloat;
-- ID --> GraphQLID;
+- Float :arrow_right: GraphQLFloat;
+- Int :arrow_right: GraphQLInt;
+- ID :arrow_right: GraphQLID;
 
 This shorthand allows you to save keystrokes when declaring field types:
 

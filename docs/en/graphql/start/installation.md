@@ -6,9 +6,10 @@ title: Installation
 
 Before getting started with Rakkit we need to install some additional dependencies and properly configure the TypeScript configuration for our project.
 
-> #### Prerequisites
->
-> Before we begin, we must make sure our development environment includes Node.js and npm.
+::: warning 
+#### Prerequisites
+Before we begin, we must make sure our development environment includes Node.js and npm.
+:::
 
 ## Packages installation
 

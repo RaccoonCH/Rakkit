@@ -1,5 +1,5 @@
 # MetadataStorage
-Just like the Rakkit object is a singleton, so you can access its instance via `MetadataStorage.Instance`.  
+Just like the Rakkit object is a singleton, so you can access its instance via `MetadataStorage.Instance` or `Rakkit.MetadataStorage`.  
 It provides various properties that may be useful to you such as: services, injections, routers, endoints, websocket, etc....  
 You just have to remember that it is he who manages the decorators, so you can access the information about them through this object instance.  
 

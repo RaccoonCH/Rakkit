@@ -66,29 +66,3 @@ You must also declare in the tsconfig.json file that you are using decorators:
 }
 
 ```
-
-## Start the application
-In order to start the application you will need to use the `Rakkit` class and access the static `start` method of it.  
-Here is an example:
-```typescript
-import "reflect-metdata";
-import { Rakkit } from "rakkit";
-
-Rakkit.start();
-```
-
-## Start parameters
-You can pass several parameters when starting the application in the `start` method to configure it.  
-
-| Property | Value | default | Description |
-| --- | --- | --- | --- |
-| silent | `boolean?` | `false` | Never write anything in the console |
-| host | `string?` | `localhost` | The hostname |
-| port | `number?` | `4000` | The port number |
-| restEndpoint | `string?` | `"/rest"` | the REST endpoint |
-| socketioOptions | `WsOptions?` | `path: "/ws"` | Setting up Socket.io |
-| routers | `ClassOrString[]?` | `undefined` | A list of paths representing the routers files ([glob](https://github.com/isaacs/node-glob)) or a list of routers classes |
-| websockets | `ClassOrString[]?` | `undefined` | A list of paths representing the websockets files ([glob](https://github.com/isaacs/node-glob)) or a list of websockets classes |
-| globalRestMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware for l'api REST (class or functions) |
-| globalRootMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware for the root router (`"/"`) (class or functions) |
-| appMiddlewares | `MiddlewareType[]?` | `undefined` | A list of global middleware on the Koa application |

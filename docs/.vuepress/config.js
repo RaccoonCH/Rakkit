@@ -48,6 +48,7 @@ module.exports = {
             collapsable: false,
             children: [
               "/en/start/installation",
+              "/en/start/getting-started",
               "/en/start/demos"
             ]
           },
