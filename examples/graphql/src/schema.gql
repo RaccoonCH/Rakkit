@@ -12,7 +12,7 @@ interface ExampleInterfaceType2 {
 type ExampleObjectType {
   hello: String
   test: MyInterface!
-  aa(param0: String!): String!
+  aa: String!
 }
 
 """ObjectType named from required ExampleInputType"""

@@ -1,6 +1,6 @@
 import { IContext, NextFunction } from "..";
 
 export type HandlerFunction = (
-  context: IContext,
+  context: Partial<IContext>,
   next: NextFunction
 ) => Promise<any> | any;

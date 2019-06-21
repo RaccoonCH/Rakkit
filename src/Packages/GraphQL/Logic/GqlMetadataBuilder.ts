@@ -786,7 +786,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             description: fieldDef.params.description
           };
           if (fieldDef.params.resolveType === "Subscription") {
-            const subFn = (payload, args) => {
+            const subFn = (payload, args, context, infos) => {
               let topics: string[] | string;
               if (typeof fieldDef.params.topics === "function") {
                 topics = this.bindContext(
@@ -796,7 +796,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
                   payload,
                   args,
                   pubSub: this._pubSub,
-                  context: undefined
+                  context,
+                  infos
                 });
               } else {
                 topics = fieldDef.params.topics;
@@ -804,7 +805,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
               return this._pubSub.asyncIterator(topics);
             };
             if (fieldDef.params.subscribe) {
-              gqlField.subscribe = async (payload, args) => {
+              gqlField.subscribe = async (payload, args, context, infos) => {
                 return await this.bindContext(
                   fieldDef,
                   fieldDef.params.subscribe
@@ -812,14 +813,15 @@ export class GqlMetadataBuilder extends MetadataBuilder {
                   payload,
                   args,
                   pubSub: this._pubSub,
-                  context: undefined
+                  context,
+                  infos
                 });
               };
             } else {
               if (fieldDef.params.filter) {
                 gqlField.subscribe = withFilter(
                   subFn,
-                  async (payload, args) => {
+                  async (payload, args, context, infos) => {
                     return await this.bindContext(
                       fieldDef,
                       fieldDef.params.filter
@@ -827,7 +829,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
                       payload,
                       args,
                       pubSub: this._pubSub,
-                      context: undefined
+                      context,
+                      infos
                     });
                   }
                 );

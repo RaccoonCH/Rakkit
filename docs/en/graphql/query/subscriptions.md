@@ -30,7 +30,7 @@ class SampleResolver {
   @Subscription({
     topics: "NOTIFICATIONS", // single topic
     topics: ["NOTIFICATIONS", "ERRORS"] // or topics array
-    topics: ({ args, payload, context }) => args.topic // or dynamic topic function
+    topics: ({ args }) => args.topic // or dynamic topic function
   })
   newNotification(): Notification {
     // ...
@@ -74,7 +74,7 @@ class SampleResolver {
 
 > Be aware that we can't mix the `subscribe` option with the `topics` and `filter` options. If the filtering is still needed, we can use the [`withFilter` function](https://github.com/apollographql/graphql-subscriptions#filters) from the `graphql-subscriptions` package.
 
-Now we can implement the subscription resolver. It will receive the payload from a triggered topic of the pubsub system using the `@Root()` decorator. There, we can transform it to the returned shape.
+Now we can implement the subscription resolver. It will receive the payload **before the context**. There, we can transform it to the returned shape.
 
 ```typescript
 class SampleResolver {
@@ -84,11 +84,13 @@ class SampleResolver {
     filter: ({ payload, args }) => args.priorities.includes(payload.priority),
   })
   newNotification(
-    @Root() notificationPayload: NotificationPayload,
-    @Args() args: NewNotificationsArgs,
+    @FlatArgs()
+    args: NewNotificationsArgs,
+    payload: NotificationPayload,
+    context: IContext
   ): Notification {
     return {
-      ...notificationPayload,
+      ...payload,
       date: new Date(),
     };
   }
@@ -108,7 +110,10 @@ So, let us assume we have this mutation for adding a new comment:
 class SampleResolver {
   // ...
   @Mutation(returns => Boolean)
-  async addNewComment(@Arg("comment") input: CommentInput) {
+  async addNewComment(
+    @Arg("comment")
+    input: CommentInput
+  ) {
     const comment = this.commentsService.createNew(input);
     await this.commentsRepository.save(comment);
     return true;
@@ -123,32 +128,17 @@ There we can trigger the topics and send the payload to all topic subscribers.
 class SampleResolver {
   // ...
   @Mutation(returns => Boolean)
-  async addNewComment(@Arg("comment") input: CommentInput, @PubSub() pubSub: PubSubEngine) {
+  async addNewComment(
+    @Arg("comment")
+    input: CommentInput,
+    context: IContext
+  ) {
+    const pubSub = context.gql.pubSub;
     const comment = this.commentsService.createNew(input);
     await this.commentsRepository.save(comment);
     // here we can trigger subscriptions topics
     const payload: NotificationPayload = { message: input.content };
     await pubSub.publish("NOTIFICATIONS", payload);
-    return true;
-  }
-}
-```
-
-For easier testability (mocking/stubbing), we can also inject the `publish` method by itself bound to a selected topic.
-This is done by using the `@PubSub("TOPIC_NAME")` decorator and the `Publisher<TPayload>` type:
-
-```typescript
-class SampleResolver {
-  // ...
-  @Mutation(returns => Boolean)
-  async addNewComment(
-    @Arg("comment") input: CommentInput,
-    @PubSub("NOTIFICATIONS") publish: Publisher<NotificationPayload>,
-  ) {
-    const comment = this.commentsService.createNew(input);
-    await this.commentsRepository.save(comment);
-    // here we can trigger subscriptions topics
-    await publish({ message: input.content });
     return true;
   }
 }
@@ -163,14 +153,16 @@ This solution has a big drawback in that it will work correctly only when we hav
 
 For better scalability we'll want to use one of the [`PubSub implementations`](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations) backed by an external store like Redis with the [`graphql-redis-subscriptions`](https://github.com/davidyaha/graphql-redis-subscriptions) package.
 
-All we need to do is create an instance of PubSub according to the package instructions and then provide it to the Rakkit `buildSchema` options:
+All we need to do is create an instance of PubSub according to the package instructions and then provide it to the `Rakkit.start` options:
 
 ```typescript
 const myRedisPubSub = getConfiguredRedisPubSub();
 
-const schema = await buildSchema({
-  resolvers: [__dirname + "/**/*.resolver.ts"],
-  pubSub: myRedisPubSub,
+await Rakkit.start({
+  gql: {
+    resolvers: [__dirname + "/**/*.resolver.ts"],
+    pubSub: myRedisPubSub
+  }
 });
 ```
 
@@ -193,10 +185,3 @@ const server = new ApolloServer({
 ```
 
 And it's done! We have a working GraphQL subscription server on `/subscriptions`, along with the normal HTTP GraphQL server.
-
-## Examples
-
-See how subscriptions work in a [simple example](https://github.com/19majkel94/type-graphql/tree/master/examples/simple-subscriptions).
-
-For production usage, it's better to use something more scalable like a Redis-based pubsub system - [a working example is also available](https://github.com/19majkel94/type-graphql/tree/master/examples/redis-subscriptions).
-However, to launch this example you need to have a running instance of Redis and you might have to modify the example code to provide your connection parameters.

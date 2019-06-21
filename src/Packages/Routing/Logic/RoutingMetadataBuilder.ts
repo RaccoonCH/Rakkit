@@ -166,7 +166,7 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
     ], []);
   }
 
-  GetWrappedHandlerFunction(handler: HandlerFunction): Koa.Middleware {
+  GetWrappedHandlerFunction(handler: HandlerFunction): Partial<Koa.Middleware> {
     return async (context: IContext, next: NextFunction) => {
       context.apiType = "rest";
       await handler(context, next);

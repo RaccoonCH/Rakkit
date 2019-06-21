@@ -73,7 +73,7 @@ They are exported from the `rakkit` package as `GQLISODateScalar` and `GQLTimest
 By default, Rakkit uses the ISO date format, however you can change it in the `Rakkit.start` options:
 
 ```typescript
-import { buildSchema } from "type-graphql";
+import { Rakkit } from "rakkit";
 
 const schema = await Rakkit.start({
   gql: {

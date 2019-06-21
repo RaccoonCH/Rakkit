@@ -65,6 +65,10 @@ In the case of lists, we may also need to define their nullability in a more det
 
 In the config object we can also provide the `description` and `deprecationReason` properties for GraphQL schema purposes.
 
+::: danger
+If you don't type a field (or query/mutation/subcription) by default the field becomes nullable and the type is Boolean. It returns `null` if you query it.
+:::
+
 So after these changes our example class would look like this:
 
 ```typescript

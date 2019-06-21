@@ -7,12 +7,12 @@ module.exports = {
     "/en/": {
       path: "/",
       lang: "en"
-    },
-    "/fr/": {
-      lang: "fr",
-      title: "Rakkit",
-      description: "Un framework écrit en TypeScript qui permet de créer des API REST/GraphQL pour vos applications backend"
-    },
+    }
+    // "/fr/": {
+    //   lang: "fr",
+    //   title: "Rakkit",
+    //   description: "Un framework écrit en TypeScript qui permet de créer des API REST/GraphQL pour vos applications backend"
+    // },
   },
   plugins: [
     [ 
@@ -143,110 +143,110 @@ module.exports = {
             ]
           }
         ]
-      },
-      "/fr/": {
-        editLinkText: "Editer cette page sur GitHub",
-        sidebar: [
-          {
-            title: "Commencer",
-            collapsable: false,
-            children: [
-              "/fr/start/installation",
-              "/fr/start/demos"
-            ]
-          },
-          {
-            title: "GraphQL",
-            collapsable: true,
-            children: [
-              {
-                title: "Getting Started",
-                collapsable: false,
-                children: [
-                  "/en/graphql/start/introduction",
-                  "/en/graphql/start/installation",
-                  "/en/graphql/start/bootstrap"
-                ]
-              },
-              {
-                title: "Type definition",
-                collapsable: false,
-                children: [
-                  "/en/graphql/type/type-definition",
-                  "/en/graphql/type/inheritance",
-                  "/en/graphql/type/generics",
-                  "/en/graphql/type/interfaces",
-                  "/en/graphql/type/unions",
-                  "/en/graphql/type/enums",
-                  "/en/graphql/type/scalars"
-                ]
-              },
-              {
-                title: "Networking & Queries",
-                collapsable: false,
-                children: [
-                  "/en/graphql/query/resolvers",
-                  "/en/graphql/query/middlewares",
-                  "/en/graphql/query/subscriptions"
-                ]
-              },
-              {
-                title: "Misc",
-                collapsable: false,
-                children: [
-                  "/en/graphql/misc/write-schema"
-                ]
-              }
-            ]
-          },
-          {
-            title: "REST",
-            collapsable: true,
-            children: [
-              "/fr/rest/router",
-              "/fr/rest/middlewares",
-              "/fr/rest/koa-middlewares",
-              "/fr/rest/serving-static-files"
-            ]
-          },
-          {
-            title: "Websocket",
-            collapsable: true,
-            children: [
-              "/fr/ws/introduction",
-              "/fr/ws/server-side",
-              "/fr/ws/client-side"
-            ]
-          },
-          {
-            title: "DI",
-            collapsable: true,
-            children: [
-              "/fr/di/introduction",
-              "/fr/di/services-and-injections",
-              "/fr/di/inheritance",
-              "/fr/di/api",
-              "/fr/di/limitations"
-            ]
-          },
-          {
-            title: "API",
-            collapsable: true,
-            children: [
-              "/fr/api/metadata-storage",
-              "/fr/api/rakkit"
-            ]
-          },
-          {
-            title: "Développement",
-            collapsable: true,
-            children: [
-              "/fr/dev/contributing",
-              "/fr/dev/changelog"
-            ]
-          }
-        ]
       }
+      // "/fr/": {
+      //   editLinkText: "Editer cette page sur GitHub",
+      //   sidebar: [
+      //     {
+      //       title: "Commencer",
+      //       collapsable: false,
+      //       children: [
+      //         "/fr/start/installation",
+      //         "/fr/start/demos"
+      //       ]
+      //     },
+      //     {
+      //       title: "GraphQL",
+      //       collapsable: true,
+      //       children: [
+      //         {
+      //           title: "Getting Started",
+      //           collapsable: false,
+      //           children: [
+      //             "/en/graphql/start/introduction",
+      //             "/en/graphql/start/installation",
+      //             "/en/graphql/start/bootstrap"
+      //           ]
+      //         },
+      //         {
+      //           title: "Type definition",
+      //           collapsable: false,
+      //           children: [
+      //             "/en/graphql/type/type-definition",
+      //             "/en/graphql/type/inheritance",
+      //             "/en/graphql/type/generics",
+      //             "/en/graphql/type/interfaces",
+      //             "/en/graphql/type/unions",
+      //             "/en/graphql/type/enums",
+      //             "/en/graphql/type/scalars"
+      //           ]
+      //         },
+      //         {
+      //           title: "Networking & Queries",
+      //           collapsable: false,
+      //           children: [
+      //             "/en/graphql/query/resolvers",
+      //             "/en/graphql/query/middlewares",
+      //             "/en/graphql/query/subscriptions"
+      //           ]
+      //         },
+      //         {
+      //           title: "Misc",
+      //           collapsable: false,
+      //           children: [
+      //             "/en/graphql/misc/write-schema"
+      //           ]
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       title: "REST",
+      //       collapsable: true,
+      //       children: [
+      //         "/fr/rest/router",
+      //         "/fr/rest/middlewares",
+      //         "/fr/rest/koa-middlewares",
+      //         "/fr/rest/serving-static-files"
+      //       ]
+      //     },
+      //     {
+      //       title: "Websocket",
+      //       collapsable: true,
+      //       children: [
+      //         "/fr/ws/introduction",
+      //         "/fr/ws/server-side",
+      //         "/fr/ws/client-side"
+      //       ]
+      //     },
+      //     {
+      //       title: "DI",
+      //       collapsable: true,
+      //       children: [
+      //         "/fr/di/introduction",
+      //         "/fr/di/services-and-injections",
+      //         "/fr/di/inheritance",
+      //         "/fr/di/api",
+      //         "/fr/di/limitations"
+      //       ]
+      //     },
+      //     {
+      //       title: "API",
+      //       collapsable: true,
+      //       children: [
+      //         "/fr/api/metadata-storage",
+      //         "/fr/api/rakkit"
+      //       ]
+      //     },
+      //     {
+      //       title: "Développement",
+      //       collapsable: true,
+      //       children: [
+      //         "/fr/dev/contributing",
+      //         "/fr/dev/changelog"
+      //       ]
+      //     }
+      //   ]
+      // }
     }
   }
 }

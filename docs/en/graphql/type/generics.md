@@ -130,7 +130,3 @@ class UserResolver {
   }
 }
 ```
-
-## Examples
-
-A more advanced usage example of the generic types feature can be found in [this examples folder](https://github.com/19majkel94/type-graphql/tree/master/examples/generic-types) from TypeGraphQL.

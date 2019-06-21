@@ -157,9 +157,12 @@ class AddRecipeInput implements Partial<Recipe> {
 }
 ```
 
-## Querying, context and next
+## Querying, args and context
 
+#### Args
 After that we can use the `AddRecipeInput` type in our mutation. We can do this inline (using the `@Arg()` decorator) or as a field of the args class like in the query example above.
+
+#### Context
 
 We may also need access to the context. To achieve this there is an extra arguments (after your args) that has the `IContext` type. The GraphQL query information is available with the `context.gql` property.
 
@@ -182,37 +185,6 @@ class RecipeResolver {
 }
 ```
 
-### Different ways send the response
-
-You have multiple ways to return a result for you queries (to have a full compatibility between REST and GraphQL middlewares) :
-- using **`return`**
-- using **`context.gql.response`**
-- using **`context.body`**
-- using **`context.response.body`**
-
-If you don't use the return keyword you might want to type the response by passing the return type to `IContext`, for example:
-
-```typescript
-import { IContext } from "rakkit";
-
-@Resolver()
-class RecipeResolver {
-  // ...
-  @Mutation()
-  addRecipe(
-    @Arg("data") newRecipeData: AddRecipeInput,
-    context: IContext<Recipe>
-  ) {
-    // sample implementation
-    const recipe = RecipesUtils.create(newRecipeData, ctx.user);
-    this.recipesCollection.push(recipe);
-    context.gql.response = recipe;
-  }
-}
-```
-
-Because our method is synchronous and explicitly returns `Recipe`, we can omit the `@Mutation()` type annotation.
-
 This declaration will result in the following part of the schema in SDL:
 
 ```graphql
@@ -225,6 +197,47 @@ input AddRecipeInput {
 ```graphql
 type Mutation {
   addRecipe(data: AddRecipeInput!): Recipe!
+}
+```
+
+### Different ways send the response
+
+You have multiple ways to return a result for you queries (to have a full compatibility between REST and GraphQL middlewares) :
+- using **`return`**
+- using **`context.gql.response`**
+- using **`context.body`**
+- using **`context.response.body`** (:warning: response undefined, if you don't injected the koa context to your GraphQL server)
+
+The main problem with the return type is that you must call next before the return keyword, like this:
+
+```typescript
+import { IContext, NextFunction } from "rakkit";
+
+@Resolver()
+class SpeakerResolver {
+  @Query()
+  async sayHello(context: IContext, next: NextFunction): string {
+    await next(); // Next before the return keyword...
+    return "hello";
+  }
+}
+```
+
+So to resolve this issue and the REST/GraphQL middleware compatibility we implemented multiple ways to achieve it by using context property assignation. You must pass the return type to the decorator and you can type the property by passing the response type to `IContext`.  
+For example with `context.gql.response`:
+
+```typescript
+import { IContext, NextFunction } from "rakkit";
+
+@Resolver()
+class SpeakerResolver {
+  @Query(type => String)
+  async sayHello(
+    context: IContext<string>,
+    next: NextFunction
+  ) {
+    context.gql.response = "hello";
+    await next(); // Next AFTER the return assignation
 }
 ```
 
@@ -257,30 +270,16 @@ class RecipeResolver {
 }
 ```
 
-We then mark the method as a field resolver with the `@FieldResolver()` decorator. Since we've already defined the field type in the `Recipe` class definition, there's no need to redefine it. We also decorate the method parameters with the `@Root` decorator in order to inject the recipe object.
+We then mark the method as a field resolver with the `@FieldResolver()` decorator. Since we've already defined the field type in the `Recipe` class definition, there's no need to redefine it. We can get the root object of the field resolver with `context.gql.root` and you can type it by passing the type as the second parameter.
 
 ```typescript
 @Resolver(of => Recipe)
 class RecipeResolver {
   // queries and mutations
 
-  @FieldResolver()
-  averageRating(@Root() recipe: Recipe) {
-    // ...
-  }
-}
-```
-
-For enhanced type safety we can implement the `ResolverInterface<Recipe>` interface.
-It's a small helper that checks if the return type of the field resolver methods, like `averageRating(...)`, matches the `averageRating` property of the `Recipe` class and whether the first parameter of the method is the actual object type (`Recipe` class).
-
-```typescript
-@Resolver(of => Recipe)
-class RecipeResolver implements ResolverInterface<Recipe> {
-  // queries and mutations
-
-  @FieldResolver()
-  averageRating(@Root() recipe: Recipe) {
+  @FieldResolver(type => Number)
+  averageRating(context: IContext<number, Recipe>) {
+    const root = context.gql.root;
     // ...
   }
 }
@@ -290,11 +289,12 @@ Here is the full implementation of the sample `averageRating` field resolver:
 
 ```typescript
 @Resolver(of => Recipe)
-class RecipeResolver implements ResolverInterface<Recipe> {
+class RecipeResolver {
   // queries and mutations
 
-  @FieldResolver()
-  averageRating(@Root() recipe: Recipe) {
+  @FieldResolver(type => Number, { nullable: true })
+  averageRating(context: IContext<any, Recipe>): Number {
+    const recipe = context.gql.root;
     const ratingsSum = recipe.ratings.reduce((a, b) => a + b, 0);
     return recipe.ratings.length ? ratingsSum / recipe.ratings.length : null;
   }
@@ -317,7 +317,7 @@ class Recipe {
   @Field(type => [Rate])
   ratings: Rate[];
 
-  @Field(type => Float, { nullable: true })
+  @Field(type => Number, { nullable: true })
   averageRating(@Arg("since") sinceDate: Date): number | null {
     const ratings = this.ratings.filter(rate => rate.date > sinceDate);
     if (!ratings.length) return null;
@@ -340,7 +340,8 @@ class RecipeResolver implements ResolverInterface<Recipe> {
   ) {}
 
   @FieldResolver()
-  async author(@Root() recipe: Recipe) {
+  async author(context: IContext<User, Recipe>): User {
+    const recipe = context.gql.root;
     const author = await this.userRepository.findById(recipe.userId);
     if (!author) throw new SomethingWentWrongError();
     return author;
@@ -353,8 +354,3 @@ Note that if a field name of a field resolver doesn't exist in the resolver obje
 ## Resolver Inheritance
 
 Resolver class `inheritance` is an advanced topic covered in the [resolver inheritance docs](inheritance.md#resolvers-inheritance).
-
-## Examples
-
-These code samples are just made up for tutorial purposes.
-You can find more advanced, real examples in the [examples folder on the repository](https://github.com/19majkel94/type-graphql/tree/master/examples).

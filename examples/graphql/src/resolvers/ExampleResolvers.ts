@@ -61,10 +61,8 @@ export class ExampleResolver3 {
   }
 
   @FieldResolver(type => String)
-  private async aa(
-    @Arg("param0")
-    param: String,
-    context: IContext<String>,
+  async aa(
+    context: IContext<any, ExampleObjectType>,
     next: NextFunction
   ) {
     context.gql.response = "a";

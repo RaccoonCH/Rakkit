@@ -24,7 +24,7 @@ Also, the `reflect-metadata` shim is required to make the type reflection work:
 npm i reflect-metadata
 ```
 
-We must ensure that it is imported at the top of our entry file (before we use/import `type-graphql` or our resolvers):
+We must ensure that it is imported at the top of our entry file (before we use/import `rakkit` or our resolvers):
 
 ```typescript
 import "reflect-metadata";
@@ -41,7 +41,7 @@ It's important to set these options in the `tsconfig.json` file of our project:
 }
 ```
 
-`Rakkit` is designed to work with Node.js LTS (8, 10) and the latest stable releases. It uses features from ES7 (ES2016) so we should set our `tsconfig.json` file appropriately:
+Rakkit is designed to work with Node.js LTS (8, 10) and the latest stable releases. It uses features from ES7 (ES2016) so we should set our `tsconfig.json` file appropriately:
 
 ```js
 {

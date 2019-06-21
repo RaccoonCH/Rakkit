@@ -7,7 +7,7 @@ sidebar_label: What & Why
 
 We all love GraphQL! It's really great and solves many problems that we have with REST APIs, such as overfetching and underfetching. But developing a GraphQL API in Node.js with TypeScript is sometimes a bit of a pain.
 
-Rakkit's GraphQL Package works basically the some way as [TypeGraphQL](https://github.com/19majkel94/type-graphql) does (but it's not the same code base). So this documentation is based on theirs.
+Rakkit's GraphQL Package works basically the same way as [TypeGraphQL](https://github.com/19majkel94/type-graphql) does (but it's not the same code base). So this documentation is based on theirs.
 
 ## What?
 
@@ -62,5 +62,5 @@ The biggest problem is code redundancy (DRY principle) which makes it difficult 
 
 ## Copyrights
 
-This documentation is based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)** documentation, because our framework works almost the same way. As a result, parts of it will be modified and others added. The name Rakkit will then be replaced by Rakkit.
+This documentation is based on the **[TypeGraphQL](https://github.com/19majkel94/type-graphql)** documentation, because our framework works almost the same way. As a result, parts of it will be modified and others added. The name Rakkit can, in most cases, be replaced by TypeGraphQL.
 *Copyright (c) 2018 Michał Lytek*
