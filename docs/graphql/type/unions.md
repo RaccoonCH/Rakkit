@@ -66,7 +66,7 @@ class SearchResolver {
 
 **Rakkit automatically determines** the type using instanceof if you return a class instance. However, if a plain-object is returned it will find the type thanks to the different fields provided.  
 
-We can also provide our own `resolveType` function (like [interfaces](/interfaces)) implementation to the `CreateUnion` options. This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, e.g.:
+We can also provide our own `resolveType` function (like [interfaces](/graphql/type/interfaces#resolving-type)) implementation to the `CreateUnion` options. This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, e.g.:
 
 ```typescript
 const SearchResultUnion = TypeCreator.CreateUnion({

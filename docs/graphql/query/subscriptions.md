@@ -2,6 +2,8 @@
 title: Subscriptions
 ---
 
+# Subcriptions
+
 GraphQL can be used to perform reads with queries and writes with mutations.
 However, oftentimes clients want to get updates pushed to them from the server when data they care about changes.
 To support that, GraphQL has a third operation: subscription. Rakkit of course has great support for subscription, using the [graphql-subscriptions](https://github.com/apollographql/graphql-subscriptions) package created by [Apollo GraphQL](https://www.apollographql.com/).
@@ -72,7 +74,9 @@ class SampleResolver {
 }
 ```
 
-> Be aware that we can't mix the `subscribe` option with the `topics` and `filter` options. If the filtering is still needed, we can use the [`withFilter` function](https://github.com/apollographql/graphql-subscriptions#filters) from the `graphql-subscriptions` package.
+::: warning
+Be aware that we can't mix the `subscribe` option with the `topics` and `filter` options. If the filtering is still needed, we can use the [`withFilter` function](https://github.com/apollographql/graphql-subscriptions#filters) from the `graphql-subscriptions` package.
+:::
 
 Now we can implement the subscription resolver. It will receive the payload **before the context**. There, we can transform it to the returned shape.
 

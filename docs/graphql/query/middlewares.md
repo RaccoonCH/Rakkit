@@ -15,7 +15,7 @@ We may be familiar with how middleware works in [`express.js`](https://expressjs
 ### Declaring a middleware
 
 REST and GraphQL are both Rakkit packages and use the same routing engine, so the way to declare middleware is the same as for REST.   
-Therefore you can **refer to the [documentation](/en/rest/middlewares)** made for REST middlewares to declare them for GraphQL.
+Therefore you can **refer to the [documentation](/rest/middlewares)** made for REST middlewares to declare them for GraphQL.
 
 ### Attaching Middleware
 

@@ -8,8 +8,8 @@ After creating our resolvers, type classes, and other business-related code, we 
 
 ## Create Executable Schema
 
-To create an executable schema from type and resolver definitions, we need to use the `buildSchema` function.
-It takes a configuration object as a parameter and returns a promise of a `GraphQLSchema` object.
+To create an executable schema from type and resolver definitions, we need to use the `Rakkit.start` method.
+It takes a configuration object as a parameter and then you can access to the schema by `Rakkit.MetadataStorage.Gql.Schema`.
 
 In the configuration object you must provide a `resolvers` property, which can be an array of resolver classes:
 

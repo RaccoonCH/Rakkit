@@ -4,6 +4,8 @@ title: Types and Fields
 
 # Type definition
 
+## Types and fields
+
 The main idea of Rakkit is to automatically create GraphQL schema definitions from TypeScript classes. To avoid the need for schema definition files and interfaces describing the schema, we use decorators and a bit of reflection magic.
 
 Let's start by defining our example TypeScript class which represents our `Recipe` model with fields for storing the recipe data:
@@ -57,7 +59,7 @@ For simple types (like `string` or `boolean`) this is all that's needed but due 
 
 Why use function syntax and not a simple `{ type: Rate }` config object? Because, by using function syntax we solve the problem of circular dependencies (e.g. Post <--> User), so it was adopted as a convention. You can use the shorthand syntax `@Field(() => Rate)` (or `@Field(type => Rate)` to be explicit) if you want to save some keystrokes but it might be less readable for others.
 
-By default, all fields are non nullable, just like properties in TypeScript. However, you can change that behavior by providing `nullableByDefault: true` option in `Rakkit.start` settings, described in [bootstrap guide](/en/graphql/start/bootstrap).
+By default, all fields are non nullable, just like properties in TypeScript. However, you can change that behavior by providing `nullableByDefault: true` option in `Rakkit.start` settings, described in [bootstrap guide](/graphql/start/bootstrap).
 
 So for nullable properties like `averageRating` which might not be defined when a recipe has no ratings yet, we mark the class property as optional with a `?:` operator and also have to pass the `{ nullable: true }` decorator parameter. We should be aware that when we declare our type as a nullable union (e.g. `string | null`), we need to explicitly provide the type to the `@Field` decorator.
 
@@ -123,16 +125,16 @@ type Rate {
 }
 ```
 
-As we can see, for the `id` property of `Recipe` we passed `type => ID` and for the `value` field of `Rate` we passed `type => Int`. This way we can overwrite the inferred type from the reflection metadata. We can read more about the ID and Int scalars in [the scalars docs](/en/graphql/type/scalars). There is also a section about the built-in `Date` scalar.
+As we can see, for the `id` property of `Recipe` we passed `type => ID` and for the `value` field of `Rate` we passed `type => Int`. This way we can overwrite the inferred type from the reflection metadata. We can read more about the ID and Int scalars in [the scalars docs](/graphql/type/scalars). There is also a section about the built-in `Date` scalar.
 
 Also the `user` property doesn't have a `@Field()` decorator - this way we can hide some properties of our data model. In this case, we need to store the `user` field of the `Rate` object to the database in order to prevent multiple rates, but we don't want to make it publicly accessible.
 
-Note that if a field of an object type is purely calculable (e.g. `averageRating` from `ratings` array) and we don't want to pollute the class signature, we can omit it and just implement the field resolver (described in [resolvers doc](/en/graphql/query/resolvers)).
+Note that if a field of an object type is purely calculable (e.g. `averageRating` from `ratings` array) and we don't want to pollute the class signature, we can omit it and just implement the field resolver (described in [resolvers doc](/graphql/query/resolvers/#field-resolvers)).
 
-You can also create `Required` and `Partial` type from an ObjectType, InputType or InterfaceType with the [TypeCreator](/en/graphql/type/type-creator)'s API.
+You can also create `Required` and `Partial` type from an ObjectType, InputType or InterfaceType with the [TypeCreator](/graphql/type/type-creator)'s API.
 
 ## Field resolver
-You can define queries in types that are linked to fields. It works the same way as for [`@Query()`](/en/graphql/query/resolvers) but you the difference is that you must use the `@Field()` decorator.
+You can define queries in types that are linked to fields. It works the same way as for [@Query()](/graphql/query/resolvers/#queries-and-mutations) but you the difference is that you must use the `@Field()` decorator.
 
 ```typescript
 @ObjectType()

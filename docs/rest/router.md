@@ -5,7 +5,7 @@ They are based on the same operation as those of [koa](https://koajs.com/). You 
 **Router decorator**  
 **`@Router(path: string)`**  
 - He decorates a **class**.  
-- **Declares the class as a router**, the `path` parameter is the **router access path**. Which will be accessible according to the parameters you provided in the [start options](http://localhost:3000/#/fr/GettingStarted?id=param%C3%A8tres-de-d%C3%A9start) and the value provided to the declaration of endpoints in the class (see below).  
+- **Declares the class as a router**, the `path` parameter is the **router access path**. Which will be accessible according to the parameters you provided in the [start options](/start/getting-started/#rest-parameters) and the value provided to the declaration of endpoints in the class (see below).  
 
 **Enpoint decorator**  
 **`@Get(endpoint?: string) & @Post & @Put & Delete`**  
@@ -49,8 +49,8 @@ export class ExampleRouter {
 
 ## Route merging
 You can have two **class methods** that have the same **http method** as well as the same **endpoint** in order to chain the executions that are done **in the order of declaration of methods in the class**.  
-_Especially useful when coupled with the use of [middlewares](http://localhost:3000/#/fr/Middleware)_  
-To be able to use this feature you will need to understand how the [next](http://localhost:3000/#/fr/Middleware?id=before-all-function-next) function works.  
+_Especially useful when coupled with the use of [middlewares](/rest/middlewares)_  
+To be able to use this feature you will need to understand how the [next](/rest/middlewares/#first-of-all-the-next-function) function works.  
 
 Roads can be merged this way:
 ```typescript
@@ -69,7 +69,7 @@ export class ExampleRouter {
   }
 }
 ```
-**Precision on the function [next](http://localhost:3000/#/fr/Middleware?id=before-all-function-next)**   
+**Precision on the function [next](/rest/middlewares/#first-of-all-the-next-function)**   
 How we can observe it, we **just needed to call the function next to the first method** (`first`) because we want **to go to the second** `second` .  
-In this example if the client accesses the route `http://localhost:4000/example`, he will receive the answer: `hello world`.  
+In this example if the client accesses the route `http://localhost:4000/rest/example`, he will receive the answer: `hello world`.  
 Main if the next function had not been called, the client would have just received `hello`.

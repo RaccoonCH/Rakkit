@@ -4,13 +4,13 @@ title: Generic Types
 
 # Generic Types
 
-[Type Inheritance](/inheritance) is a great way to reduce code duplication by extracting common fields to the base class. But in some cases, the strict set of fields is not enough because we might need to declare the types of some fields in a more flexible way, like a type parameter (e.g. `items: T[]` in case of a pagination).
+[Type Inheritance](/graphql/type/inheritance) is a great way to reduce code duplication by extracting common fields to the base class. But in some cases, the strict set of fields is not enough because we might need to declare the types of some fields in a more flexible way, like a type parameter (e.g. `items: T[]` in case of a pagination).
 
 Hence Rakkit also has support for describing generic GraphQL types.
 
 ## How to?
 
-Unfortunately, the limited reflection capabilities of TypeScript don't allow for combining decorators with standard generic classes. To achieve behavior like that of generic types, we use the same class-creator pattern like the one described in the [Resolvers Inheritance](/inheritance) docs.
+Unfortunately, the limited reflection capabilities of TypeScript don't allow for combining decorators with standard generic classes. To achieve behavior like that of generic types, we use the same class-creator pattern like the one described in the [Resolvers Inheritance](/graphql/type/inheritance/#resolver-inheritance) docs.
 
 Start by defining a `PaginatedResponse` function that creates and returns a `PaginatedResponseClass`:
 

@@ -5,7 +5,7 @@ To use it you will need the instance of the main router available via the `Metad
 ```typescript
 import { Serve } from "static-koa-router";
 
-Serve(`${__dirname}/public`, MetadataStorage.Instance.Rest.MainRouter)
+Serve(`${__dirname}/public`, Rakkit.MetadataStorage.Rest.MainRouter)
 ```
 
 You can also mount it on a router that you can create by yourself using the `koa-router` library. But be careful not to avoid a router that you would have declared with the same route.

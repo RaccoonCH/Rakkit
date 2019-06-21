@@ -2,7 +2,7 @@
 title: Getting started
 ---
 
-# Getting started
+## Getting started
 In order to start the application you will need to use the `Rakkit` class and access the static `start` method of it.  
 Here is an example:
 ```typescript
@@ -37,7 +37,7 @@ You can pass several parameters when starting the application in the `start` met
 | globalMiddlewaresExclude | `string[]` | `[]` | Don't apply globalMiddlewares for some types of fields |
 | nullableByDefault | `boolean` | `false` | Tell to Rakkit to make all fields nullable by default |
 | inArrayNullableByDefault | `boolean` | `false` | Tell to Rakkit to make all depth of a multi-dimensional array nullable by default |
-| scalarsMap | `IScalarAssociation[]` | `[]` | Link a class to a scalar graphql type. |
+| scalarsMap | `IScalarAssociation[]` | `[]` | Link a class to a scalar graphql type. More details [here](/graphql/type/scalars/#custom-scalars). |
 | dateMode | `"isoDate" | "timestamp"` | `"isoDate"` | The GraphQL scalar type that is associated to the Date type |
 | pubSub | `PubSubEngine` | `new PubSub()` (from [graphql-subscriptions](https://github.com/apollographql/graphql-subscriptions)) | Your custom PubSub engine instance  |
 | emitSchemaFile | `string` | `undefined` | Write the schema file in SDL to the specified path |

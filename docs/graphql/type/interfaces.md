@@ -51,7 +51,7 @@ We can also omit the decorators since the GraphQL types will be copied from the 
 
 Be aware that when our object type is implementing a GraphQL interface type, **we have to return an instance of the type class** in our resolvers. Otherwise, `graphql-js` will not be able to detect the underlying GraphQL type correctly.
 
-We can also provide our own `resolveType` function implementation to the `@InterfaceType` options (available too for TypeCreator.CreateUnion). This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, the same ways [like in unions](/unions).
+We can also provide our own `resolveType` function implementation to the `@InterfaceType` options (available too for TypeCreator.CreateUnion). This way we can return plain objects in resolvers and then determine the returned object type by checking the shape of the data object, the same ways [like in unions](/graphql/type/unions/#resolving-type).
 
 But **Rakkit automatically determines** the type using instanceof if you return a class instance. However, if a plain-object is returned it will find the type thanks to the different fields provided.
 

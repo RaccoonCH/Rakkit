@@ -42,7 +42,7 @@ class Post {
 It works the same way as for [Partial types](#partial) but the TypeCreator method is `TypeCreator.CreateRequired`
 
 ## Enums
-The enum type documentation is available [here](/en/graphql/type/enums)
+The enum type documentation is available [here](/graphql/type/enums)
 
 ## Unions
-The union type documentation is available [here](/en/graphql/type/unions)
+The union type documentation is available [here](/graphql/type/unions)

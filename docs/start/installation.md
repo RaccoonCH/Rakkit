@@ -23,8 +23,6 @@ title: Installation
   </p>
 </center>
 
-# Getting started
-
 ## Installation
 You can simply install **Rakkit** with `npm` or `yarn`.
 ```

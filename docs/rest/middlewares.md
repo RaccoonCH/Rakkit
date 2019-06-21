@@ -97,7 +97,7 @@ In this example we have this order of execution:
 - MySecondBeforeMiddleware
 - get
 - MyAfterMiddleware  
-When accessing the route `http://localhost:4000/example` we will therefore receive as an answer `-2;-1;0;1;`
+When accessing the route `http://localhost:4000/rest/example` we will therefore receive as an answer `-2;-1;0;1;`
 
 ### Declaration at router level
 By using middleware at the router, middleware will be applied to all points on the router.  
@@ -127,7 +127,7 @@ In this example we have this order of execution:
 - MySecondBeforeMiddleware
 - _Called route_
 - MyAfterMiddleware  
-By accessing any endpoint of this router: `http://localhost:4000/example/*` (`/` or `/foo`) we will receive as an answer `-2;-1;0;1;`
+By accessing any endpoint of this router: `http://localhost:4000/rest/example/*` (`/` or `/foo`) we will receive as an answer `-2;-1;0;1;`
 
 ### Declaration at the global level
 You can **apply middlewares to all routers in your application (i.e. to all endpoints)** by passing the list of these in the `globalRestMiddlewares` (`/rest` by default) or `globalRootMiddlewares` (`/` root) property of `Rakkit` as parameters.  
@@ -136,33 +136,36 @@ You can also use this feature to **attach Koa** "plugins", such as [koa-bodypars
 import * as BodyParser from "koa-bodyparser";
 
 Rakkit.start({
-  globalRootMiddlewares: [
-    BodyParser(); // Parse the request's body before accessing any other method
-  ],
-  globalRestMiddlewares: [
-    MyBeforeMiddleware,
-    MySecondBeforeMiddleware,
-    MyAfterMiddleware
-  ]
+  rest: {
+    globalRootMiddlewares: [
+      MyBeforeMiddleware
+    ],
+    globalRestMiddlewares: [
+      MySecondBeforeMiddleware,
+      MyAfterMiddleware
+    ]
+  }
 });
 ```
 
-### AppMiddlewares
+### App middlewares
 It defines middleware directly on the instance of the Koa application and not on Koa-Router, this allows you for example to attach Koa modules.
 ```typescript
 import * as Cors from "@koa/cors";
 import * as BodyParser from "koa-bodyparser";
 
 Rakkit.start({
-  appMiddlewares: [
-    Cors(),
-    BodyParser()
-  ]
+  rest: {
+    globalAppMiddlewares: [
+      Cors(),
+      BodyParser()
+    ]
+  }
 });
 ```
 
 ## Special case: Merging endpoint and middlewares
-As explained in the [router](/#/en/router) part you can merge endpoints, you can also use middlewares with this notion.
+As explained in the [router](/rest/router#route-merging) part, you can merge endpoints, you can also use middlewares with this notion.
 
 ```typescript
 @Router("example")

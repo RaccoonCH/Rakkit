@@ -43,11 +43,13 @@ import { Rakkit } from "rakkit";
 import { ExampleWs } from "./ExampleWs.ts";
 
 Rakkit.start({
-  websockets: [
-    ExampleWs
-  ],
-  socketioOptions: {
-    path: "/ws-server"
+  ws: {
+    websockets: [
+      ExampleWs
+    ],
+    options: {
+      path: "/ws-server"
+    }
   }
 });
 ```

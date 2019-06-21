@@ -100,7 +100,7 @@ class C {
 ### Constructor injection
 Another way to inject a dependency, which is by the constructor, can be used.  
 It works the same way, but with this notation you don't have to decorate the injection if it is simple ( simple = @Inject() ).  
-However, you will not be able to **do circular injection** with this method unlike with property injection, this is explained in [below](http://localhost:3000/#/fr/DI?id=circular-dependencies) and that is why we recommend property injection.
+However, you will not be able to **do circular injection** with this method unlike with property injection, this is explained in [below](/di/limitations/#circular-dependencies) and that is why we recommend property injection.
 ```typescript
 @Service()
 @Service("a")

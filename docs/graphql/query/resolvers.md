@@ -4,7 +4,7 @@ title: Resolvers
 
 # Resolvers
 
-Besides [declaring GraphQL's object types](/graphql/type-definition), Rakkit allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or with **[Rakkit REST](/rest/router)**.
+Besides [declaring GraphQL's object types](/graphql/type/type-definition), Rakkit allows us to easily create queries, mutations and field resolvers - like normal class methods, similar to REST controllers in frameworks like Java `Spring`, .NET `Web API` or with **[Rakkit REST](/rest/router)**.
 
 ## Queries and Mutations
 
@@ -17,7 +17,7 @@ First we create the resolver class and annotate it with the `@Resolver()` decora
 class RecipeResolver {}
 ```
 
-We can use a DI framework (as described in the [dependency injection docs](/en/di/introduction)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
+We can use a DI framework (as described in the [dependency injection docs](/di/introduction)) to inject class dependencies (like services or repositories) or to store data inside the resolver class - it's guaranteed to be a single instance per app.
 
 ```typescript
 @Resolver()
@@ -130,7 +130,7 @@ type Query {
 
 ### Input types
 
-GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence Rakkit allows us to create inputs in the same way as [object types](/en/graphql/type/type-definition) but by using the `@InputType()` decorator:
+GraphQL mutations can be similarly created: Declare the class method, use the `@Mutation` decorator, create arguments, provide a return type (if needed) etc. But for mutations we usually use `input` types, hence Rakkit allows us to create inputs in the same way as [object types](/graphql/type/type-definition) but by using the `@InputType()` decorator:
 
 ```typescript
 @InputType()
@@ -353,4 +353,4 @@ Note that if a field name of a field resolver doesn't exist in the resolver obje
 
 ## Resolver Inheritance
 
-Resolver class `inheritance` is an advanced topic covered in the [resolver inheritance docs](inheritance.md#resolvers-inheritance).
+Resolver class `inheritance` is an advanced topic covered in the [resolver inheritance docs](/graphql/type/inheritance/#resolver-inheritance).
