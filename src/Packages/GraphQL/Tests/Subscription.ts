@@ -39,7 +39,7 @@ describe("GraphQL", () => {
       class SubscriptionResolver {
         @Query({ nullable: true })
         activeSub(
-          @Arg({ name: "topic" })
+          @Arg("topic")
           topic: string,
           context: IContext
         ): string {
@@ -51,7 +51,7 @@ describe("GraphQL", () => {
           topics: ({ args }) => args.topic
         })
         sub(
-          @Arg({ name: "topic" })
+          @Arg("topic")
           topic: string,
           payload: string,
           ctx: IContext,
@@ -142,7 +142,7 @@ describe("GraphQL", () => {
       class SubscriptionResolver {
         @Query({ nullable: true })
         activeSubCustom(
-          @Arg({ name: "topic" })
+          @Arg("topic")
           topic: string,
           context: IContext
         ): string {
@@ -249,7 +249,7 @@ describe("GraphQL", () => {
       class SubscriptionResolver {
         @Query({ nullable: true })
         activeSubCustom(
-          @Arg({ name: "topic" })
+          @Arg("topic")
           topic: string,
           context: IContext
         ): string {
@@ -265,7 +265,7 @@ describe("GraphQL", () => {
           }
         })
         subFilter(
-          @Arg({ name: "topic" })
+          @Arg("topic")
           topic: string,
           payload: string,
           ctx: IContext,

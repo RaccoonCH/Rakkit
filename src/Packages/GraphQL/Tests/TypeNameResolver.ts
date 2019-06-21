@@ -62,7 +62,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveProvidedInterfaceFn(
-          @Arg({ name: "interface" })
+          @Arg("interface")
           a: number
         ): ProvidedResolveInterface {
           switch (a) {
@@ -146,7 +146,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveSafelyInterfaceType(
-          @Arg({ name: "interface" })
+          @Arg("interface")
           a: Boolean
         ): ResolveInterface {
           return a ? new ResolveInterfaceOne() : new ResolveInterfaceTwo();
@@ -156,7 +156,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveUnsafelyInterfaceType(
-          @Arg({ name: "interface" })
+          @Arg("interface")
           a: Boolean
         ): ResolveInterface {
           let returnObj: (ResolveInterfaceOne | ResolveInterfaceTwo) = {
@@ -254,7 +254,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveProvidedUnion(
-          @Arg({ name: "union" })
+          @Arg("union")
           a: number
         ): typeof resolveUnion | Object {
           switch (a) {
@@ -331,7 +331,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveSafelyUnionType(
-          @Arg({ name: "union" })
+          @Arg("union")
           a: Boolean
         ): ResolveUnionOne | ResolveUnionTwo {
           return a ? new ResolveUnionOne() : new ResolveUnionTwo();
@@ -341,7 +341,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveUnsafelyUnionType(
-          @Arg({ name: "union" })
+          @Arg("union")
           a: Boolean
         ): ResolveUnionOne | ResolveUnionTwo {
           let returnObj: (ResolveUnionOne | ResolveUnionTwo) = {

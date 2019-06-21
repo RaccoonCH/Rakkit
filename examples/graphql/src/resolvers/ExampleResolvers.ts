@@ -10,7 +10,8 @@ import {
   Mutation,
   TypeCreator,
   Subscription,
-  FieldResolver
+  FieldResolver,
+  FlatArgs
 } from "../../../../src";
 import {
   getItems,
@@ -20,7 +21,8 @@ import {
   TestEnum,
   MyInterface,
   MyInterfaceObj1,
-  ExampleObjectType
+  ExampleObjectType,
+  RequiredExampleInputType
 } from "../objects/ExampleObjectType";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
@@ -40,11 +42,11 @@ export class ExampleResolver3 {
   @Query(type => union)
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
   async a(
-    @Arg(type => params, { nullable: true, flat: true })
+    @Arg("param0", type => params, { nullable: true })
     str: Response<ExampleInputType, ExampleInputType2>,
-    @Arg({ nullable: true, name: "zzz", flat: true })
-    stra: ExampleInputType2,
-    @Arg({ name: "aa", defaultValue: 123, description: "yo" })
+    @FlatArgs(type => RequiredExampleInputType)
+    stra: Required<ExampleInputType> ,
+    @Arg("aa", { defaultValue: 123, description: "yo" })
     aaa: number,
     context: IContext<ExampleInputType | ExampleInputType2>,
     next: NextFunction
@@ -60,7 +62,7 @@ export class ExampleResolver3 {
 
   @FieldResolver(type => String)
   private async aa(
-    @Arg()
+    @Arg("param0")
     param: String,
     context: IContext<String>,
     next: NextFunction
@@ -119,7 +121,10 @@ export class ExampleResolver {
     topics: "yo"
   })
   sub(
-    @Arg(type => [[[String]]], { name: "topic" })
+    @Arg("topic", type => [[[String]]], {
+      description: "yop",
+      defaultValue: []
+    })
     topic: String,
     payload: any,
     context: IContext,

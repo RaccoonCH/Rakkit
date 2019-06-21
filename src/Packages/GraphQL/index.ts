@@ -6,13 +6,13 @@ export * from "./Decorator/Decorators/Query/Mutation";
 export * from "./Decorator/Decorators/Query/Query";
 export * from "./Decorator/Decorators/Query/Resolver";
 export * from "./Decorator/Decorators/Query/Arg";
+export * from "./Decorator/Decorators/Query/FlatArgs";
 export * from "./Decorator/Decorators/Query/Subscription";
 export * from "./Decorator/Decorators/Type/InputType";
 export * from "./Decorator/Decorators/Type/ObjectType";
 export * from "./Decorator/Decorators/Type/InterfaceType";
 export * from "./Decorator/Decorators/Type/EnumType";
 export * from "./Decorator/Decorators/Type/ConcatName";
-export * from "./Helpers/DecoratorHelper";
 
 export * from "./Decorator/Types/IField";
 export * from "./Decorator/Types/IGqlType";
@@ -54,3 +54,5 @@ export * from "./Logic/TypeCreator";
 export * from "./Scalars/IsoDateTime";
 export * from "./Scalars/TimeStamp";
 export * from "./Scalars/Aliases";
+
+export * from "./Helpers/DecoratorHelper";

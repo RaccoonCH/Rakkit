@@ -1132,12 +1132,12 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             }
           });
           finalArg[fieldArg.name] = this.createFieldInstance(
-            fieldArg.type,
+            fieldArg,
             groupedArg
           );
         } else {
           finalArg[fieldArg.name] = this.createFieldInstance(
-            fieldArg.type,
+            fieldArg,
             args[fieldArg.name]
           );
         }
@@ -1153,26 +1153,36 @@ export class GqlMetadataBuilder extends MetadataBuilder {
    * @param fieldValue The value of the field
    */
   private createFieldInstance(
-    typeFn: TypeFn,
+    fieldDef: IHasType,
     fieldValue: any
   ) {
-    if (typeFn) {
-      const fieldType = typeFn();
+    if (fieldDef.type) {
+      const fieldType = fieldDef.type();
       const fieldGqlTypeDef = this.GetOneGqlTypeDef(fieldType);
       if (fieldGqlTypeDef && fieldValue) {
-        if (fieldGqlTypeDef.params.gqlType === GraphQLEnumType) {
-          return fieldGqlTypeDef.params.enumValues[fieldValue].value;
-        } else {
-          const instance = new (fieldType as IClassType)();
-          Object.entries(fieldValue).map(([key, value]) => {
-            const childField = this._fieldDefs.find((fieldDef) =>
-              fieldDef.class === fieldType &&
-              fieldDef.params.name === key
-            );
-            instance[childField.key] = this.createFieldInstance(childField.params.type, value);
-          });
-          return instance;
-        }
+        const parseArray = (values: any[] | any) => {
+          if (Array.isArray(values)) {
+            return values.map(parseArray);
+          } else {
+            if (fieldGqlTypeDef.params.gqlType === GraphQLEnumType) {
+              return fieldGqlTypeDef.params.enumValues[fieldValue].value;
+            } else {
+              const instance = new (fieldType as IClassType)();
+              Object.entries(values).map(([key, value]) => {
+                const childField = this._fieldDefs.find((fieldDef) =>
+                  fieldDef.class === fieldType &&
+                  fieldDef.params.name === key
+                );
+                if (childField) {
+                  instance[childField.key] = this.createFieldInstance(childField.params, value);
+                }
+              });
+              return instance;
+            }
+          }
+        };
+        const parsed = parseArray(fieldValue);
+        return parsed;
       }
     }
     return fieldValue;

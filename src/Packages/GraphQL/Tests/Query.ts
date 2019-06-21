@@ -23,7 +23,8 @@ import {
   NextFunction,
   MetadataStorage,
   IClassType,
-  FieldResolver
+  FieldResolver,
+  FlatArgs
 } from "../../..";
 import { wait } from "../../Core/Tests/Utils/Waiter";
 import { UseMiddleware } from "../../Routing";
@@ -90,24 +91,21 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolve(
-          @Arg({
+          @Arg("first", {
             defaultValue: "abc",
             description: "arg a",
-            name: "first",
             nullable: true
           })
           a: String,
-          @Arg({
+          @Arg("second", {
             defaultValue: 123,
             description: "arg b",
-            name: "second",
             nullable: true
           })
           b: Number,
-          @Arg(type => [[[String]]], {
+          @Arg("third", type => [[[String]]], {
             defaultValue: [[[]]],
             description: "arg c",
-            name: "third",
             nullable: false,
             arrayNullable: [false, true, false]
           })
@@ -165,10 +163,7 @@ describe("GraphQL", () => {
           nullable: true
         })
         resolveA(
-          @Arg({
-            name: "first",
-            nullable: true
-          })
+          @Arg("first", { nullable: true })
           a: string
         ): String {
           return a;
@@ -176,7 +171,7 @@ describe("GraphQL", () => {
 
         @FieldResolver()
         dynamicField(
-          @Arg()
+          @Arg("param0")
           param: string,
           context: IContext
         ): string {
@@ -199,7 +194,7 @@ describe("GraphQL", () => {
           name: "resolveB"
         })
         async resolve(
-          @Arg({ name: "second" })
+          @Arg("second")
           b: string,
           context: IContext<String>
         ) {
@@ -215,7 +210,7 @@ describe("GraphQL", () => {
           name: "resolveC"
         })
         async resolve(
-          @Arg({ name: "second" })
+          @Arg("second")
           c: string,
           context: IContext<String>
         ) {
@@ -329,6 +324,9 @@ describe("GraphQL", () => {
         class InputArgs {
           @Field()
           name: string;
+
+          @Field(type => [[[InputArgs]]], { nullable: true })
+          inputArgs: InputArgs[][][];
         }
 
         const responses: {
@@ -343,17 +341,17 @@ describe("GraphQL", () => {
         class ArgsParsingResolver {
           @Query()
           parseArgs(
-            @Arg(type => [[InputArgs]], { name: "arg" })
-            arg: [[InputArgs]],
-            @Arg({ name: "arg2" })
+            @Arg("arg", type => [[[InputArgs]]], { nullable: true })
+            arg: [[[InputArgs]]],
+            @Arg("arg2")
             arg2: string,
-            @Arg({ name: "arg3", nullable: true })
+            @Arg("arg3", { nullable: true })
             arg3: number,
             ctx: IContext,
             next: NextFunction
           ): string {
             responses.push({
-              arg: arg[0][0],
+              arg: arg[0][0][0],
               arg2,
               arg3,
               ctx,
@@ -364,11 +362,11 @@ describe("GraphQL", () => {
 
           @Query()
           parseArgsFlat(
-            @Arg({ name: "arg", flat: true })
+            @FlatArgs()
             arg: InputArgs,
-            @Arg({ name: "arg2" })
+            @Arg("arg2")
             arg2: string,
-            @Arg({ name: "arg3", nullable: true })
+            @Arg("arg3", { nullable: true })
             arg3: number,
             ctx: IContext,
             next: NextFunction
@@ -399,16 +397,19 @@ describe("GraphQL", () => {
         });
 
         await Axios.post("http://localhost:4000/graphql", {
-          query: 'query { parseArgs(arg: [[{name: "hello"}]], arg2: "hello2") }'
+          query: 'query { parseArgs(arg: [[[{ name: "hello", inputArgs: [[[{ name: "yes" }]]] }]]], arg2: "hello2") }'
         });
 
         await Axios.post("http://localhost:4000/graphql", {
-          query: 'query { parseArgsFlat(name: "hello", arg2: "hello2") }'
+          query: 'query { parseArgsFlat(name: "hello", inputArgs: [[[{ name: "yes" }]]], arg2: "hello2") }'
         });
+
+        expect(responses).toHaveLength(2);
 
         for (const res of responses) {
           expect(res.arg).toBeInstanceOf(InputArgs);
           expect(res.arg.name).toBe("hello");
+          expect(res.arg.inputArgs[0][0][0].name).toEqual("yes");
           expect(res.arg2).toBe("hello2");
           expect(res.arg3).toBe(undefined);
           expect(res.ctx.gql).not.toBe(undefined);

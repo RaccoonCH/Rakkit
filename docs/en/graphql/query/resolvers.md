@@ -68,8 +68,8 @@ class RecipeResolver {
   // ...
   @Query(returns => [Recipe])
   async recipes(
-    @Arg({ name: "title", nullable: true }) title?: string,
-    @Arg({ name: "servings", defaultValue: 2 }) servings: number,
+    @Arg("title", { nullable: true }) title?: string,
+    @Arg("servings", { defaultValue: 2 }) servings: number,
   ): Promise<Recipe[]> {
     // ...
   }
@@ -79,7 +79,7 @@ class RecipeResolver {
 ### Flat arguments
 
 TypeGraphQL behaviour is different, we have a virtual type that doesn't exists natively with GraphQL: `ArgsType`, basicaly it compiles it into an `InputType` but the difference is that the fields are flatten when you use it as query arguments.
-So with Rakkit we decided to keep the existing type that is provided by GraphQL, to flat it, you can simply pass `{ flat: true }` to the `@Arg()` decorator options.
+So with Rakkit we decided to keep the existing type that is provided by GraphQL, to flat it you must use the `@FlatArgs()` decorator.
 (You have only the `@Arg()` decorator, not `Arg`**`s`**)
 e.g.:
 
@@ -108,7 +108,7 @@ class RecipeResolver {
   // ...
   @Query(returns => [Recipe])
   async recipes(
-    @Arg({ flat: true })
+    @FlatArgs()
     recipeArgs: GetRecipesArgs
   ) {
     // sample implementation

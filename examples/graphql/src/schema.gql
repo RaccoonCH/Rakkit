@@ -137,12 +137,10 @@ type MyInterfaceObj2 implements MyInterface {
 
 type Query {
   a(
-    items: [GraphQLInputObjectTypeExampleInputType!]
-    items2: GraphQLInputObjectTypeExampleInputType2!
+    param0: GenericResponseGraphQLInputObjectTypeExampleInputTypeGraphQLInputObjectTypeExampleInputType2
     hello3: String!
-    hello4: String!
-    hello6: GraphQLInputObjectTypeExampleInputType
-    hello12: String
+    enumz: testEnum!
+    resolveMe: String!
 
     """yo"""
     aa: Float = 123
@@ -165,7 +163,10 @@ type Response {
 }
 
 type Subscription {
-  sub(topic: [[[String!]!]!]!): Boolean!
+  sub(
+    """yop"""
+    topic: [[[String!]!]!] = []
+  ): Boolean!
 }
 
 union test = GraphQLObjectTypeExampleInputType | GraphQLObjectTypeExampleInputType2RequiredExampleInputType

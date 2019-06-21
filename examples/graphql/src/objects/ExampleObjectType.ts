@@ -48,7 +48,7 @@ export class ExampleInputType {
   }
 }
 
-const RequiredExampleInputType = TypeCreator.CreateRequired(ExampleInputType, {
+export const RequiredExampleInputType = TypeCreator.CreateRequired(ExampleInputType, {
   name: "RequiredExampleInputType",
   gqlType: GQLObjectType
 });
