@@ -7,8 +7,9 @@ import { GoodbyeMiddleware } from "../../basic/src/middlewares/GoodbyeMiddleware
 @Router("yo")
 class Test {
   @Get("/test")
-  async yo(context: IContext, next: NextFunction) {
+  async yo(context: IContext<string>, next: NextFunction) {
     context.body = "hello";
+    console.log("ok");
     await next();
   }
 }
@@ -21,6 +22,10 @@ export class App {
       rest: {
         routers: [
           Test
+        ],
+        globalAppMiddlewares: [
+          HelloMiddleware,
+          GoodbyeMiddleware
         ]
       },
       gql: {

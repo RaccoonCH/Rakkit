@@ -79,8 +79,7 @@ class RecipeResolver {
 ### Flat arguments
 
 TypeGraphQL behaviour is different, we have a virtual type that doesn't exists natively with GraphQL: `ArgsType`, basicaly it compiles it into an `InputType` but the difference is that the fields are flatten when you use it as query arguments.
-So with Rakkit we decided to keep the existing type that is provided by GraphQL, to flat it you must use the `@FlatArgs()` decorator.
-(You have only the `@Arg()` decorator, not `Arg`**`s`**)
+So with Rakkit we decided to keep the existing type that is provided by GraphQL, to flat an InputType you must use the `@FlatArgs()` decorator.
 e.g.:
 
 ```typescript
