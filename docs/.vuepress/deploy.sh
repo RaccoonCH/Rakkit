@@ -14,5 +14,3 @@ git push -f https://owencalvin:${GITHUB_TOKEN}@github.com/RaccoonCH/Rakkit.git m
 
 cd ..
 rm -rf dist
-
-cd -
