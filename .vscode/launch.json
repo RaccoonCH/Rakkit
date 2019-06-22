@@ -18,6 +18,17 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug GraphQL",
+      "protocol": "inspector",
+      "args": ["${workspaceRoot}/examples/graphql/src/App.ts"],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Debug test classes",
       "protocol": "inspector",
       "args": ["${workspaceRoot}/tests/ClassesForTesting/DebugClasses.ts"],
