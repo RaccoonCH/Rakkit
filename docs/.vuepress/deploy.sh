@@ -10,7 +10,7 @@ git init
 git add -A
 git commit -m 'deploy'
 
-git push -f https://${GITHUB_TOKEN}@$github.com/RaccoonCH/Rakkit.git master:gh-pages
+git push -f https://owencalvin:${GITHUB_TOKEN}@github.com/RaccoonCH/Rakkit.git master:gh-pages
 
 cd ..
 rm -rf dist
