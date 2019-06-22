@@ -8,11 +8,15 @@ export class App {
 
   async start() {
     await Rakkit.start({
-      websockets: this._websockets,
-      routers: this._routers,
-      globalRestMiddlewares: [
-        BodyParser()
-      ]
+      ws: {
+        websockets: this._websockets
+      },
+      rest: {
+        routers: this._routers,
+        globalRestMiddlewares: [
+          BodyParser()
+        ]
+      }
     });
 
     Serve(

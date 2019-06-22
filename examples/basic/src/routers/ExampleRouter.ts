@@ -5,7 +5,7 @@ import {
   Router,
   Get,
   Inject,
-  Context,
+  IContext,
   NextFunction,
   UseMiddleware,
   Post
@@ -19,7 +19,7 @@ export class ExampleRouter {
 
   @Get("/")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
-  async get(context: Context, next: NextFunction) {
+  async get(context: IContext, next: NextFunction) {
     console.log(this._routerService);
     context.body = "Hello world";
     await next();
@@ -27,7 +27,7 @@ export class ExampleRouter {
 
   @Post("/")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
-  async post(context: Context, next: NextFunction) {
+  async post(context: IContext, next: NextFunction) {
     console.log(this._routerService);
     console.log(context.request.body);
     context.body = "Hello world";
@@ -36,7 +36,7 @@ export class ExampleRouter {
 
   @Get("/async")
   @UseMiddleware(HelloMiddleware, GoodbyeMiddleware)
-  async asyncJob(context: Context, next: NextFunction) {
+  async asyncJob(context: IContext, next: NextFunction) {
     await new Promise((resolve) => {
       setTimeout(resolve, 5000);
     });

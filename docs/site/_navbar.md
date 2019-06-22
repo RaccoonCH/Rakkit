@@ -1,1 +1,0 @@
-[:fr: Français](/fr/GettingStarted)

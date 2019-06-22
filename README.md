@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="docs/assets/logo.png" width="220" alt="Rakkit logo"/>
+  <img src="docs/.vuepress/public/logo.png" width="220" alt="Rakkit logo"/>
   <br>
-  A library written in <b>TypeScript</b> that provides <b>REST API</b> and <b>Websocket</b> tools to build amazing server-side applications
+  A library written in <b>TypeScript</b> that provides <b>REST/GraphQL API</b> and <b>Websocket</b> tools to build amazing server-side applications
   <p align="center">
     <a href="https://www.npmjs.com/package/rakkit">
       <img src="https://badge.fury.io/js/rakkit.svg">
@@ -36,22 +36,26 @@ yarn add rakkit
 The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 
 ## 🔨 Features (Fully typed, Class based & Decorators)  
+- GraphQL API creation
 - Dependency injection support
 - Rest API Creation ([koa](https://koajs.com/))
 - Websocket app creation ([socket.io](https://socket.io/))
 
 ## 🔮 The next step
-We want to integrate the use of GraphQL in a near future, like [type-graphql](https://github.com/19majkel94/type-graphql) does.
+An headless CMS !
 
 ## 📠 Chat with us
 - [Discord](https://discord.gg/McygUJb)
 - [Gitter](https://gitter.im/_rakkit_/community)
 
 ## 📔 The project history  
-Initially this tool was made in order to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a standalone library, so we choose to make it an independent tool to benefit the community and progress on a better basis.
+Initially this tool was made in order to create a homemade headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a standalone library, so we choose to make it an independent tool to benefit the community and progress on a better basis.
 
 ## 🧠 Philosophy  
-We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
+We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it.
 
 ## 💪 Contributing  
-All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).
+All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).  
+
+Actual contributors:
+- [Owen Calvin](https://github.com/OwenCalvin)
