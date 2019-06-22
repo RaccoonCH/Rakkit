@@ -17,6 +17,9 @@ title: Installation
     <a href="https://david-dm.org/RaccoonCH/Rakkit">
       <img src="https://david-dm.org/RaccoonCH/Rakkit.svg">
     </a>
+    <a href="https://bundlephobia.com/result?p=rakkit@latest">
+      <img src="https://badgen.net/bundlephobia/min/rakkit">
+    </a>
     <a href="https://gitter.im/_rakkit_/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge">
       <img src="https://badges.gitter.im/_rakkit_/community.svg">
     </a>
