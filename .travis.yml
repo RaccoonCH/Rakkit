@@ -20,7 +20,7 @@ jobs:
       node_js:
         - 11
       before_install:
-        - npm i -g vuepress @vuepress/plugin-google-analytics
+        - npm i -g vuepress @vuepress/plugin-google-analytics@next
       script:
         - npm run docs:publish
       notifications:
