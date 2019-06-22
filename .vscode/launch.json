@@ -7,28 +7,49 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug TS",
+      "name": "Debug app",
       "protocol": "inspector",
-      "args": ["${workspaceRoot}/examples/normal/src/App.ts"],
+      "args": ["${workspaceRoot}/examples/basic/src/App.ts"],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "name": "Debug GraphQL",
+      "protocol": "inspector",
+      "args": ["${workspaceRoot}/examples/graphql/src/App.ts"],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug test classes",
+      "protocol": "inspector",
+      "args": ["${workspaceRoot}/tests/ClassesForTesting/DebugClasses.ts"],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Debug tests",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
-        "--inspect-brk",
         "--inspect=9228",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
+        "--no-cache",
+        "--runInBand",
         "--config",
         "${workspaceRoot}/jest.config.json",
-        "--runInBand",
-        "--forceExit",
         "--coverage",
-        "--verbose",
-        "--detectOpenHandles"
+        "false"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
