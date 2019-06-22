@@ -4,7 +4,7 @@ set -e
 
 npm run docs:build
 
-cd .vuepress/dist
+cd docs/.vuepress/dist
 
 git init
 git add -A
