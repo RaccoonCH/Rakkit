@@ -27,7 +27,9 @@
   },
   "scripts": {
     "start": "ts-node -T examples/basic/src/App.ts",
-    "test": "jest --config jest.config.json --detectOpenHandles --runInBand --forceExit"
+    "test": "jest --config jest.config.json --detectOpenHandles --runInBand --forceExit",
+    "docs:build": "vuepress build docs",
+    "docs:publish": "sudo bash docs/.vuepress/deploy.sh"
   },
   "keywords": [
     "typescript",
