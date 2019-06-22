@@ -17,13 +17,10 @@ jobs:
           on_failure: always
     - stage: doc
       language: node_js
-      cache:
-        directories:
-          - "node_modules"
       node_js:
         - 11
       before_install:
-        - npm i -g vuepress
+        - npm i -g vuepress @vuepress/plugin-google-analytics
       script:
         - npm run docs:publish
       notifications:
