@@ -17,6 +17,9 @@ jobs:
           on_failure: always
     - stage: doc
       language: node_js
+      cache:
+        directories:
+          - "node_modules"
       node_js:
         - 11
       before_install:

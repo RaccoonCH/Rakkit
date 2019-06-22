@@ -33,7 +33,7 @@ yarn add rakkit
 ```
 
 ## 📜 Documentation
-The documentation is available [here](https://raccoonch.github.io/Rakkit/).
+The documentation is available [here](https://rakkit.dev).
 
 ## 🔨 Features (Fully typed, Class based & Decorators)  
 - GraphQL API creation
@@ -55,7 +55,7 @@ Initially this tool was made in order to create a homemade headless CMS. But as 
 We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it.
 
 ## 💪 Contributing  
-All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).  
+All information is available [here](https://rakkit.dev/dev/contributing.html).  
 
 Actual contributors:
 - [Owen Calvin](https://github.com/OwenCalvin)
