@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Scalars | Rakkit</title>
+    <meta name="description" content="A framework written in TypeScript that provides REST/GraphQL API and Websocket tools to build amazing server-side applications">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/favicon/site.webmanifest">
+  <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#3a0839">
+  <link rel="shortcut icon" href="/favicon/favicon.ico">
+  <meta name="msapplication-TileColor" content="#3a0839">
+  <meta name="msapplication-config" content="/favicon/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+    
+    <link rel="preload" href="/assets/css/0.styles.b5c449e4.css" as="style"><link rel="preload" href="/assets/js/app.cde378e9.js" as="script"><link rel="preload" href="/assets/js/2.d96be7e9.js" as="script"><link rel="preload" href="/assets/js/24.1720b743.js" as="script"><link rel="prefetch" href="/assets/js/10.aecf0b49.js"><link rel="prefetch" href="/assets/js/11.df9dc6e2.js"><link rel="prefetch" href="/assets/js/12.3b278416.js"><link rel="prefetch" href="/assets/js/13.69323374.js"><link rel="prefetch" href="/assets/js/14.38a4229d.js"><link rel="prefetch" href="/assets/js/15.aa7c2e84.js"><link rel="prefetch" href="/assets/js/16.14dd4f7f.js"><link rel="prefetch" href="/assets/js/17.150d4321.js"><link rel="prefetch" href="/assets/js/18.cff99b80.js"><link rel="prefetch" href="/assets/js/19.7b694b98.js"><link rel="prefetch" href="/assets/js/20.ca08d56f.js"><link rel="prefetch" href="/assets/js/21.6a3b9e5f.js"><link rel="prefetch" href="/assets/js/22.7f88cba3.js"><link rel="prefetch" href="/assets/js/23.82ba9afb.js"><link rel="prefetch" href="/assets/js/25.b010b571.js"><link rel="prefetch" href="/assets/js/26.a889ca22.js"><link rel="prefetch" href="/assets/js/27.90a281c7.js"><link rel="prefetch" href="/assets/js/28.e11f2d40.js"><link rel="prefetch" href="/assets/js/29.9045cc84.js"><link rel="prefetch" href="/assets/js/3.22cc39cc.js"><link rel="prefetch" href="/assets/js/30.9cec3ced.js"><link rel="prefetch" href="/assets/js/31.68693ff8.js"><link rel="prefetch" href="/assets/js/32.1990966a.js"><link rel="prefetch" href="/assets/js/33.2a40d71d.js"><link rel="prefetch" href="/assets/js/34.773a0e2f.js"><link rel="prefetch" href="/assets/js/35.15a7eaea.js"><link rel="prefetch" href="/assets/js/36.a096f572.js"><link rel="prefetch" href="/assets/js/37.c47c4bc8.js"><link rel="prefetch" href="/assets/js/38.fd660314.js"><link rel="prefetch" href="/assets/js/39.43aeedbe.js"><link rel="prefetch" href="/assets/js/4.bc2927b0.js"><link rel="prefetch" href="/assets/js/5.e57150a0.js"><link rel="prefetch" href="/assets/js/6.61a82962.js"><link rel="prefetch" href="/assets/js/7.7354f340.js"><link rel="prefetch" href="/assets/js/8.b9aa947b.js"><link rel="prefetch" href="/assets/js/9.e07fc09c.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.b5c449e4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/logo.png" alt="Rakkit" class="logo"> <span class="site-name can-hide">Rakkit</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"> <a href="https://github.com/raccoonch/rakkit" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"> <a href="https://github.com/raccoonch/rakkit" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Getting started</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/start/installation.html" class="sidebar-link">Installation</a></li><li><a href="/start/getting-started.html" class="sidebar-link">Getting started</a></li><li><a href="/start/rakkit.html" class="sidebar-link">The Rakkit class</a></li><li><a href="/start/demos.html" class="sidebar-link">Demos</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>GraphQL</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>REST</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>Websocket</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>DI</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>Development</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/dev/contributing.html" class="sidebar-link">Contribution</a></li><li><a href="/dev/changelog.html" class="sidebar-link">Changelog</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="scalars"><a href="#scalars" aria-hidden="true" class="header-anchor">#</a> Scalars</h1> <h2 id="aliases"><a href="#aliases" aria-hidden="true" class="header-anchor">#</a> Aliases</h2> <p>Rakkit provides aliases for 3 basic scalars:</p> <ul><li>Float ➡️ GraphQLFloat;</li> <li>Int ➡️ GraphQLInt;</li> <li>ID ➡️ GraphQLID;</li></ul> <p>This shorthand allows you to save keystrokes when declaring field types:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token comment">// import the aliases</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> <span class="token constant">ID</span><span class="token punctuation">,</span> Float<span class="token punctuation">,</span> Int <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;rakkit&quot;</span><span class="token punctuation">;</span>
+
+@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">MysteryObject</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">type</span></span> <span class="token operator">=&gt;</span> <span class="token constant">ID</span><span class="token punctuation">)</span>
+  <span class="token keyword">readonly</span> id<span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">type</span></span> <span class="token operator">=&gt;</span> Int<span class="token punctuation">)</span>
+  notificationsCount<span class="token punctuation">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">type</span></span> <span class="token operator">=&gt;</span> Float<span class="token punctuation">)</span>
+  probability<span class="token punctuation">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>In the last case you can omit the <code>type =&gt; Float</code> since JavaScript <code>Number</code> will become <code>GraphQLFloat</code> in the schema automatically.</p> <p>Other scalars - i.e. <code>GraphQLString</code> and <code>GraphQLBoolean</code> - do not need aliases. When possible, they will be reflected automatically:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code>@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  name<span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  isOld<span class="token punctuation">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>However in some cases we must explicitly declare the string/bool scalar type. Use JS constructor functions (<code>String</code>, <code>Boolean</code>) then:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code>@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">SampleObject</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">type</span></span> <span class="token operator">=&gt;</span> String<span class="token punctuation">,</span> <span class="token punctuation">{</span> nullable<span class="token punctuation">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token comment">// TS reflected type is `Object` :(</span>
+  <span class="token keyword">get</span> <span class="token function">optionalInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> undefined <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token string">&quot;Gotcha!&quot;</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="date-scalars"><a href="#date-scalars" aria-hidden="true" class="header-anchor">#</a> Date Scalars</h2> <p>Rakkit provides built-in scalars for the <code>Date</code> type. There are two versions of this scalar:</p> <ul><li>timestamp based (<code>&quot;timestamp&quot;</code>) - <code>1518037458374</code></li> <li>ISO format (<code>&quot;isoDate&quot;</code>) - <code>&quot;2018-02-07T21:04:39.573Z&quot;</code></li></ul> <p>They are exported from the <code>rakkit</code> package as <code>GQLISODateScalar</code> and <code>GQLTimestampScalar</code>.</p> <p>By default, Rakkit uses the ISO date format, however you can change it in the <code>Rakkit.start</code> options:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Rakkit <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;rakkit&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    dateScalarMode<span class="token punctuation">:</span> <span class="token string">&quot;timestamp&quot;</span><span class="token punctuation">,</span> <span class="token comment">// &quot;timestamp&quot; or &quot;isoDate&quot;</span>
+    <span class="token comment">// ...</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>There's no need then to explicitly declare the field type:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code>@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  registrationDate<span class="token punctuation">:</span> Date<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="custom-scalars"><a href="#custom-scalars" aria-hidden="true" class="header-anchor">#</a> Custom Scalars</h2> <p>Rakkit also supports custom scalar types!</p> <p>First of all, we need to create our own <code>GraphQLScalarType</code> instance or import a scalar type from a 3rd-party npm library. For example, Mongo's ObjectId:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> GraphQLScalarType<span class="token punctuation">,</span> Kind <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;graphql&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> ObjectId <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;mongodb&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> ObjectIdScalar <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GraphQLScalarType</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  name<span class="token punctuation">:</span> <span class="token string">&quot;ObjectId&quot;</span><span class="token punctuation">,</span>
+  description<span class="token punctuation">:</span> <span class="token string">&quot;Mongo object id scalar type&quot;</span><span class="token punctuation">,</span>
+  <span class="token function">parseValue</span><span class="token punctuation">(</span><span class="token parameter">value<span class="token punctuation">:</span> <span class="token builtin">string</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ObjectId</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// value from the client input variables</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token parameter">value<span class="token punctuation">:</span> ObjectId</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> value<span class="token punctuation">.</span><span class="token function">toHexString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// value sent to the client</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token function">parseLiteral</span><span class="token punctuation">(</span><span class="token parameter">ast</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ast<span class="token punctuation">.</span>kind <span class="token operator">===</span> Kind<span class="token punctuation">.</span><span class="token constant">STRING</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ObjectId</span><span class="token punctuation">(</span>ast<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// value from the client query</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>Then we can just use it in our field decorators:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token comment">// import the earlier created const</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> ObjectIdScalar <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;../my-scalars/ObjectId&quot;</span><span class="token punctuation">;</span>
+
+@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">type</span></span> <span class="token operator">=&gt;</span> ObjectIdScalar<span class="token punctuation">)</span> <span class="token comment">// and explicitly use it</span>
+  <span class="token keyword">readonly</span> id<span class="token punctuation">:</span> ObjectId<span class="token punctuation">;</span>
+
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  name<span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  isOld<span class="token punctuation">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Optionally, we can declare the association between the reflected property type and our scalars to automatically map them (no need for explicit type annotation!):</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code>@<span class="token function">ObjectType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  @<span class="token function">Field</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// magic goes here - no type annotation for custom scalar</span>
+  <span class="token keyword">readonly</span> id<span class="token punctuation">:</span> ObjectId<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>All we need to do is register the association map in the <code>Rakkit.start</code> options:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> ObjectId <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;mongodb&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> ObjectIdScalar <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;../my-scalars/ObjectId&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Rakkit <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;rakkit&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    scalarsMap<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span> <span class="token keyword">type</span><span class="token punctuation">:</span> ObjectId<span class="token punctuation">,</span> scalar<span class="token punctuation">:</span> ObjectIdScalar <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token comment">// ...</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>However, we must be aware that this will only work when the TypeScript reflection mechanism can handle it. So our class property type must be a <code>class</code>, not an enum, union or interface.</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/raccoonch/rakkit/edit/master/docs/graphql/type/scalars.md" target="_blank" rel="noopener noreferrer">Edit this page on GitHub</a> <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/graphql/type/enums.html" class="prev">
+          Enums
+        </a></span> <span class="next"><a href="/graphql/type/type-creator.html">
+          Type Creator
+        </a>
+        →
+      </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.cde378e9.js" defer></script><script src="/assets/js/2.d96be7e9.js" defer></script><script src="/assets/js/24.1720b743.js" defer></script>
+  </body>
+</html>

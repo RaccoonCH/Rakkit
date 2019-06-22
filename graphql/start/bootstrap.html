@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bootstrapping | Rakkit</title>
+    <meta name="description" content="A framework written in TypeScript that provides REST/GraphQL API and Websocket tools to build amazing server-side applications">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/favicon/site.webmanifest">
+  <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#3a0839">
+  <link rel="shortcut icon" href="/favicon/favicon.ico">
+  <meta name="msapplication-TileColor" content="#3a0839">
+  <meta name="msapplication-config" content="/favicon/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+    
+    <link rel="preload" href="/assets/css/0.styles.b5c449e4.css" as="style"><link rel="preload" href="/assets/js/app.cde378e9.js" as="script"><link rel="preload" href="/assets/js/2.d96be7e9.js" as="script"><link rel="preload" href="/assets/js/17.150d4321.js" as="script"><link rel="prefetch" href="/assets/js/10.aecf0b49.js"><link rel="prefetch" href="/assets/js/11.df9dc6e2.js"><link rel="prefetch" href="/assets/js/12.3b278416.js"><link rel="prefetch" href="/assets/js/13.69323374.js"><link rel="prefetch" href="/assets/js/14.38a4229d.js"><link rel="prefetch" href="/assets/js/15.aa7c2e84.js"><link rel="prefetch" href="/assets/js/16.14dd4f7f.js"><link rel="prefetch" href="/assets/js/18.cff99b80.js"><link rel="prefetch" href="/assets/js/19.7b694b98.js"><link rel="prefetch" href="/assets/js/20.ca08d56f.js"><link rel="prefetch" href="/assets/js/21.6a3b9e5f.js"><link rel="prefetch" href="/assets/js/22.7f88cba3.js"><link rel="prefetch" href="/assets/js/23.82ba9afb.js"><link rel="prefetch" href="/assets/js/24.1720b743.js"><link rel="prefetch" href="/assets/js/25.b010b571.js"><link rel="prefetch" href="/assets/js/26.a889ca22.js"><link rel="prefetch" href="/assets/js/27.90a281c7.js"><link rel="prefetch" href="/assets/js/28.e11f2d40.js"><link rel="prefetch" href="/assets/js/29.9045cc84.js"><link rel="prefetch" href="/assets/js/3.22cc39cc.js"><link rel="prefetch" href="/assets/js/30.9cec3ced.js"><link rel="prefetch" href="/assets/js/31.68693ff8.js"><link rel="prefetch" href="/assets/js/32.1990966a.js"><link rel="prefetch" href="/assets/js/33.2a40d71d.js"><link rel="prefetch" href="/assets/js/34.773a0e2f.js"><link rel="prefetch" href="/assets/js/35.15a7eaea.js"><link rel="prefetch" href="/assets/js/36.a096f572.js"><link rel="prefetch" href="/assets/js/37.c47c4bc8.js"><link rel="prefetch" href="/assets/js/38.fd660314.js"><link rel="prefetch" href="/assets/js/39.43aeedbe.js"><link rel="prefetch" href="/assets/js/4.bc2927b0.js"><link rel="prefetch" href="/assets/js/5.e57150a0.js"><link rel="prefetch" href="/assets/js/6.61a82962.js"><link rel="prefetch" href="/assets/js/7.7354f340.js"><link rel="prefetch" href="/assets/js/8.b9aa947b.js"><link rel="prefetch" href="/assets/js/9.e07fc09c.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.b5c449e4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/logo.png" alt="Rakkit" class="logo"> <span class="site-name can-hide">Rakkit</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"> <a href="https://github.com/raccoonch/rakkit" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"> <a href="https://github.com/raccoonch/rakkit" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Getting started</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/start/installation.html" class="sidebar-link">Installation</a></li><li><a href="/start/getting-started.html" class="sidebar-link">Getting started</a></li><li><a href="/start/rakkit.html" class="sidebar-link">The Rakkit class</a></li><li><a href="/start/demos.html" class="sidebar-link">Demos</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>GraphQL</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>REST</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>Websocket</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>DI</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>Development</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/dev/contributing.html" class="sidebar-link">Contribution</a></li><li><a href="/dev/changelog.html" class="sidebar-link">Changelog</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="bootstraping"><a href="#bootstraping" aria-hidden="true" class="header-anchor">#</a> Bootstraping</h1> <p>After creating our resolvers, type classes, and other business-related code, we need to make our app run. First we have to build the schema, then we can expose it with an HTTP server, WebSockets or even MQTT.</p> <h2 id="create-executable-schema"><a href="#create-executable-schema" aria-hidden="true" class="header-anchor">#</a> Create Executable Schema</h2> <p>To create an executable schema from type and resolver definitions, we need to use the <code>Rakkit.start</code> method.
+It takes a configuration object as a parameter and then you can access to the schema by <code>Rakkit.MetadataStorage.Gql.Schema</code>.</p> <p>In the configuration object you must provide a <code>resolvers</code> property, which can be an array of resolver classes:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span>
+  FirstResolver<span class="token punctuation">,</span>
+  SecondResolver
+<span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;../app/src/resolvers&quot;</span><span class="token punctuation">;</span>
+<span class="token comment">// ...</span>
+<span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    resolvers<span class="token punctuation">:</span> <span class="token punctuation">[</span>FirstResolver<span class="token punctuation">,</span> SampleResolver<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>However, when there are several resolver classes, manual imports can be cumbersome.
+So we can also provide an array of paths to resolver module files instead, which can include globs:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    resolvers<span class="token punctuation">:</span> <span class="token punctuation">[</span>__dirname <span class="token operator">+</span> <span class="token string">&quot;/modules/**/*.resolver.ts&quot;</span><span class="token punctuation">,</span> __dirname <span class="token operator">+</span> <span class="token string">&quot;/resolvers/**/*.ts&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="retrieve-the-schema"><a href="#retrieve-the-schema" aria-hidden="true" class="header-anchor">#</a> Retrieve the schema</h3> <p>You can retrieve the schema using the Rakkit instance, after the <code>await Rakkit.start({ ... })</code> call:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    resolvers<span class="token punctuation">:</span> <span class="token punctuation">[</span>__dirname <span class="token operator">+</span> <span class="token string">&quot;/**/*.resolver.ts&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> schema <span class="token operator">=</span> Rakkit<span class="token punctuation">.</span>MetadataStorage<span class="token punctuation">.</span>Gql<span class="token punctuation">.</span>Schema<span class="token punctuation">;</span>
+</code></pre></div><p>To make <code>await</code> work, we need to declare it as an async function. Example of <code>main.ts</code> file:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Rakkit <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;rakkit&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">await</span> Rakkit<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    gql<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      resolvers<span class="token punctuation">:</span> <span class="token punctuation">[</span>__dirname <span class="token operator">+</span> <span class="token string">&quot;/**/*.resolver.ts&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> schema <span class="token operator">=</span> Rakkit<span class="token punctuation">.</span>MetadataStorage<span class="token punctuation">.</span>Gql<span class="token punctuation">.</span>Schema<span class="token punctuation">;</span>
+  <span class="token comment">// other initialization code, like creating http server</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// actually run the async function</span>
+</code></pre></div><h2 id="create-an-http-graphql-endpoint"><a href="#create-an-http-graphql-endpoint" aria-hidden="true" class="header-anchor">#</a> Create an HTTP GraphQL endpoint</h2> <p>In most cases, the GraphQL app is served by an HTTP server. After building the schema we can create the GraphQL endpoint with a variety of tools such as <a href="https://github.com/prisma/graphql-yoga" target="_blank" rel="noopener noreferrer"><code>graphql-yoga</code><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a> or <a href="https://github.com/apollographql/apollo-server" target="_blank" rel="noopener noreferrer"><code>apollo-server</code><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>. Here is an example using <a href="https://github.com/apollographql/apollo-server" target="_blank" rel="noopener noreferrer"><code>apollo-server</code><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> ApolloServer <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;apollo-server&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token constant">PORT</span> <span class="token operator">=</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">PORT</span> <span class="token operator">||</span> <span class="token number">4000</span><span class="token punctuation">;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// ... Building schema here</span>
+
+  <span class="token comment">// Create the GraphQL server</span>
+  <span class="token keyword">const</span> server <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ApolloServer</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    schema<span class="token punctuation">,</span>
+    playground<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Start the server</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> url <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">await</span> server<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token constant">PORT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`Server is running, GraphQL Playground available at </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>url<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>Remember to install the <code>apollo-server</code> package from npm - it's not bundled with Rakkit.</p> <p>Of course you can use the <code>express-graphql</code> middleware, <code>graphql-yoga</code> or whatever you want 😉</p> <h3 id="set-the-context"><a href="#set-the-context" aria-hidden="true" class="header-anchor">#</a> Set the context</h3> <p>You can link Rakkit REST (koa app) and HTTP server to your apollo-server to have access to the entire context:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> ApolloServer <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;apollo-server&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token constant">PORT</span> <span class="token operator">=</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">PORT</span> <span class="token operator">||</span> <span class="token number">4000</span><span class="token punctuation">;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// ... Building schema here</span>
+
+  <span class="token comment">// Create the GraphQL server</span>
+  <span class="token keyword">const</span> server <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ApolloServer</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    schema<span class="token punctuation">,</span>
+    playground<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token function-variable function">context</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">{</span> ctx <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">(</span><span class="token punctuation">{</span>
+      <span class="token operator">...</span>ctx
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Start the server</span>
+  server<span class="token punctuation">.</span><span class="token function">applyMiddleware</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    app<span class="token punctuation">:</span> Rakkit<span class="token punctuation">.</span>Instance<span class="token punctuation">.</span>KoaApp
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Uncomment if you want to enable subscriptions:</span>
+  <span class="token comment">// server.installSubscriptionHandlers(Rakkit.Instance.HttpServer);</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/raccoonch/rakkit/edit/master/docs/graphql/start/bootstrap.md" target="_blank" rel="noopener noreferrer">Edit this page on GitHub</a> <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/graphql/start/installation.html" class="prev">
+          Installation
+        </a></span> <span class="next"><a href="/graphql/type/type-definition.html">
+          Types and Fields
+        </a>
+        →
+      </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.cde378e9.js" defer></script><script src="/assets/js/2.d96be7e9.js" defer></script><script src="/assets/js/17.150d4321.js" defer></script>
+  </body>
+</html>
