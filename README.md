@@ -1,12 +1,30 @@
 <p align="center">
-  <img src="logo.png" width="220" alt="Nest Logo"/>
+  <img src="docs/.vuepress/public/logo.png" width="220" alt="Rakkit logo"/>
   <br>
-  A simple backend framework written in <b>TypeScript</b> that provide <b>GraphQL / REST API</b> and <b>Websocket</b> tools to build amazing server-side application
+  A library written in <b>TypeScript</b> that provides <b>REST/GraphQL API</b> and <b>Websocket</b> tools to build amazing server-side applications
+  <p align="center">
+    <a href="https://www.npmjs.com/package/rakkit">
+      <img src="https://badge.fury.io/js/rakkit.svg">
+    </a>
+    <a href="https://travis-ci.com/RaccoonCH/Rakkit">
+      <img src="https://travis-ci.com/RaccoonCH/Rakkit.svg?branch=master"/>
+    </a>
+    <a href="https://codecov.io/gh/RaccoonCH/Rakkit">
+      <img src="https://codecov.io/gh/RaccoonCH/Rakkit/branch/master/graph/badge.svg" />
+    </a>
+    <a href="https://david-dm.org/RaccoonCH/Rakkit">
+      <img src="https://david-dm.org/RaccoonCH/Rakkit.svg">
+    </a>
+    <a href="https://bundlephobia.com/result?p=rakkit@latest">
+      <img src="https://badgen.net/bundlephobia/min/rakkit">
+    </a>
+    <a href="https://gitter.im/_rakkit_/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge">
+      <img src="https://badges.gitter.im/_rakkit_/community.svg">
+    </a>
+  </p>
 </p>
-  
-  
-### Getting started  
 
+## 🚀 Getting started  
 ```
 npm i rakkit
 ```
@@ -14,43 +32,30 @@ npm i rakkit
 yarn add rakkit
 ```
 
-### The project history  
+## 📜 Documentation
+The documentation is available [here](https://raccoonch.github.io/Rakkit/).
 
-Initially this tool was to be used to create a homemade Headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a Framework, so we chose to make it an independent tool to benefit the community and progress on a better basis.
+## 🔨 Features (Fully typed, Class based & Decorators)  
+- GraphQL API creation
+- Dependency injection support
+- Rest API Creation ([koa](https://koajs.com/))
+- Websocket app creation ([socket.io](https://socket.io/))
 
+## 🔮 The next step
+An headless CMS !
 
-### Philosophy  
+## 📠 Chat with us
+- [Discord](https://discord.gg/McygUJb)
+- [Gitter](https://gitter.im/_rakkit_/community)
 
-We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it. We also didn't want to make a clone of NestJS.
+## 📔 The project history  
+Initially this tool was made in order to create a homemade headless CMS. But as the project progressed, our needs grew and our backend application looked more and more like a standalone library, so we choose to make it an independent tool to benefit the community and progress on a better basis.
 
+## 🧠 Philosophy  
+We wanted to create a tool that would allow us to create backend applications much more simply with a small learning curve, so that anyone, with some TypeScript basics, could use it.
 
-### Project core  
+## 💪 Contributing  
+All information is available [here](https://raccoonch.github.io/Rakkit/#/Contributing).  
 
-At the heart of the project there is a [type-graphql](https://github.com/19majkel94/type-graphql) fork, which allowed us to move forward to develop the GraphQL part relatively quickly. Changes have also been made to support generic classes and to standardize the REST and GraphQL part (for the use of middlewares). For this reason, you can, in part, refer to the (very well provided) [documentation](https://19majkel94.github.io/type-graphql/) of it.
-
-
-### Features (Full typed, class based)  
-
-- GraphQL API Creation
-- Rest API Creation ([koa](https://koajs.com/) base)
-- Websocket support ([socket.io](https://socket.io/))
-- Typeorm interface to optimize and execute SQL queries with GraphQL
-
-### Contributing  
-
-You can simply clone the project and submit a pull request, we will analyze it and decide whether or not it is valid.
-
-
-### Primary necessity before releasing  
-
-- Unit-test
-- Documentation
-- Travis CI Integration
-- Codecov integration
-- Provide examples
-
-
-### Chat with us
-
-- [Discord](https://discord.gg/szRhf3C)
-- [Gitter](https://gitter.im/_rakkit)
+Actual contributors:
+- [Owen Calvin](https://github.com/OwenCalvin)

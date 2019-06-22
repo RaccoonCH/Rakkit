@@ -1,13 +1,13 @@
 {
-  "verbose": false,
+  "verbose": true,
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "testMatch": ["**/functional/**/*.ts", "**/units/**/*.ts"],
+  "testMatch": ["<rootDir>/src/Packages/**/Tests/*.ts"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "rootDir": "./",
-  "roots": ["<rootDir>/tests", "<rootDir>/src"],
-  "collectCoverage": false,
+  "roots": ["<rootDir>/src"],
+  "collectCoverage": true,
   "collectCoverageFrom": [
     "<rootDir>/src/**/*.ts",
     "!<rootDir>/src/**/*.d.ts"
