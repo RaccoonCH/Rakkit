@@ -42,7 +42,9 @@ export class RoutingMetadataBuilder extends MetadataBuilder {
   }
 
   AddMiddleware(item: IDecorator<IMiddleware>) {
-    MetadataStorage.Instance.Di.AddService(item);
+    if (item.params.isClass) {
+      MetadataStorage.Instance.Di.AddService(item);
+    }
     this._middlewares.set(item.originalClass, item);
   }
 
