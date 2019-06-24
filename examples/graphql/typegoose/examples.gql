@@ -1,0 +1,57 @@
+query GetRecipes {
+  recipes {
+    _id
+    title
+    author {
+      email
+    }
+    ratings {
+      value
+    }
+  }
+}
+
+query GetRecipe {
+  # fill with correct ObjectId
+  recipe(recipeId: "5d10d88461086d4a102fd511") {
+    _id
+    title
+    ratings {
+      value
+      user {
+        nickname
+      }
+      date
+    }
+    author {
+      _id
+      nickname
+      email
+    }
+  }
+}
+
+mutation AddRecipe {
+  addRecipe(recipe: { title: "New Recipe" }) {
+    _id
+    ratings {
+      value
+    }
+    author {
+      nickname
+    }
+  }
+}
+
+mutation RateRecipe {
+  # fill with correct ObjectId
+  rate(rate: { recipeId: "5d10d88461086d4a102fd511", value: 4 }) {
+    _id
+    ratings {
+      value
+      user {
+        email
+      }
+    }
+  }
+}

@@ -20,7 +20,7 @@
       "request": "launch",
       "name": "Debug GraphQL",
       "protocol": "inspector",
-      "args": ["${workspaceRoot}/examples/graphql/src/App.ts"],
+      "args": ["${workspaceRoot}/examples/graphql/typegoose/index.ts"],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",

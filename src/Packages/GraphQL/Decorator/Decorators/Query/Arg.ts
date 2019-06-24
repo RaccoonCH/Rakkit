@@ -35,7 +35,7 @@ export function Arg(name: string, typeOrParams?: TypeFn | IArgParams, params?: I
           name,
           flat: false,
           arrayDepth: typeInfos.arrayDepth,
-          nullable: !!definedParams.defaultValue || definedParams.nullable,
+          nullable: definedParams.defaultValue !== undefined || definedParams.nullable,
           arrayNullable: [],
           ...definedParams
         };

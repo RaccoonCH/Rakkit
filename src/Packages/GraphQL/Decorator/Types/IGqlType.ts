@@ -11,6 +11,7 @@ export interface IGqlType<Type extends GqlType = any> extends IGqlObject, IResol
   gqlType?: Type;
   extends?: Function;
   enumValues?: GraphQLEnumValueConfigMap;
+  enumRef?: Object;
   unionTypes?: Function[];
   transformation?: ITypeTransformation<Type>;
   compiled?: InstanceType<Type>;

@@ -29,27 +29,35 @@ export class TypeCreator {
     params?: IEnumTypeParams
   ) {
     const generatedName = Object.entries(enumType).reduce((prev, [key, value]) => {
-      return prev + key;
+      if (Number.isNaN(Number(key))) {
+        return prev + key;
+      }
+      return prev;
     }, "");
     const definedParams = params || {};
     const definedName = definedParams.name || generatedName;
     const gqlTypeDef = this.createGqlTypeDef(
       definedName,
       GraphQLEnumType,
-      params
+      {
+        ...params,
+        enumRef: enumType
+      }
     );
 
     Object.entries(enumType).map(([key, value]) => {
-      MetadataStorage.Instance.Gql.AddField(
-        DecoratorHelper.getAddFieldParams(
-          gqlTypeDef.class,
-          key,
-          undefined,
-          {
-            enumValue: value
-          }
-        )
-      );
+      if (Number.isNaN(Number(key))) {
+        MetadataStorage.Instance.Gql.AddField(
+          DecoratorHelper.getAddFieldParams(
+            gqlTypeDef.class,
+            key,
+            undefined,
+            {
+              enumValue: value
+            }
+          )
+        );
+      }
     });
 
     MetadataStorage.Instance.Gql.AddType(gqlTypeDef);

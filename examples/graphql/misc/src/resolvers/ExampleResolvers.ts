@@ -1,5 +1,5 @@
-import { GoodbyeMiddleware } from "./../../../basic/src/middlewares/GoodbyeMiddleware";
-import { HelloMiddleware } from "./../../../basic/src/middlewares/HelloMiddleware";
+import { GoodbyeMiddleware } from "../../../../basic/src/middlewares/GoodbyeMiddleware";
+import { HelloMiddleware } from "../../../../basic/src/middlewares/HelloMiddleware";
 import {
   Resolver,
   Query,
@@ -12,7 +12,7 @@ import {
   Subscription,
   FieldResolver,
   FlatArgs
-} from "../../../../src";
+} from "../../../../../src";
 import {
   getItems,
   Response,
@@ -23,7 +23,7 @@ import {
   MyInterfaceObj1,
   ExampleObjectType,
   RequiredExampleInputType
-} from "../objects/ExampleObjectType";
+} from "../objects/ExampleTypes";
 
 const params = getItems(ExampleInputType, ExampleInputType2);
 
