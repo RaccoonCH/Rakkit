@@ -935,7 +935,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         break;
       default:
         const enumRef = this._gqlTypeDefs.find((typeDef) =>
-          typeDef.params.enumRef === baseType
+          typeDef.params.enumRef === baseType &&
+          typeDef.params.enumRef !== undefined
         );
         if (enumRef) {
           finalType = enumRef.params.compiled;
