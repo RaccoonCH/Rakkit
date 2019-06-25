@@ -16,6 +16,7 @@ export interface IField extends IHasType {
   description?: string;
   function?: Function;
   enumValue?: any;
+  enumObject?: Object;
   args?: IArg[];
   defaultValue?: any;
   subscribe?: (params: ISubscriptionFnParams) => AsyncIterator<any>;

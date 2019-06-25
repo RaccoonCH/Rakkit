@@ -1,8 +1,8 @@
 import { ApolloServer } from "apollo-server-koa";
-import { Rakkit, MetadataStorage, GQLISODateTime, Router, Get, IContext, NextFunction } from "../../../src";
-import { ScalarMapTest } from "./objects/ExampleObjectType";
-import { HelloMiddleware } from "../../basic/src/middlewares/HelloMiddleware";
-import { GoodbyeMiddleware } from "../../basic/src/middlewares/GoodbyeMiddleware";
+import { Rakkit, MetadataStorage, GQLISODateTime, Router, Get, IContext, NextFunction } from "../../../../src";
+import { ScalarMapTest } from "./objects/ExampleTypes";
+import { HelloMiddleware } from "../../../basic/src/middlewares/HelloMiddleware";
+import { GoodbyeMiddleware } from "../../../basic/src/middlewares/GoodbyeMiddleware";
 
 @Router("yo")
 class Test {

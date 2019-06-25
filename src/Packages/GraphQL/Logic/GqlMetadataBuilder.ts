@@ -40,7 +40,6 @@ import {
   IContext,
   IClassType,
   NextFunction,
-  TypeFn,
   SetterType,
   ITypeTransformation,
   GQLTimestamp
@@ -229,7 +228,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   private fillClassWithFieldResolvers() {
     this._gqlTypeDefs.map((typeDef) => {
       if (typeDef.params.name === "Query") {
-        this._fieldDefs.find((fieldDef) => {
+        this._fieldDefs.map((fieldDef) => {
           if (
             typeDef.originalClass === fieldDef.originalClass &&
             typeDef.params.ofType &&
@@ -842,7 +841,10 @@ export class GqlMetadataBuilder extends MetadataBuilder {
           if (![GraphQLInputObjectType].includes(gqlTypeDef.params.gqlType)) {
             this.applyResolveToField(gqlField, fieldDef);
           }
-          if (gqlTypeDef.params.gqlType === GraphQLInputObjectType && fieldDef.params.defaultValue) {
+          if (
+            gqlTypeDef.params.gqlType === GraphQLInputObjectType &&
+            fieldDef.params.defaultValue !== undefined
+          ) {
             (gqlField as any as GraphQLInputFieldConfig).defaultValue = fieldDef.params.defaultValue;
           }
           prev[fieldDef.params.name] = gqlField;
@@ -927,14 +929,22 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         finalType = this.Config.dateMode === "isoDate" ? GQLISODateTime : GQLTimestamp;
         break;
       default:
-        if (baseType instanceof GraphQLScalarType) {
-          finalType = baseType;
+        const enumRef = this._gqlTypeDefs.find((typeDef) =>
+          typeDef.params.enumRef === baseType &&
+          typeDef.params.enumRef !== undefined
+        );
+        if (enumRef) {
+          finalType = enumRef.params.compiled;
         } else {
-          const foundType = this.Config.scalarsMap.find((association) =>
-            association.type === baseType
-          );
-          if (foundType) {
-            finalType = foundType.scalar;
+          if (baseType instanceof GraphQLScalarType) {
+            finalType = baseType;
+          } else {
+            const foundType = this.Config.scalarsMap.find((association) =>
+              association.type === baseType
+            );
+            if (foundType) {
+              finalType = foundType.scalar;
+            }
           }
         }
         break;
@@ -973,17 +983,14 @@ export class GqlMetadataBuilder extends MetadataBuilder {
         const argMap = fieldDef.params.args.reduce<GraphQLFieldConfigArgumentMap>((prev, arg) => {
           const argType = arg.type();
           let gqlTypeDef = this.GetOneGqlTypeDef(argType);
-          const baseParams = {
-            description: arg.description,
-            defaultValue: arg.defaultValue
-          };
 
           if (arg.flat) {
             this._fieldDefs.map((field) => {
               if (field.class === gqlTypeDef.class) {
                 prev[field.params.name] = {
                   type: this.parseTypeToGql(field.params, gqlTypeDef) as GraphQLInputType,
-                  ...baseParams
+                  defaultValue: field.params.defaultValue,
+                  description: field.params.description
                 };
               }
             });
@@ -991,7 +998,8 @@ export class GqlMetadataBuilder extends MetadataBuilder {
             gqlTypeDef = this.GetOneGqlTypeDef(argType, GraphQLInputObjectType);
             prev[arg.name] = {
               type: this.parseTypeToGql(arg, gqlTypeDef) as GraphQLInputType,
-              ...baseParams
+              description: arg.description,
+              defaultValue: arg.defaultValue
             };
           }
           return prev;

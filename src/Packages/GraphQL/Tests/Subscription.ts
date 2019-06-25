@@ -285,9 +285,10 @@ describe("GraphQL", () => {
           globalMiddlewares: []
         }
       });
+      const schema = MetadataStorage.Instance.Gql.Schema;
 
       const server = new ApolloServer({
-        schema: MetadataStorage.Instance.Gql.Schema,
+        schema,
         context: ({ctx}) => ({
           ...ctx
         })

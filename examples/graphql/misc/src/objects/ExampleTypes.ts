@@ -10,7 +10,7 @@ import {
   EnumField,
   GQLInterfaceType,
   GQLObjectType
-} from "../../../../src";
+} from "../../../../../src";
 
 export enum TestEnum {
   a = "a",
