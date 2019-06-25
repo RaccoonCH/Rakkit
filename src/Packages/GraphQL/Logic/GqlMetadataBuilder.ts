@@ -228,7 +228,7 @@ export class GqlMetadataBuilder extends MetadataBuilder {
   private fillClassWithFieldResolvers() {
     this._gqlTypeDefs.map((typeDef) => {
       if (typeDef.params.name === "Query") {
-        this._fieldDefs.find((fieldDef) => {
+        this._fieldDefs.map((fieldDef) => {
           if (
             typeDef.originalClass === fieldDef.originalClass &&
             typeDef.params.ofType &&
