@@ -10,6 +10,7 @@ export interface IGqlConfig {
   resolvers: ClassOrString[];
   globalMiddlewares: MiddlewareType[];
   nullableByDefault: boolean;
+  inArrayNullableByDefault: boolean;
   scalarsMap: IScalarAssociation[];
   dateMode: "isoDate" | "timestamp";
   pubSub: PubSubEngine;

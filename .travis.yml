@@ -15,3 +15,15 @@ jobs:
         email:
           on_success: never
           on_failure: always
+    - stage: doc
+      language: node_js
+      node_js:
+        - 11
+      before_install:
+        - npm i -g vuepress @vuepress/plugin-google-analytics@next
+      script:
+        - npm run docs:publish
+      notifications:
+        email:
+          on_success: never
+          on_failure: always

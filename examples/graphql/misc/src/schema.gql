@@ -17,7 +17,7 @@ type ExampleObjectType {
 
 """ObjectType named from required ExampleInputType"""
 type ExampleObjectType0RequiredExampleInputType {
-  hello0: [String!]!
+  hello0: [String]!
 }
 
 type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & ExampleInterfaceType2 {
@@ -32,7 +32,7 @@ type ExampleObjectType2 implements GraphQLInterfaceTypeExampleInterfaceType & Ex
 
 input GenericResponseGraphQLInputObjectTypeExampleInputTypeGraphQLInputObjectTypeExampleInputType2 {
   """items"""
-  items: [GraphQLInputObjectTypeExampleInputType!] = []
+  items: [GraphQLInputObjectTypeExampleInputType] = []
   items2: GraphQLInputObjectTypeExampleInputType2!
   hello3: String
   hello4: String!
@@ -145,8 +145,8 @@ type Query {
     """yo"""
     aa: Float = 123
   ): test!
-  getAll: [ExampleObjectType!]!
-  helloWorld: [[test!]!]!
+  getAll: [ExampleObjectType]!
+  helloWorld: [[test]]!
   b: String!
 }
 
@@ -165,7 +165,7 @@ type Response {
 type Subscription {
   sub(
     """yop"""
-    topic: [[[String!]!]!] = []
+    topic: [[[String]]] = []
   ): Boolean!
 }
 
@@ -183,5 +183,5 @@ enum testEnum {
 }
 
 type ZZZ {
-  hello0: [[String!]]!
+  hello0: [[String]]!
 }
