@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2016",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "build",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "importHelpers": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "es2016",
+      "esnext.asynciterable"
+    ],
+    "moduleResolution": "node",
+    "baseUrl": "."
+  },
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "app"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "rest-graphql-websocket-http-in-one-server",
+  "version": "1.0.0",
+  "description": "An example showing how to run in one Rakkit server: REST, GraphQL, Websocket, and HTTP",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node -r tsconfig-paths/register src/App.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Iulian Radu <igmx.atulian.radu@>",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^2.11.0",
+    "apollo-server-koa": "^2.11.0",
+    "class-transformer": "^0.2.3",
+    "koa-bodyparser": "^4.3.0",
+    "rakkit": "^1.0.7",
+    "reflect-metadata": "^0.1.13",
+    "static-koa-router": "^1.0.3",
+    "ts-node": "^8.8.1",
+    "tsconfig-paths": "^3.9.0"
+  },
+  "devDependencies": {
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  }
+}

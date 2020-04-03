@@ -1,0 +1,149 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2020-04-03T17:04:30.072Z",
+  "__export_source": "insomnia.desktop.app:v7.1.1",
+  "resources": [
+    {
+      "_id": "req_b1bcbc6cd7b14252a0d303de80852b2b",
+      "authentication": {},
+      "body": {},
+      "created": 1585929527274,
+      "description": "",
+      "headers": [],
+      "isPrivate": false,
+      "metaSortKey": -1585926424544.5,
+      "method": "GET",
+      "modified": 1585933412927,
+      "name": "/index.html",
+      "parameters": [],
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "{{ hostUrl  }}/",
+      "_type": "request"
+    },
+    {
+      "_id": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "created": 1585926318226,
+      "description": "",
+      "modified": 1585926318226,
+      "name": "rest-graphql",
+      "parentId": null,
+      "_type": "workspace"
+    },
+    {
+      "_id": "req_ef37a582d5bb41f989ab6bbddd791647",
+      "authentication": {},
+      "body": {},
+      "created": 1585929560548,
+      "description": "",
+      "headers": [],
+      "isPrivate": false,
+      "metaSortKey": -1585926397782.75,
+      "method": "GET",
+      "modified": 1585933381765,
+      "name": "/rest/example",
+      "parameters": [],
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "{{ hostUrl  }}/rest/example",
+      "_type": "request"
+    },
+    {
+      "_id": "req_7baa06ad404f49889112ce2b1c8a575c",
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"a\": \"b\"\n}"
+      },
+      "created": 1585932352837,
+      "description": "",
+      "headers": [
+        {
+          "id": "pair_c0348e22e3ac415c9e1479e969ee9e58",
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "isPrivate": false,
+      "metaSortKey": -1585926384401.875,
+      "method": "POST",
+      "modified": 1585933385126,
+      "name": "/rest/example",
+      "parameters": [],
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "{{ hostUrl  }}/rest/example",
+      "_type": "request"
+    },
+    {
+      "_id": "req_cab481daeec14b919d6ae411028185a8",
+      "authentication": {},
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "{\"query\":\"query q {\\n  recipes {\\n    title\\n    description\\n    ratings\\n    creationDate\\n    ratingsCount\\n    averageRating\\n  }\\n}\",\"operationName\":\"q\"}"
+      },
+      "created": 1585926371021,
+      "description": "",
+      "headers": [
+        {
+          "id": "pair_1bb230e753444b57b1bbb1a0eaa27ae5",
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "isPrivate": false,
+      "metaSortKey": -1585926371021,
+      "method": "POST",
+      "modified": 1585933418438,
+      "name": "query recipes",
+      "parameters": [],
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "{{ hostUrl  }}/graphql",
+      "_type": "request"
+    },
+    {
+      "_id": "env_fcfc11b1ea6c5fb12fdc077660775d72c354fc8c",
+      "color": null,
+      "created": 1585926318282,
+      "data": { "hostUrl": "http://localhost:4000" },
+      "dataPropertyOrder": { "&": ["hostUrl"] },
+      "isPrivate": false,
+      "metaSortKey": 1585926318282,
+      "modified": 1585926344868,
+      "name": "Base Environment",
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_fcfc11b1ea6c5fb12fdc077660775d72c354fc8c",
+      "cookies": [],
+      "created": 1585926318289,
+      "modified": 1585926318289,
+      "name": "Default Jar",
+      "parentId": "wrk_01b45b5abfc44aacb7bf7cb17510dabd",
+      "_type": "cookie_jar"
+    }
+  ]
+}
